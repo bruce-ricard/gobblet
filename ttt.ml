@@ -59,13 +59,12 @@ module Board (Piece : PIECE) =
         diagonal false
       ]
 
-    let all_same array =
-      if array.(0) = array.(1) && array.(1) == array.(2) then
-        Some array.(0)
-      else
-        None
+    let all_same (array : Piece.t option array ): Piece.t option =
+      match array.(0), array.(1), array.(2) with
+      | Some(x), Some(y), Some(z) when x = y && y = z -> Some(x)
+                                                   | _ -> None
 
-    let check_board board =
+    let check_board (board : board) : Piece.t option =
       List.fold_left (fun result element ->
           match result, element with
             None, None -> None
@@ -150,7 +149,8 @@ let main () =
   let r2 = move_unsafe (snd r1) 1 1 P2 in
   print_tuple r2;
   let r3 = move_unsafe (snd r2) 0 1 P1 in
-  print_tuple r3
-
+  print_tuple r3;
+  let r4 = move_unsafe (snd r3) 0 2 P1 in
+  print_tuple r4
 
 let () = main ()
