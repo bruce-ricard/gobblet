@@ -1,0 +1,16 @@
+Name: Tic Tac Toe
+Version: 0.1
+Synopsis: A library to play tic tac toe.
+Authors: Bruce Ricard <bruce.ricard@gmail.com>
+License: LGPL with OCaml linking exception
+
+Description: A library to play tic tac toe.
+
+
+OASISFormat: 0.4
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Executable "ttt"
+  Path: .
+  MainIs: ttt.ml
