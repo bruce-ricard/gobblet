@@ -12,6 +12,7 @@
 _build/
 
 # ocamlbuild targets
+a.out
 *.byte
 *.native
 
