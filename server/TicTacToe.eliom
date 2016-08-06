@@ -23,7 +23,11 @@ let canvas_elt =
 
 let page =
   (html
-     (head (title (pcdata "Tic Tac Toe")) [])
+     (Eliom_tools.F.head
+        ~css:[["css"; "TicTacToe.css"]]
+        ~title:"Tic Tac Toe"
+        ()
+     )
      (body
         [
           h1 [pcdata "Welcome to this tic tac toe game!"];
@@ -64,7 +68,10 @@ let%client init_client () =
 
 
 let main_service =
-  Eliom_service.App.service ~path:[] ~get_params:Eliom_parameter.unit ()
+  Eliom_service.App.service
+    ~path:[]
+    ~get_params:Eliom_parameter.unit
+    ()
 
 let () =
   TicTacToe_app.register
