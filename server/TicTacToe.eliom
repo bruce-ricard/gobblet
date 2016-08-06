@@ -21,6 +21,20 @@ let canvas_elt =
   canvas ~a:[a_width 300; a_height 300]
              [pcdata "your browser doesn't support canvas"]
 
+let cell s =
+  td ~a:[ a_class ["cell"]]
+     [pcdata s]
+
+let row a b c =
+  tr [cell a; cell b; cell c]
+
+let board =
+  table [
+      row "X" "X" "";
+      row "O" "X" "O";
+      row "" "O" "X"
+    ]
+
 let page =
   (html
      (Eliom_tools.F.head
@@ -31,21 +45,7 @@ let page =
      (body
         [
           h1 [pcdata "Welcome to this tic tac toe game!"];
-          table [
-              tr [
-                  td [div ~a:
-                          [
-                            a_class ["cell"];
-                            (*a_onclick {{ Dom_html.window##alert(Js.string "hello") }};*)
-                          ]
-                          [pcdata "bijour"]];
-                  td [pcdata "missou"];
-                ];
-              tr [
-                  td [pcdata "le"];
-                  td [pcdata "professeur"];
-                ]
-            ];
+          board;
           canvas_elt
         ];
 

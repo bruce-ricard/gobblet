@@ -2,6 +2,22 @@
     font-family: sans-serif;
 }
 
-.cell {
-    height: 500px;
+td {
+    height:100px;
+    width:100px;
+    text-align:center;
+    font-size:50px;
+    font-weight:bold;
+}
+
+table {
+    border-spacing:0;
+}
+td:nth-child(2) {
+    border-color:black;
+    border-style:solid ;
+    border-width:0px 10px ;
+}
+tr:not(:last-child) td {
+    border-bottom:10px solid black;
 }
