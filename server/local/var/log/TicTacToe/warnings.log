@@ -1,0 +1,113 @@
+Aug  3 13:28:41: ocsigen:main: Command pipe created
+Aug  3 13:28:43: ocsipersist:dbm: Initializing ...
+Aug  3 13:28:43: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 13:28:43: ocsipersist:dbm: ...Initialization complete
+Aug  3 13:28:43: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 13:28:43: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 13:48:42: ocsipersist:dbm: Initializing ...
+Aug  3 13:48:42: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 13:48:44: ocsipersist:dbm: ...Initialization complete
+Aug  3 13:48:44: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 13:48:44: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 14:01:28: ocsipersist:dbm: Initializing ...
+Aug  3 14:01:28: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 14:01:30: ocsipersist:dbm: ...Initialization complete
+Aug  3 14:01:30: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 14:01:30: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 14:10:38: ocsipersist:dbm: Initializing ...
+Aug  3 14:10:38: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 14:10:39: ocsipersist:dbm: ...Initialization complete
+Aug  3 14:10:39: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 14:10:39: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 14:11:11: ocsipersist:dbm: Initializing ...
+Aug  3 14:11:11: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 14:11:12: ocsipersist:dbm: ...Initialization complete
+Aug  3 14:11:13: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 14:11:13: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 14:42:21: ocsipersist:dbm: Initializing ...
+Aug  3 14:42:21: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 14:42:22: ocsipersist:dbm: ...Initialization complete
+Aug  3 14:42:23: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 14:42:23: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 15:08:42: ocsipersist:dbm: Initializing ...
+Aug  3 15:08:42: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 15:08:43: ocsipersist:dbm: ...Initialization complete
+Aug  3 15:08:44: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 15:08:44: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  3 16:09:24: ocsipersist:dbm: Initializing ...
+Aug  3 16:09:24: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  3 16:09:26: ocsipersist:dbm: ...Initialization complete
+Aug  3 16:09:26: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  3 16:09:26: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  4 19:18:04: ocsipersist:dbm: Initializing ...
+Aug  4 19:18:04: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  4 19:18:05: ocsipersist:dbm: ...Initialization complete
+Aug  4 19:18:05: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  4 19:18:05: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  4 19:21:50: main: Unexpected exception in Server.wait_connection (handle connection): (Invalid_argument Lwt.wakeup_result)
+Aug  4 19:29:20: ocsipersist:dbm: Initializing ...
+Aug  4 19:29:20: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  4 19:29:21: ocsipersist:dbm: ...Initialization complete
+Aug  4 19:29:21: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  4 19:29:21: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 01:49:26: ocsipersist:dbm: Initializing ...
+Aug  5 01:49:26: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 01:49:27: ocsipersist:dbm: ...Initialization complete
+Aug  5 01:49:27: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 01:49:27: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 02:23:21: ocsipersist:dbm: Initializing ...
+Aug  5 02:23:21: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 02:23:22: ocsipersist:dbm: ...Initialization complete
+Aug  5 02:23:22: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 02:23:22: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 02:42:56: ocsipersist:dbm: Initializing ...
+Aug  5 02:42:56: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 02:42:57: ocsipersist:dbm: ...Initialization complete
+Aug  5 02:42:57: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 02:42:57: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 02:43:27: ocsipersist:dbm: Initializing ...
+Aug  5 02:43:27: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 02:43:28: ocsipersist:dbm: ...Initialization complete
+Aug  5 02:43:28: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 02:43:28: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 02:55:11: ocsipersist:dbm: Initializing ...
+Aug  5 02:55:11: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 02:55:12: ocsipersist:dbm: ...Initialization complete
+Aug  5 02:55:12: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 02:55:12: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 13:53:16: ocsipersist:dbm: Initializing ...
+Aug  5 13:53:16: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 13:53:17: ocsipersist:dbm: ...Initialization complete
+Aug  5 13:53:17: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 13:53:17: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 15:46:09: ocsipersist:dbm: Initializing ...
+Aug  5 15:46:09: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 15:46:10: ocsipersist:dbm: ...Initialization complete
+Aug  5 15:46:11: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 15:46:11: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 16:13:11: ocsipersist:dbm: Initializing ...
+Aug  5 16:13:11: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 16:13:12: ocsipersist:dbm: ...Initialization complete
+Aug  5 16:13:13: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 16:13:13: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 16:14:23: ocsipersist:dbm: Initializing ...
+Aug  5 16:14:23: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 16:14:24: ocsipersist:dbm: ...Initialization complete
+Aug  5 16:14:24: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 16:14:24: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 16:21:05: ocsipersist:dbm: Initializing ...
+Aug  5 16:21:05: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 16:21:06: ocsipersist:dbm: ...Initialization complete
+Aug  5 16:21:06: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 16:21:06: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 17:32:13: ocsipersist:dbm: Initializing ...
+Aug  5 17:32:13: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 17:32:14: ocsipersist:dbm: ...Initialization complete
+Aug  5 17:32:14: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 17:32:14: ocsigen:main: Ocsigen has been launched (initialisations ok)
+Aug  5 18:32:50: ocsigen:main: While talking to 94.102.49.174:connection abruptly closed by peer
+Aug  5 23:35:42: ocsipersist:dbm: Initializing ...
+Aug  5 23:35:42: ocsipersist:dbm: Launching a new Ocsidbm process: /home/bruce/.opam/4.02.3/lib/ocsigenserver/extensions/ocsidbm on directory local/var/data/TicTacToe/ocsipersist.
+Aug  5 23:35:43: ocsipersist:dbm: ...Initialization complete
+Aug  5 23:35:43: ocsigen:config: While parsing config file, tag <host>: No defaulthostname, assuming it is "vps81546.vps.ovh.ca"
+Aug  5 23:35:43: ocsigen:main: Ocsigen has been launched (initialisations ok)
