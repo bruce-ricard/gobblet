@@ -21,18 +21,18 @@ let canvas_elt =
   canvas ~a:[a_width 300; a_height 300]
              [pcdata "your browser doesn't support canvas"]
 
-let cell s =
-  td ~a:[ a_class ["cell"]]
+let cell id s =
+  td ~a:[ a_class ["cell"]; a_id ("cell" ^ string_of_int id)]
      [pcdata s]
 
-let row a b c =
-  tr [cell a; cell b; cell c]
+let row n a b c =
+  tr [cell (3*n + 1) a; cell (3*n + 2) b; cell (3*n + 3) c]
 
 let board =
   table [
-      row "X" "X" "";
-      row "O" "X" "O";
-      row "" "O" "X"
+      row 0 "X" "X" "";
+      row 1 "O" "X" "O";
+      row 2 "" "O" "X"
     ]
 
 let page =
@@ -63,7 +63,12 @@ let%client init_client () =
   Lwt.async (fun () ->
       let%lwt _ = Lwt_js_events.click  Dom_html.document in
       Lwt.return (Eliom_lib.alert "Hello click!")
+    );
+  Lwt.async (fun () ->
+      let%lwt _ = Lwt_js_events.click (Dom_html.getElementById "cell1") in
+      Lwt.return (Eliom_lib.alert "Hello click first cell!")
     )
+
 
 
 
