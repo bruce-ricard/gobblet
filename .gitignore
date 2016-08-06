@@ -11,6 +11,12 @@
 # ocamlbuild working directory
 _build/
 
+#ocsigen temp files
+server/local
+server/_client
+server/_server
+server/_deps
+
 # ocamlbuild targets
 a.out
 *.byte
