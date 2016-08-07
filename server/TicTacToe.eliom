@@ -1,6 +1,7 @@
 [%%shared
     open Eliom_lib
     open Eliom_content
+    open Html5
     open Html5.D
     open Lwt
 
@@ -22,20 +23,33 @@ let canvas_elt =
              [pcdata "your browser doesn't support canvas"]
 
 let cell id s =
-  td ~a:[ a_class ["cell"]; a_id ("cell" ^ string_of_int id)]
-     [pcdata s]
+  let cell =
+    td
+      ~a:[a_class ["cell"]; a_id ("cell" ^ string_of_int id)]
+      [pcdata s]
+  in
+  let _ = [%client
+              (Lwt.async (fun () ->
+                   let dom_cell = (To_dom.of_element ~%cell) in
+                   Lwt_js_events.clicks dom_cell
+                                        (fun _ _ ->
+                                          dom_cell##.innerHTML := Js.string "X";
+                                          Lwt.return ()))
+               : unit)]
+  in
+  cell
 
 let row n a b c =
   tr [cell (3*n + 1) a; cell (3*n + 2) b; cell (3*n + 3) c]
 
-let board =
+let board () =
   table [
-      row 0 "X" "X" "";
-      row 1 "O" "X" "O";
-      row 2 "" "O" "X"
+      row 0 "" "" "";
+      row 1 "" "" "";
+      row 2 "" "" ""
     ]
 
-let page =
+let page () =
   (html
      (Eliom_tools.F.head
         ~css:[["css"; "TicTacToe.css"]]
@@ -44,12 +58,9 @@ let page =
      )
      (body
         [
-          h1 [pcdata "Welcome to this tic tac toe game!"];
-          board;
-          canvas_elt
+          div [h1 [pcdata "Welcome to this tic tac toe game!"]];
+          div [board ()];
         ];
-
-
      )
   )
 
@@ -59,15 +70,15 @@ let%client init_client () =
   let ctx = canvas##(getContext (Dom_html._2d_)) in
   ctx##.lineCap := Js.string "round";
   ctx##.fillStyle := Js.string "#FF0000";
-  ctx##fillRect 0. 0. 300. 300.;
-  Lwt.async (fun () ->
+  ctx##fillRect 0. 0. 300. 300.
+(*  Lwt.async (fun () ->
       let%lwt _ = Lwt_js_events.click  Dom_html.document in
       Lwt.return (Eliom_lib.alert "Hello click!")
     );
   Lwt.async (fun () ->
       let%lwt _ = Lwt_js_events.click (Dom_html.getElementById "cell1") in
       Lwt.return (Eliom_lib.alert "Hello click first cell!")
-    )
+    )*)
 
 
 
@@ -83,8 +94,5 @@ let () =
     ~service:main_service
     (fun () () ->
       let _ = [%client (init_client () : unit)] in
-      Lwt.return page
+      Lwt.return (page ())
     )
-
-
-    (*let%client _ = Eliom_lib.alert "Hello!"*)

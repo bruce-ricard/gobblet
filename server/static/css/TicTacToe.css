@@ -2,6 +2,11 @@
     font-family: sans-serif;
 }
 
+div {
+    text-align: center;
+    emargin:auto
+}
+
 td {
     height:100px;
     width:100px;
@@ -12,6 +17,9 @@ td {
 
 table {
     border-spacing:0;
+    cursor:default;
+    margin:0px auto;
+
 }
 td:nth-child(2) {
     border-color:black;
