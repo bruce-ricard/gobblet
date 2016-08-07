@@ -14,3 +14,7 @@ Plugins: META (0.4), DevFiles (0.4)
 Executable "ttt"
   Path: .
   MainIs: ttt.ml
+
+Library "ttt"
+  Path: .
+  Modules: Ttt

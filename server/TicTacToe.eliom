@@ -4,6 +4,7 @@
     open Html5
     open Html5.D
     open Lwt
+    open Ttt
 
     type messages =
       ((int * int * int) * int * (int * int) * (int * int))
@@ -29,12 +30,12 @@ let cell id s =
       [pcdata s]
   in
   let _ = [%client
-              (Lwt.async (fun () ->
+              ((Lwt.async (fun () ->
                    let dom_cell = (To_dom.of_element ~%cell) in
                    Lwt_js_events.clicks dom_cell
                                         (fun _ _ ->
                                           dom_cell##.innerHTML := Js.string "X";
-                                          Lwt.return ()))
+                                          Lwt.return ())))
                : unit)]
   in
   cell
@@ -42,11 +43,13 @@ let cell id s =
 let row n a b c =
   tr [cell (3*n + 1) a; cell (3*n + 2) b; cell (3*n + 3) c]
 
+let empty_row n = row n "" "" ""
+
 let board () =
   table [
-      row 0 "" "" "";
-      row 1 "" "" "";
-      row 2 "" "" ""
+      empty_row 0;
+      empty_row 1;
+      empty_row 2
     ]
 
 let page () =
