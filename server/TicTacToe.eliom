@@ -30,12 +30,12 @@ let cell id s =
       [pcdata s]
   in
   let _ = [%client
-              ((Lwt.async (fun () ->
+              (Lwt.async (fun () ->
                    let dom_cell = (To_dom.of_element ~%cell) in
                    Lwt_js_events.clicks dom_cell
                                         (fun _ _ ->
                                           dom_cell##.innerHTML := Js.string "X";
-                                          Lwt.return ())))
+                                          Lwt.return ()))
                : unit)]
   in
   cell
