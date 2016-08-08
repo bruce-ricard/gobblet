@@ -22,6 +22,13 @@ module TicTacToe_app =
 let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: messages]
 
+let%client next_symbol = ref "X"
+let%client update_next_symbol () =
+  if !next_symbol = "X" then
+    next_symbol := "O"
+  else
+    next_symbol := "X"
+
 let cell id s =
   let cell =
     td
@@ -33,7 +40,8 @@ let cell id s =
                    let dom_cell = (To_dom.of_element ~%cell) in
                    Lwt_js_events.clicks dom_cell
                                         (fun _ _ ->
-                                          dom_cell##.innerHTML := Js.string "X";
+                                          dom_cell##.innerHTML := Js.string !next_symbol;
+                                          update_next_symbol ();
                                           Lwt.return ()))
                : unit)]
   in
