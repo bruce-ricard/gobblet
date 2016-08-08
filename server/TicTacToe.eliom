@@ -6,6 +6,8 @@
     open Lwt
     open Ttt
 
+    module XOBoard = Board(XOPiece)
+
     type messages =
       ((int * int * int) * int * (int * int) * (int * int))
             [@@deriving json]
@@ -17,11 +19,8 @@ module TicTacToe_app =
       let application_name = "TicTacToe"
     end)
 
+let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: messages]
-
-let canvas_elt =
-  canvas ~a:[a_width 300; a_height 300]
-             [pcdata "your browser doesn't support canvas"]
 
 let cell id s =
   let cell =
@@ -68,22 +67,7 @@ let page () =
   )
 
 
-let%client init_client () =
-  let canvas = Eliom_content.Html5.To_dom.of_canvas ~%canvas_elt in
-  let ctx = canvas##(getContext (Dom_html._2d_)) in
-  ctx##.lineCap := Js.string "round";
-  ctx##.fillStyle := Js.string "#FF0000";
-  ctx##fillRect 0. 0. 300. 300.
-(*  Lwt.async (fun () ->
-      let%lwt _ = Lwt_js_events.click  Dom_html.document in
-      Lwt.return (Eliom_lib.alert "Hello click!")
-    );
-  Lwt.async (fun () ->
-      let%lwt _ = Lwt_js_events.click (Dom_html.getElementById "cell1") in
-      Lwt.return (Eliom_lib.alert "Hello click first cell!")
-    )*)
-
-
+let%client init_client () = ()
 
 
 let main_service =
