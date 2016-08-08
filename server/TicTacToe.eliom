@@ -22,35 +22,64 @@ module TicTacToe_app =
 let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: messages]
 
-let%client next_symbol = ref "X"
-let%client update_next_symbol () =
-  if !next_symbol = "X" then
-    next_symbol := "O"
+let%client current_player = ref P1
+let%client update_current_player () =
+  if !current_player = P1 then
+    current_player := P2
   else
-    next_symbol := "X"
+    current_player := P1
 
-let cell id s =
+let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
+
+
+
+let%client update_game board =
+  let position_to_string = function
+      None -> ""
+    | Some(p) -> XOPiece.to_string p in
+  for x = 0 to 2 do
+    for y = 0 to 2 do
+      update_cells_matrix.(x).(y) (position_to_string board.(x).(y))
+    done
+  done
+
+let cell x y =
   let cell =
     td
-      ~a:[a_class ["cell"]; a_id ("cell" ^ string_of_int id)]
-      [pcdata s]
+      ~a:[a_class ["cell"]]
+      [pcdata ""]
   in
   let _ = [%client
               (Lwt.async (fun () ->
-                   let dom_cell = (To_dom.of_element ~%cell) in
-                   Lwt_js_events.clicks dom_cell
-                                        (fun _ _ ->
-                                          dom_cell##.innerHTML := Js.string !next_symbol;
-                                          update_next_symbol ();
-                                          Lwt.return ()))
+                   let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
+                   update_cells_matrix.(~%x).(~%y) <-
+                     (fun s -> dom_cell##.innerHTML := Js.string s);
+                   Lwt_js_events.clicks
+                     dom_cell
+                     (fun _ _ ->
+                       let open XOBoard in
+                       (
+                       match XOBoard.move !(~%board) ~row:~%x ~column:~%y !current_player with
+                         InvalidMove -> Eliom_lib.alert "Invalid move!"
+                       | Next(result, new_board) ->
+                          begin
+                            update_game new_board;
+                            ~%board := new_board;
+                            match result with
+                              KeepPlaying ->  update_current_player ()
+                            | Won P1 -> Eliom_lib.alert "Player 1 won !"
+                            | Won P2 -> Eliom_lib.alert "Player 2 won !"
+                          end
+                       );
+                       Lwt.return ()))
                : unit)]
   in
   cell
 
-let row n a b c =
-  tr [cell (3*n + 1) a; cell (3*n + 2) b; cell (3*n + 3) c]
+let row x =
+  tr [cell x 0 ; cell x 1; cell x 2]
 
-let empty_row n = row n "" "" ""
+let empty_row n = row n
 
 let board () =
   table [
