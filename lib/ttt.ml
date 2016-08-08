@@ -37,7 +37,10 @@ module Board (Piece : PIECE) =
 
     let print board = print_string (to_ascii_art board)
 
-    let valid_move board ~row ~column player = true
+    let valid_move board ~row ~column player =
+      match board.(row).(column) with
+        None -> true
+      | Some(_) -> false
 
     let lines board =
       let column n =
