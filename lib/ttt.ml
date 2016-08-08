@@ -74,6 +74,17 @@ module Board (Piece : PIECE) =
                      None
                      (List.map all_same (lines board))
 
+    let board_is_full board =
+      let result = ref true in
+      for x = 0 to 2 do
+        for y = 0 to 2 do
+          match board.(x).(y) with
+            None -> result := false
+          | Some(_) -> ()
+        done
+      done;
+      !result
+
     let copy_board b =
       let result = Array.make 3 [||] in
       result.(0) <- Array.copy b.(0);
@@ -81,7 +92,7 @@ module Board (Piece : PIECE) =
       result.(2) <- Array.copy b.(2);
       result
 
-    type result = KeepPlaying | Won of player
+    type result = KeepPlaying | Won of player | Draw
 
     type move_result =
       | InvalidMove
@@ -93,7 +104,11 @@ module Board (Piece : PIECE) =
           let board = copy_board board in
           board.(row).(column) <- Some (Piece.piece_of player);
           match check_board board with
-            None -> Next(KeepPlaying, board)
+            None ->
+            if board_is_full board then
+              Next(Draw, board)
+            else
+              Next(KeepPlaying, board)
           | Some piece -> Next(Won player, board)
         end
       else

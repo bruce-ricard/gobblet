@@ -31,8 +31,6 @@ let%client update_current_player () =
 
 let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
 
-
-
 let%client update_game board =
   let position_to_string = function
       None -> ""
