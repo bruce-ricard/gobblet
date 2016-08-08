@@ -67,6 +67,7 @@ let cell x y =
                               KeepPlaying ->  update_current_player ()
                             | Won P1 -> Eliom_lib.alert "Player 1 won !"
                             | Won P2 -> Eliom_lib.alert "Player 2 won !"
+                            | Draw -> Eliom_lib.alert " Draw!"
                           end
                        );
                        Lwt.return ()))
