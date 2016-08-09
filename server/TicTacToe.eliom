@@ -95,7 +95,7 @@ let cell x y =
                                 update_game new_board;
 
                                 match result with
-                                  KeepPlaying ->  update_current_player (); Eliom_lib.alert "next player"
+                                  KeepPlaying ->  update_current_player ()
                                 | Won P1 -> Eliom_lib.alert "Player 1 won !"
                                 | Won P2 -> Eliom_lib.alert "Player 2 won !"
                                 | Draw -> Eliom_lib.alert " Draw!"
@@ -120,22 +120,22 @@ let board () =
       empty_row 2
     ]
 
+let%client update_counter_client elt : unit =
+  let dom = Eliom_content.Html5.To_dom.of_element elt in
+  update_counter := (
+    fun () ->
+    Lwt.async (fun () ->
+        let%lwt counter = get_counter_rpc () in
+
+        dom##.innerHTML :=
+          Js.string ("Counter(client): " ^ (string_of_int counter));
+        Lwt.return ())
+  )
+
 let counter_elt () =
   let elt = div [pcdata ("Counter: " ^ (string_of_int (!counter)))] in
   [%client
-      (
-        (
-          let dom = Eliom_content.Html5.To_dom.of_element ~%elt in
-          update_counter := (
-            fun () ->
-            Lwt.async (fun () ->
-                let%lwt counter = get_counter_rpc () in
-
-                dom##.innerHTML :=
-                  Js.string ("Counter(client): " ^ (string_of_int counter));
-                Lwt.return ())
-          );
-        ) : unit)
+      ((update_counter_client ~%elt) : unit)
   ];
   elt
 
