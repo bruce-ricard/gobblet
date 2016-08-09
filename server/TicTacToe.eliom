@@ -21,6 +21,15 @@ module TicTacToe_app =
 
 let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: messages]
+let counter = ref 0
+let incr_counter () = incr counter; Lwt.return ()
+let%client incr_counter_rpc = ~%(server_function [%derive.json: unit] incr_counter)
+
+let get_counter () = Lwt.return !counter
+let%client get_counter_rpc = ~%(server_function [%derive.json: unit] get_counter)
+
+let update_board new_board =
+  board := new_board
 
 let%client current_player = ref P1
 let%client update_current_player () =
@@ -41,11 +50,13 @@ let%client update_game board =
     done
   done
 
+let%client update_counter = ref (fun () -> ())
+
 let cell x y =
   let cell =
     td
       ~a:[a_class ["cell"]]
-      [pcdata ""]
+      [pcdata ""] (* (position_to_string board.(x).(y))]*)
   in
   let _ = [%client
               (Lwt.async (fun () ->
@@ -55,6 +66,9 @@ let cell x y =
                    Lwt_js_events.clicks
                      dom_cell
                      (fun _ _ ->
+                       incr_counter_rpc ();
+                       !update_counter ();
+
                        let open XOBoard in
                        (
                        match XOBoard.move !(~%board) ~row:~%x ~column:~%y !current_player with
@@ -62,7 +76,7 @@ let cell x y =
                        | Next(result, new_board) ->
                           begin
                             update_game new_board;
-                            ~%board := new_board;
+
                             match result with
                               KeepPlaying ->  update_current_player ()
                             | Won P1 -> Eliom_lib.alert "Player 1 won !"
@@ -87,6 +101,23 @@ let board () =
       empty_row 2
     ]
 
+let counter_elt () =
+  let elt = div [pcdata ("Counter: " ^ (string_of_int (!counter)))] in
+  [%client
+      ((let dom = Eliom_content.Html5.To_dom.of_element ~%elt in
+       update_counter :=
+         fun () ->
+         Lwt.async (fun () ->
+             let%lwt counter = get_counter_rpc () in
+
+             dom##.innerHTML :=
+               Js.string ("Counter(client): " ^ (string_of_int counter));
+             Lwt.return ())
+       ) : unit)
+];
+ elt
+
+
 let page () =
   (html
      (Eliom_tools.F.head
@@ -98,6 +129,7 @@ let page () =
         [
           div [h1 [pcdata "Welcome to this tic tac toe game!"]];
           div [board ()];
+          counter_elt ()
         ];
      )
   )
@@ -116,6 +148,7 @@ let () =
   TicTacToe_app.register
     ~service:main_service
     (fun () () ->
+      incr_counter ();
       let _ = [%client (init_client () : unit)] in
       Lwt.return (page ())
     )
