@@ -9,8 +9,8 @@
     module XOBoard = Board(XOPiece)
 
     type messages =
-      ((int * int * int) * int * (int * int) * (int * int))
-            [@@deriving json]
+      (int * int * int)
+        [@@deriving json]
 ]
 
 module TicTacToe_app =
@@ -52,6 +52,20 @@ let%client update_game board =
 
 let%client update_counter = ref (fun () -> ())
 
+let move (row, column, player) =
+  Lwt.wrap (fun () ->
+      let result = XOBoard.move !board ~row ~column (Obj.magic player) in
+      begin
+        match result with
+          InvalidMove -> ()
+        | Next(_,new_board) -> board := new_board
+      end;
+      result
+    )
+
+
+let%client move_rpc =  ~%(server_function [%derive.json: messages] move)
+
 let cell x y =
   let cell =
     td
@@ -71,20 +85,24 @@ let cell x y =
 
                        let open XOBoard in
                        (
-                       match XOBoard.move !(~%board) ~row:~%x ~column:~%y !current_player with
-                         InvalidMove -> Eliom_lib.alert "Invalid move!"
-                       | Next(result, new_board) ->
-                          begin
-                            update_game new_board;
+                         let%lwt move_result = move_rpc (~%x,~%y, Obj.magic !current_player) in
+                         begin
+                           match move_result with
+                             InvalidMove -> Eliom_lib.alert "Invalid move!"
+                           | Next(result, new_board) ->
+                              begin
+                                update_game new_board;
 
-                            match result with
-                              KeepPlaying ->  update_current_player ()
-                            | Won P1 -> Eliom_lib.alert "Player 1 won !"
-                            | Won P2 -> Eliom_lib.alert "Player 2 won !"
-                            | Draw -> Eliom_lib.alert " Draw!"
-                          end
+                                match result with
+                                  KeepPlaying ->  update_current_player (); Eliom_lib.alert "next player"
+                                | Won P1 -> Eliom_lib.alert "Player 1 won !"
+                                | Won P2 -> Eliom_lib.alert "Player 2 won !"
+                                | Draw -> Eliom_lib.alert " Draw!"
+                              end
+                         end;
+                         Lwt.return ())
                        );
-                       Lwt.return ()))
+                 )
                : unit)]
   in
   cell
