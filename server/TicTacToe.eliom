@@ -56,6 +56,7 @@ let move (row, column, player) =
   Lwt.wrap (fun () ->
       let result = XOBoard.move !board ~row ~column (Obj.magic player) in
       begin
+        let open XOBoard in
         match result with
           InvalidMove -> ()
         | Next(_,new_board) -> board := new_board
@@ -80,7 +81,7 @@ let cell x y =
                    Lwt_js_events.clicks
                      dom_cell
                      (fun _ _ ->
-                       incr_counter_rpc ();
+                       Lwt.async incr_counter_rpc;
                        !update_counter ();
 
                        let open XOBoard in
@@ -122,18 +123,21 @@ let board () =
 let counter_elt () =
   let elt = div [pcdata ("Counter: " ^ (string_of_int (!counter)))] in
   [%client
-      ((let dom = Eliom_content.Html5.To_dom.of_element ~%elt in
-       update_counter :=
-         fun () ->
-         Lwt.async (fun () ->
-             let%lwt counter = get_counter_rpc () in
+      (
+        (
+          let dom = Eliom_content.Html5.To_dom.of_element ~%elt in
+          update_counter := (
+            fun () ->
+            Lwt.async (fun () ->
+                let%lwt counter = get_counter_rpc () in
 
-             dom##.innerHTML :=
-               Js.string ("Counter(client): " ^ (string_of_int counter));
-             Lwt.return ())
-       ) : unit)
-];
- elt
+                dom##.innerHTML :=
+                  Js.string ("Counter(client): " ^ (string_of_int counter));
+                Lwt.return ())
+          );
+        ) : unit)
+  ];
+  elt
 
 
 let page () =
@@ -166,7 +170,7 @@ let () =
   TicTacToe_app.register
     ~service:main_service
     (fun () () ->
-      incr_counter ();
+      Lwt.async incr_counter;
       let _ = [%client (init_client () : unit)] in
       Lwt.return (page ())
     )
