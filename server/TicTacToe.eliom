@@ -113,7 +113,7 @@ let row x =
 
 let empty_row n = row n
 
-let board () =
+let board_html () =
   table [
       empty_row 0;
       empty_row 1;
@@ -139,8 +139,22 @@ let counter_elt () =
   ];
   elt
 
+let reset_game () =
+  board := XOBoard.empty_board ();
+  Lwt.return ()
+
+let%client reset_game_rpc = ~%(server_function [%derive.json: unit] reset_game)
+
 let new_game_button () =
   let elt = div [button [pcdata "New game"]] in
+  [%client
+      ((Lwt.async (fun () ->
+            let dom_elt = Eliom_content.Html5.To_dom.of_element ~%elt in
+            Lwt_js_events.clicks
+              dom_elt
+              (fun _ _ -> reset_game_rpc ())))
+       : unit)
+  ];
   elt
 
 let page () =
@@ -154,7 +168,7 @@ let page () =
         [
           div [h1 [pcdata "Welcome to this tic tac toe game!"]];
           new_game_button ();
-          div [board ()];
+          div [board_html ()];
           counter_elt ()
         ];
      )
