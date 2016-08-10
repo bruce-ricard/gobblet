@@ -139,6 +139,9 @@ let counter_elt () =
   ];
   elt
 
+let new_game_button () =
+  let elt = div [button [pcdata "New game"]] in
+  elt
 
 let page () =
   (html
@@ -150,6 +153,7 @@ let page () =
      (body
         [
           div [h1 [pcdata "Welcome to this tic tac toe game!"]];
+          new_game_button ();
           div [board ()];
           counter_elt ()
         ];
