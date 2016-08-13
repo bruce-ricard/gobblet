@@ -20,7 +20,7 @@ module TicTacToe_app =
     end)
 
 let board = ref (XOBoard.empty_board ())
-let bus = Eliom_bus.create [%derive.json: messages]
+let bus = Eliom_bus.create [%derive.json: string]
 let counter = ref 0
 let incr_counter () = incr counter; Lwt.return ()
 let%client incr_counter_rpc = ~%(server_function [%derive.json: unit] incr_counter)
@@ -40,10 +40,11 @@ let%client update_current_player () =
 
 let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
 
+let%shared position_to_string = function
+    None -> ""
+  | Some(p) -> XOPiece.to_string p
+
 let%client update_game board =
-  let position_to_string = function
-      None -> ""
-    | Some(p) -> XOPiece.to_string p in
   for x = 0 to 2 do
     for y = 0 to 2 do
       update_cells_matrix.(x).(y) (position_to_string board.(x).(y))
@@ -157,6 +158,24 @@ let new_game_button () =
   ];
   elt
 
+let chat_logs_html () =
+  ul [
+      li [pcdata "test"];
+      li [pcdata "123"]
+    ]
+
+let chat_input_text_html () =
+  div []
+
+let chat_html () =
+  let elt =
+    div [
+        h3 [pcdata "Chat window"];
+        chat_logs_html ();
+        chat_input_text_html ()
+      ] in
+  elt
+
 let page () =
   (html
      (Eliom_tools.F.head
@@ -168,7 +187,7 @@ let page () =
         [
           div [h1 [pcdata "Welcome to this tic tac toe game!"]];
           new_game_button ();
-          div [board_html ()];
+          div [board_html (); chat_html ()];
           counter_elt ()
         ];
      )
@@ -182,11 +201,13 @@ let main_service =
   Eliom_service.App.service
     ~path:[]
     ~get_params:Eliom_parameter.unit
+    (*    ~https:true*)
     ()
 
 let () =
   TicTacToe_app.register
     ~service:main_service
+    (*    ~scope:Eliom_common.default_group_scope*)
     (fun () () ->
       Lwt.async incr_counter;
       let _ = [%client (init_client () : unit)] in
