@@ -19,6 +19,20 @@ module TicTacToe_app =
       let application_name = "TicTacToe"
     end)
 
+
+let main_service =
+  Eliom_service.App.service
+    ~path:[]
+    ~get_params:Eliom_parameter.unit
+    (*    ~https:true*)
+    ()
+
+let connection_service =
+  Eliom_service.Http.post_service
+    ~fallback:main_service
+    ~post_params:Eliom_parameter.(string "name" ** string "password")
+        ()
+
 let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: string]
 let counter = ref 0
@@ -176,8 +190,39 @@ let chat_html () =
       ] in
   elt
 
+let username =
+  Eliom_reference.eref ~scope:Eliom_common.default_session_scope None
+
+let connection_box () =
+  let%lwt u = Eliom_reference.get username in
+    Lwt.return
+      (match u with
+       | Some s -> p [pcdata "You are connected as "; pcdata s]
+       | None ->
+          Form.post_form ~service:connection_service
+                         (fun (name1, name2) ->
+                           [fieldset
+                              [label [pcdata "login: "];
+                               Form.input
+                                 ~input_type:`Text ~name:name1
+                                 Form.string;
+                               br ();
+                               label [pcdata "password: "];
+                               Form.input
+                                 ~input_type:`Password ~name:name2
+                                 Form.string;
+                               br ();
+                               Form.input
+                                 ~input_type:`Submit ~value:"Connect"
+                                 Form.string
+                         ]])
+                         ()
+      )
+
 let page () =
-  (html
+  let%lwt cb = connection_box () in
+  Lwt.return
+    (html
      (Eliom_tools.F.head
         ~css:[["css"; "TicTacToe.css"]]
         ~title:"Tic Tac Toe"
@@ -188,6 +233,7 @@ let page () =
           div [h1 [pcdata "Welcome to this tic tac toe game!"]];
           new_game_button ();
           div [board_html (); chat_html ()];
+          cb;
           counter_elt ()
         ];
      )
@@ -196,13 +242,11 @@ let page () =
 
 let%client init_client () = ()
 
+(* User names and passwords: *)
+let users = ref [("Calvin", "123"); ("Hobbes", "456")]
 
-let main_service =
-  Eliom_service.App.service
-    ~path:[]
-    ~get_params:Eliom_parameter.unit
-    (*    ~https:true*)
-    ()
+let check_pwd name pwd =
+    try List.assoc name !users = pwd with Not_found -> false
 
 let () =
   TicTacToe_app.register
@@ -211,5 +255,18 @@ let () =
     (fun () () ->
       Lwt.async incr_counter;
       let _ = [%client (init_client () : unit)] in
-      Lwt.return (page ())
-    )
+      page ()
+    );
+
+  Eliom_registration.Html5.register
+    ~service:connection_service
+    (fun () (name, password) ->
+      let message =
+        if check_pwd name password
+        then "Hello "^name
+        else "Wrong name or password"
+      in
+      Lwt.return
+        (html (head (title (pcdata "")) [])
+              (body [h1 [pcdata message]
+    ])))
