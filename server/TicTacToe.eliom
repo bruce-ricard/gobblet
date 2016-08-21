@@ -219,8 +219,25 @@ let connection_box () =
                          ()
       )
 
+let header_login () =
+  let%lwt username = Eliom_reference.get username in
+  match username with
+  | Some name -> Lwt.return (pcdata ("Logged in as " ^ name))
+  | None -> connection_box ()
+
+let header () =
+  let%lwt login = header_login () in
+  Lwt.return (
+      div ~a:[a_class ["header"]]
+          [
+            div [pcdata "Online board games"];
+            div [login]
+          ]
+    )
+
 let page () =
   let%lwt cb = connection_box () in
+  let%lwt header = header () in
   Lwt.return
     (html
      (Eliom_tools.F.head
@@ -230,6 +247,7 @@ let page () =
      )
      (body
         [
+          header;
           div [h1 [pcdata "Welcome to this tic tac toe game!"]];
           new_game_button ();
           div [board_html (); chat_html ()];
@@ -263,10 +281,17 @@ let () =
     (fun () (name, password) ->
       let message =
         if check_pwd name password
-        then "Hello "^name
+        then
+          begin
+            Eliom_reference.set username (Some name);
+            "Hello "^name
+          end
         else "Wrong name or password"
       in
+      let%lwt cb = connection_box () in
       Lwt.return
         (html (head (title (pcdata "")) [])
-              (body [h1 [pcdata message]
+              (body [h1 [pcdata message];
+                     cb
+
     ])))
