@@ -230,8 +230,8 @@ let header () =
   Lwt.return (
       div ~a:[a_class ["header"]]
           [
-            div [pcdata "Online board games"];
-            div [login]
+            div ~a:[a_class ["logo"]] [pcdata "Online board games"];
+            div ~a:[a_class ["header_login"]] [login]
           ]
     )
 

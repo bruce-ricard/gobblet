@@ -2,6 +2,34 @@
     font-family: sans-serif;
 }
 
+html {
+    background-color: #efdecd;
+}
+
+body {
+    width: 50%;
+    margin: auto;
+    background-color: white;
+}
+
+.header {
+    width: 100%;
+    overflow: auto;
+}
+
+.logo {
+    float: left;
+}
+
+.header_login {
+
+    float: right;
+}
+
+form {
+    border: 10px solid blue;
+}
+
 div {
     text-align: center;
     emargin:auto
