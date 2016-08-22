@@ -230,7 +230,10 @@ let header () =
   Lwt.return (
       div ~a:[a_class ["header"]]
           [
-            div ~a:[a_class ["logo"]] [pcdata "Online board games"];
+            div ~a:[a_class ["logo"]] [
+                  div ~a:[a_class ["logo_image"]] [pcdata "put logo here"];
+                  div ~a:[a_class ["site_name"]] [pcdata "Online board games"]
+                ];
             div ~a:[a_class ["header_login"]] [login]
           ]
     )
@@ -266,9 +269,14 @@ let users = ref [("Calvin", "123"); ("Hobbes", "456")]
 let check_pwd name pwd =
     try List.assoc name !users = pwd with Not_found -> false
 
+let options = {
+    Eliom_registration.do_not_launch = true;
+  }
+
 let () =
   TicTacToe_app.register
     ~service:main_service
+    ~options
     (*    ~scope:Eliom_common.default_group_scope*)
     (fun () () ->
       Lwt.async incr_counter;
