@@ -11,10 +11,10 @@ OASISFormat: 0.4
 BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
-Executable "ttt"
+Executable "test"
   Path: .
   MainIs: test.ml
 
-Library "ttt"
+Library "tttoe"
   Path: .
-  Modules: Ttt
+  Modules: Users, Ttt
