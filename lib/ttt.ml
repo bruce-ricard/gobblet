@@ -1,5 +1,11 @@
 type player = P1 | P2
 
+type result = KeepPlaying | Won of player | Draw
+
+type 'board move_result =
+  | InvalidMove
+  | Next of result * 'board
+
 module type PIECE =
   sig
     type t
@@ -8,10 +14,22 @@ module type PIECE =
     val example : int -> t
   end
 
+module type BOARD =
+  sig
+    type t
+    val empty_board : unit -> t
+    val move :
+      t ->
+      row:int ->
+      column:int ->
+      player ->
+      t move_result
+  end
+
 module Board (Piece : PIECE) =
   struct
-    type board = Piece.t option array array
-    let empty_board () : board = Array.make_matrix 3 3 None
+    type t = Piece.t option array array
+    let empty_board () : t = Array.make_matrix 3 3 None
     let example () =
       let board = empty_board () in
       for x = 0 to 2 do
@@ -67,7 +85,7 @@ module Board (Piece : PIECE) =
       | Some(x), Some(y), Some(z) when x = y && y = z -> Some(x)
                                                    | _ -> None
 
-    let check_board (board : board) : Piece.t option =
+    let check_board (board : t) : Piece.t option =
       List.fold_left (fun result element ->
           match result, element with
             None, None -> None
@@ -94,12 +112,6 @@ module Board (Piece : PIECE) =
       result.(1) <- Array.copy b.(1);
       result.(2) <- Array.copy b.(2);
       result
-
-    type result = KeepPlaying | Won of player | Draw
-
-    type move_result =
-      | InvalidMove
-      | Next of result * board
 
     let move board ~row ~column player =
       if valid_move board ~row ~column player then
