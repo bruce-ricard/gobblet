@@ -1,4 +1,0 @@
-_client/TicTacToe.cmo :
-_client/TicTacToe.cmx :
-_client/TicTacToe.cmo : _server/TicTacToe.type_mli
-_client/TicTacToe.cmx : _server/TicTacToe.type_mli
