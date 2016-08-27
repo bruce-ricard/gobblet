@@ -253,22 +253,14 @@ let () =
       page ()
     );
 
-  Eliom_registration.Html5.register
+  Eliom_registration.Action.register
     ~service:connection_service
     (fun () (name, password) ->
-      let message =
-        if check_pwd name password
-        then
-          begin
-            Eliom_reference.set username (Some name);
-            "Hello "^name
-          end
-        else "Wrong name or password"
-      in
-      let%lwt cb = connection_box () in
-      Lwt.return
-        (html (head (title (pcdata "")) [])
-              (body [h1 [pcdata message];
-                     cb
-
-    ])))
+      if check_pwd name password then
+        begin
+          Eliom_reference.set username (Some name);
+          Lwt.return ()
+        end
+      else
+        Lwt.return ()
+    )
