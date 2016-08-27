@@ -16,6 +16,7 @@ server/local/
 server/_client/TicTacToe
 server/_server/
 server/_deps/
+server/.depend
 
 # ocamlbuild targets
 a.out
