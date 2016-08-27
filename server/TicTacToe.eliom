@@ -22,10 +22,16 @@ module TicTacToe_app =
 
 
 let main_service =
-  Eliom_service.App.service
+  Eliom_service.Http.service
     ~path:[]
     ~get_params:Eliom_parameter.unit
     (*    ~https:true*)
+    ()
+
+let ttt_service =
+  Eliom_service.App.service
+    ~path:["games"; "tictactoe"]
+    ~get_params:Eliom_parameter.unit
     ()
 
 let connection_service =
@@ -198,15 +204,28 @@ let header_login () =
 
 let header () =
   let%lwt login = header_login () in
+  let menu =
+    div ~a:[a_class ["menu"]]
+        [
+          a ttt_service [pcdata "Tic Tac Toe"] ()
+        ]
+  in
   Lwt.return (
-      div ~a:[a_class ["header"]]
-          [
-            div ~a:[a_class ["logo"]] [
-                  div ~a:[a_class ["logo_image"]] [pcdata "put logo here"];
-                  div ~a:[a_class ["site_name"]] [pcdata "Online board games"]
-                ];
-            div ~a:[a_class ["header_login"]] [login]
-          ]
+      div
+        [
+          div ~a:[a_class ["header"]]
+              [
+                a main_service
+                  [
+                    div ~a:[a_class ["logo"]] [
+                          div ~a:[a_class ["logo_image"]] [pcdata "put logo here"];
+                          div ~a:[a_class ["site_name"]] [pcdata "Online board games"]
+                        ];
+                  ] ();
+                div ~a:[a_class ["header_login"]] [login]
+              ];
+          menu
+        ]
     )
 
 let skeleton ~css ~title content =
@@ -222,21 +241,28 @@ let skeleton ~css ~title content =
      )
     )
 
-let page () =
+let welcome_page () =
   let%lwt cb = connection_box () in
+  let content =
+    [
+      pcdata "Welcome! To start playing, click Play in the menu."
+    ] in
+  skeleton
+    ~css:[["css"; "TicTacToe.css"]]
+    ~title:"Board games"
+    content
+
+let game_page () =
   let content =
     [
       div [h1 [pcdata "Welcome to this tic tac toe game!"]];
       new_game_button ();
       div [board_html (); chat_html ()];
-      cb;
     ] in
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Tic Tac Toe"
     content
-
-
 
 let%client init_client () = ()
 
@@ -247,17 +273,23 @@ let check_pwd name pwd =
     try List.assoc name !users = pwd with Not_found -> false
 
 let options = {
-    Eliom_registration.do_not_launch = true;
+    Eliom_registration.do_not_launch = false;
   }
 
 let () =
   TicTacToe_app.register
-    ~service:main_service
+    ~service:ttt_service
     ~options
     (*    ~scope:Eliom_common.default_group_scope*)
     (fun () () ->
       let _ = [%client (init_client () : unit)] in
-      page ()
+      game_page ()
+    );
+
+  Eliom_registration.Html5.register
+    ~service:main_service
+    (fun () () ->
+      welcome_page ()
     );
 
   Eliom_registration.Action.register
