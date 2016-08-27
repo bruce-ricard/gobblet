@@ -209,26 +209,33 @@ let header () =
           ]
     )
 
-let page () =
-  let%lwt cb = connection_box () in
+let skeleton ~css ~title content =
   let%lwt header = header () in
   Lwt.return
     (html
      (Eliom_tools.F.head
-        ~css:[["css"; "TicTacToe.css"]]
-        ~title:"Tic Tac Toe"
+        ~css ~title
         ()
      )
      (body
-        [
-          header;
-          div [h1 [pcdata "Welcome to this tic tac toe game!"]];
-          new_game_button ();
-          div [board_html (); chat_html ()];
-          cb;
-        ];
+        (header :: content)
      )
-  )
+    )
+
+let page () =
+  let%lwt cb = connection_box () in
+  let content =
+    [
+      div [h1 [pcdata "Welcome to this tic tac toe game!"]];
+      new_game_button ();
+      div [board_html (); chat_html ()];
+      cb;
+    ] in
+  skeleton
+    ~css:[["css"; "TicTacToe.css"]]
+    ~title:"Tic Tac Toe"
+    content
+
 
 
 let%client init_client () = ()
