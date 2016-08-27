@@ -36,12 +36,6 @@ let connection_service =
 
 let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: string]
-let counter = ref 0
-let incr_counter () = incr counter; Lwt.return ()
-let%client incr_counter_rpc = ~%(server_function [%derive.json: unit] incr_counter)
-
-let get_counter () = Lwt.return !counter
-let%client get_counter_rpc = ~%(server_function [%derive.json: unit] get_counter)
 
 let update_board new_board =
   board := new_board
@@ -65,8 +59,6 @@ let%client update_game board =
       update_cells_matrix.(x).(y) (position_to_string board.(x).(y))
     done
   done
-
-let%client update_counter = ref (fun () -> ())
 
 let move (row, column, player) =
   Lwt.wrap (fun () ->
@@ -97,9 +89,6 @@ let cell x y =
                    Lwt_js_events.clicks
                      dom_cell
                      (fun _ _ ->
-                       Lwt.async incr_counter_rpc;
-                       !update_counter ();
-
                        let open XOBoard in
                        (
                          let%lwt move_result = move_rpc (~%x,~%y, Obj.magic !current_player) in
@@ -135,25 +124,6 @@ let board_html () =
       empty_row 1;
       empty_row 2
     ]
-
-let%client update_counter_client elt : unit =
-  let dom = Eliom_content.Html5.To_dom.of_element elt in
-  update_counter := (
-    fun () ->
-    Lwt.async (fun () ->
-        let%lwt counter = get_counter_rpc () in
-
-        dom##.innerHTML :=
-          Js.string ("Counter(client): " ^ (string_of_int counter));
-        Lwt.return ())
-  )
-
-let counter_elt () =
-  let elt = div [pcdata ("Counter: " ^ (string_of_int (!counter)))] in
-  [%client
-      ((update_counter_client ~%elt) : unit)
-  ];
-  elt
 
 let reset_game () =
   board := XOBoard.empty_board ();
@@ -256,7 +226,6 @@ let page () =
           new_game_button ();
           div [board_html (); chat_html ()];
           cb;
-          counter_elt ()
         ];
      )
   )
@@ -280,7 +249,6 @@ let () =
     ~options
     (*    ~scope:Eliom_common.default_group_scope*)
     (fun () () ->
-      Lwt.async incr_counter;
       let _ = [%client (init_client () : unit)] in
       page ()
     );
