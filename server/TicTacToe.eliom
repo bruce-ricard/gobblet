@@ -35,14 +35,12 @@ let ttt_service =
     ()
 
 let connection_service =
-  Eliom_service.Http.post_service
-    ~fallback:main_service
+  Eliom_service.Http.post_coservice'
     ~post_params:Eliom_parameter.(string "name" ** string "password")
     ()
 
 let disconnection_service =
-  Eliom_service.Http.post_service
-    ~fallback:main_service
+  Eliom_service.Http.post_coservice'
     ~post_params:Eliom_parameter.unit
     ()
 
@@ -316,10 +314,7 @@ let () =
     ~service:connection_service
     (fun () (name, password) ->
       if check_pwd name password then
-        begin
-          Eliom_reference.set username (Some name);
-          Lwt.return ()
-        end
+        Eliom_reference.set username (Some name)
       else
         Lwt.return ()
     );
