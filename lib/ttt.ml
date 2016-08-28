@@ -31,7 +31,7 @@ module Board : BOARD = functor (Piece : PIECE) ->
     let piece_at board ~row ~column =
       board.(row).(column)
 
-    let valid_move board ~row ~column player =
+    let valid_move board ~row ~column =
       match board.(row).(column) with
         None -> true
       | Some(_) -> false
@@ -90,9 +90,8 @@ module Board : BOARD = functor (Piece : PIECE) ->
       result
 
     let move board ~row ~column piece  =
-      if valid_move board ~row ~column piece then
+      if valid_move board ~row ~column then
         begin
-          (*          let board = copy_board board in*)
           board.(row).(column) <- Some piece;
           match check_board board with
             None ->
@@ -105,8 +104,8 @@ module Board : BOARD = functor (Piece : PIECE) ->
       else
         `InvalidMove
 
-    let move_unsafe board ~row ~column player =
-      match move board ~row ~column player with
+    let move_unsafe board ~row ~column piece =
+      match move board ~row ~column piece with
         `InvalidMove -> failwith "Invalid Move"
       | result -> result
   end
