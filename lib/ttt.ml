@@ -1,5 +1,3 @@
-type player = P1 | P2
-
 type result = [`KeepPlaying | `Won | `Lost | `Draw]
 
 type move_result =
@@ -9,9 +7,7 @@ type move_result =
 module type PIECE =
   sig
     type t
-    val piece_of : player -> t
-    val to_string : t -> string
-    val example : int -> t
+    val pieces : t list
   end
 
 module type BOARD = functor (Piece : PIECE) ->
@@ -24,36 +20,16 @@ module type BOARD = functor (Piece : PIECE) ->
       column:int ->
       Piece.t ->
       move_result
+    val piece_at : t -> row:int -> column:int -> Piece.t option
   end
 
 module Board : BOARD = functor (Piece : PIECE) ->
   struct
     type t = Piece.t option array array
     let empty_board () : t = Array.make_matrix 3 3 None
-    let example () =
-      let board = empty_board () in
-      for x = 0 to 2 do
-        for y = 0 to 2 do
-          board.(x).(y) <- Some (Piece.example (3*x + y + 1))
-        done
-      done;
-      board
 
-    let to_ascii_art board =
-      let piece_option_to_string = function
-          None -> " "
-        | Some piece -> Piece.to_string piece
-      in
-      let row_to_art row =
-        piece_option_to_string row.(0) ^ " | " ^
-          piece_option_to_string row.(1) ^ " | " ^
-            piece_option_to_string row.(2)
-      in
-      row_to_art board.(0) ^ "\n" ^ "_________\n" ^
-      row_to_art board.(1) ^ "\n" ^ "_________\n" ^
-      row_to_art board.(2) ^ "\n"
-
-    let print board = print_string (to_ascii_art board)
+    let piece_at board ~row ~column =
+      board.(row).(column)
 
     let valid_move board ~row ~column player =
       match board.(row).(column) with
@@ -133,27 +109,10 @@ module Board : BOARD = functor (Piece : PIECE) ->
       match move board ~row ~column player with
         `InvalidMove -> failwith "Invalid Move"
       | result -> result
-
-
-  end
-
-module IntPiece =
-  struct
-    type t = int
-    let to_string = string_of_int
-    let example x = x
-    let piece_of = function
-        P1 -> 1 | P2 -> 2
   end
 
 module XOPiece =
   struct
     type t = X | O
-    let to_string = function
-        X -> "X"
-      | O -> "O"
-
-    let example x = X
-    let piece_of = function
-        P1 -> X | P2 -> O
+    let pieces = [ X ; O ]
   end
