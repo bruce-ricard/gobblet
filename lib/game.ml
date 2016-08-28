@@ -1,5 +1,6 @@
-module Game(Board : Ttt.BOARD) =
+module Game (Board : Ttt.BOARD) (Piece : Ttt.PIECE) =
   struct
+    module Board = Board(Piece)
     type t = {
         board : Board.t;
         next_player : Ttt.player
@@ -18,7 +19,7 @@ module Game(Board : Ttt.BOARD) =
 
     let move game ~row ~column player =
       if player = game.next_player then
-        (Board.move game.board ~row ~column player :> move_result)
+        (Board.move game.board ~row ~column (Piece.piece_of player) :> move_result)
       else
         `WrongPlayer
 

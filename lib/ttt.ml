@@ -1,6 +1,6 @@
 type player = P1 | P2
 
-type result = [`KeepPlaying | `Won of player | `Draw]
+type result = [`KeepPlaying | `Won | `Lost | `Draw]
 
 type move_result =
   [ `InvalidMove
@@ -14,7 +14,7 @@ module type PIECE =
     val example : int -> t
   end
 
-module type BOARD =
+module type BOARD = functor (Piece : PIECE) ->
   sig
     type t
     val empty_board : unit -> t
@@ -22,11 +22,11 @@ module type BOARD =
       t ->
       row:int ->
       column:int ->
-      player ->
+      Piece.t ->
       move_result
   end
 
-module Board (Piece : PIECE) =
+module Board : BOARD = functor (Piece : PIECE) ->
   struct
     type t = Piece.t option array array
     let empty_board () : t = Array.make_matrix 3 3 None
@@ -113,18 +113,18 @@ module Board (Piece : PIECE) =
       result.(2) <- Array.copy b.(2);
       result
 
-    let move board ~row ~column player =
-      if valid_move board ~row ~column player then
+    let move board ~row ~column piece  =
+      if valid_move board ~row ~column piece then
         begin
           (*          let board = copy_board board in*)
-          board.(row).(column) <- Some (Piece.piece_of player);
+          board.(row).(column) <- Some piece;
           match check_board board with
             None ->
             if board_is_full board then
               `Draw
             else
               `KeepPlaying
-          | Some piece -> `Won player
+          | Some piece -> `Won
         end
       else
         `InvalidMove
