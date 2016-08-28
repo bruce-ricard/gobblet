@@ -1,10 +1,10 @@
 type player = P1 | P2
 
-type result = KeepPlaying | Won of player | Draw
+type result = [`KeepPlaying | `Won of player | `Draw]
 
-type 'board move_result =
-  | InvalidMove
-  | Next of result * 'board
+type move_result =
+  [ `InvalidMove
+  | result ]
 
 module type PIECE =
   sig
@@ -23,7 +23,7 @@ module type BOARD =
       row:int ->
       column:int ->
       player ->
-      t move_result
+      move_result
   end
 
 module Board (Piece : PIECE) =
@@ -116,23 +116,23 @@ module Board (Piece : PIECE) =
     let move board ~row ~column player =
       if valid_move board ~row ~column player then
         begin
-          let board = copy_board board in
+          (*          let board = copy_board board in*)
           board.(row).(column) <- Some (Piece.piece_of player);
           match check_board board with
             None ->
             if board_is_full board then
-              Next(Draw, board)
+              `Draw
             else
-              Next(KeepPlaying, board)
-          | Some piece -> Next(Won player, board)
+              `KeepPlaying
+          | Some piece -> `Won player
         end
       else
-        InvalidMove
+        `InvalidMove
 
     let move_unsafe board ~row ~column player =
       match move board ~row ~column player with
-        InvalidMove -> failwith "Invalid Move"
-      | Next(result, board) -> result, board
+        `InvalidMove -> failwith "Invalid Move"
+      | result -> result
 
 
   end
