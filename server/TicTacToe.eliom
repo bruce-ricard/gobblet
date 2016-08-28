@@ -38,7 +38,13 @@ let connection_service =
   Eliom_service.Http.post_service
     ~fallback:main_service
     ~post_params:Eliom_parameter.(string "name" ** string "password")
-        ()
+    ()
+
+let disconnection_service =
+  Eliom_service.Http.post_service
+    ~fallback:main_service
+    ~post_params:Eliom_parameter.unit
+    ()
 
 let board = ref (XOBoard.empty_board ())
 let bus = Eliom_bus.create [%derive.json: string]
@@ -196,10 +202,25 @@ let connection_box () =
                          ()
       )
 
+let disconnect_box () =
+  Form.post_form
+    ~service:disconnection_service
+    (
+      fun () ->
+      [Form.input ~input_type:`Submit ~value:"Log out" Form.string]
+    )
+    ()
+
 let header_login () =
   let%lwt username = Eliom_reference.get username in
   match username with
-  | Some name -> Lwt.return (pcdata ("Logged in as " ^ name))
+  | Some name -> Lwt.return (
+                     div
+                       [
+                         pcdata ("Logged in as " ^ name);
+                         disconnect_box ()
+                       ]
+                   )
   | None -> connection_box ()
 
 let header () =
@@ -277,19 +298,18 @@ let options = {
   }
 
 let () =
-  TicTacToe_app.register
-    ~service:ttt_service
-    ~options
-    (*    ~scope:Eliom_common.default_group_scope*)
-    (fun () () ->
-      let _ = [%client (init_client () : unit)] in
-      game_page ()
-    );
-
   Eliom_registration.Html5.register
     ~service:main_service
     (fun () () ->
       welcome_page ()
+    );
+
+  TicTacToe_app.register
+    ~service:ttt_service
+    ~options
+    (fun () () ->
+      let _ = [%client (init_client () : unit)] in
+      game_page ()
     );
 
   Eliom_registration.Action.register
@@ -302,4 +322,10 @@ let () =
         end
       else
         Lwt.return ()
+    );
+
+  Eliom_registration.Action.register
+    ~service:disconnection_service
+    (fun () () ->
+      (Eliom_reference.set username (None));
     )
