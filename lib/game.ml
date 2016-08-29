@@ -1,14 +1,21 @@
 type player = P1 | P2
+type move_result = [ Ttt.move_result | `WrongPlayer ]
 
-module Game (Board : Ttt.BOARD) (Piece : Ttt.PIECE) =
+module type GAME =
+  sig
+    type t
+    val new_game : unit -> t
+    val move : t -> row:int -> column:int -> player -> move_result
+  end
+
+
+module Game (Board : Ttt.BOARD) (Piece : Ttt.PIECE) : GAME =
   struct
     module Board = Board(Piece)
     type t = {
         board : Board.t;
         next_player : player
       }
-
-    type move_result = [ Ttt.move_result | `WrongPlayer ]
 
     let new_game () =
       {

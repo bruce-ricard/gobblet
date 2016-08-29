@@ -6,7 +6,6 @@ type registration_result =
   | UserAlreadyExists
   | Error of string
 
-
 module type USERS =
   sig
     val register : user -> password -> registration_result
@@ -41,7 +40,7 @@ module Test_db : USER_DB =
   struct
     type t = (user * password) list ref
 
-    let users = ref [("bruce", "123"); ("arthur", "aeer")]
+    let users = ref [("bruce", "123"); ("bruce2", "123"); ("bruce3", "123"); ("arthur", "aeer")]
 
     let get user =
       try
