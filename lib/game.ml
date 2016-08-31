@@ -1,15 +1,16 @@
 type player = P1 | P2
 type move_result = [ Ttt.move_result | `WrongPlayer ]
 
-module type GAME =
+module type GAME = functor (Piece : Ttt.PIECE) ->
   sig
     type t
     val new_game : unit -> t
     val move : t -> row:int -> column:int -> player -> move_result
+    val piece_at : t -> row:int -> column:int -> Piece.t option
   end
 
 
-module Game (Board : Ttt.BOARD) (Piece : Ttt.PIECE) : GAME =
+module Game = functor (Board : Ttt.BOARD) (Piece : Ttt.PIECE) ->
   struct
     module Board = Board(Piece)
     type t = {
@@ -37,5 +38,7 @@ module Game (Board : Ttt.BOARD) (Piece : Ttt.PIECE) : GAME =
         (Board.move game.board ~row ~column (piece_of player) :> move_result)
       else
         `WrongPlayer
+
+    let piece_at game = Board.piece_at game.board
 
   end

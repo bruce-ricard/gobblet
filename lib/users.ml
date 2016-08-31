@@ -9,14 +9,15 @@ type registration_result =
 module type USERS =
   sig
     val register : user -> password -> registration_result
-    val get_user : user -> password -> User.user option
+    val get_user : user -> User.user option
+    val log_in : user -> password -> User.user option (* TODO maybe make this a logged in user ?*)
   end
 
 module type USER_DB =
   sig
     val get : user -> password -> User.user option
     val exists : user -> bool
-    val put : user -> User.user  -> unit
+    val put : user -> password -> unit
   end
 
 module Users(User_db : USER_DB) : USERS =
@@ -27,10 +28,13 @@ module Users(User_db : USER_DB) : USERS =
       let user = normalize user in
       match User_db.exists user with
         true -> UserAlreadyExists
-      | false -> User_db.put user (new User.user user password); Success
+      | false -> User_db.put user password; Success
 
-    let get_user  user password =
+    let log_in user password =
       User_db.get user password
+
+    let get_user user =
+      User_db.get user ""
   end
 
 
@@ -39,18 +43,20 @@ module Test_db : USER_DB =
     type t = (user * password) list ref
 
     let users = [("bruce", "123"); ("bruce2", "123"); ("bruce3", "123"); ("arthur", "aeer")]
-    let users_o = ref ((List.map (fun (name, passwd) -> name, new User.user name passwd)) users)
+    let users_o = ref ((List.map (fun (name, passwd) ->
+                            (name, passwd), new User.user name passwd)) users)
 
     let exists login =
-      List.exists (fun (l,_) -> l = login) !users_o
+      List.exists (fun ((l,_),_) -> l = login) !users_o
 
     let get user password =
       try
-        Some (List.assoc user !users_o)
+        Some (List.assoc (user, password) !users_o)
       with
         Not_found -> None
 
-    let put login user = users_o := (login, user) :: !users_o
+    let put login password =
+      users_o := ((login, password), new User.user login password) :: !users_o
   end
 
 module Users_test = Users(Test_db)
