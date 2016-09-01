@@ -2,8 +2,9 @@ open Game
 open Games
 
 module Games = MemoryGames
-module TTTGame = Game(Ttt.Board)
-module TTTGames = Games(TTTGame)(Ttt.XOPiece)
+module TTTGameF = Game(Ttt.Board)
+module TTTGame = TTTGameF(Ttt.XOPiece)
+module TTTGames = Games(TTTGameF)(Ttt.XOPiece)
 
 class user login password =
 object
