@@ -15,7 +15,7 @@ module Game = functor (Board : Ttt.BOARD) (Piece : Ttt.PIECE) ->
     module Board = Board(Piece)
     type t = {
         board : Board.t;
-        next_player : player
+        mutable next_player : player
       }
 
     let new_game () =
