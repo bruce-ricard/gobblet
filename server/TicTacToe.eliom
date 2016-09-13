@@ -6,12 +6,13 @@
     open Lwt
     open Ttt
     open Users
-    open User
 
     module TTTUsers = Users_test
 
     (*    module TTTGame = TTTGameF(Ttt.XOPiece)*)
-    module TTT = TTTGameInProgress
+    module TTT = User.TTTGameInProgress
+    module TTTGames = User.TTTGames
+    module MemoryGames = User.Games
 
     type messages =
       (int * int * int)
@@ -56,7 +57,7 @@ let disconnection_service =
 
 let bus = Eliom_bus.create [%derive.json: string]
 let current_user =
-  Eliom_reference.eref ~scope:Eliom_common.default_session_scope (None : (string * user) option)
+  Eliom_reference.eref ~scope:Eliom_common.default_session_scope (None : (string * User.user) option)
 
 let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
 
@@ -79,7 +80,7 @@ let move (game_id, row, column) =
   | None -> Lwt.return `WrongPlayer
   | Some (user, _) ->
      begin
-       match TTTGames.get_game_by_id (ID game_id) with
+       match TTTGames.get_game_by_id (Games.ID game_id) with
          None -> Lwt.return `WrongPlayer
        | Some game ->
           Lwt.wrap (fun () ->
@@ -89,7 +90,7 @@ let move (game_id, row, column) =
 
 let%client move_rpc =  ~%(server_function [%derive.json: messages] move)
 
-let cell game_id x y content =
+let cell (Games.ID game_id) x y content =
   let sign = piece_to_string content in
   let cell =
     td
@@ -107,17 +108,12 @@ let cell game_id x y content =
                        let%lwt move_result = move_rpc (~%game_id, ~%x,~%y) in
                        begin
                          match move_result with
-                           InvalidMove -> Eliom_lib.alert "Invalid move!"
-                         | Next(result, new_board) ->
-                            begin
-                              update_game new_board;
-
-                              match result with
-                                KeepPlaying ->  update_current_player ()
-                              | Won P1 -> Eliom_lib.alert "Player 1 won !"
-                              | Won P2 -> Eliom_lib.alert "Player 2 won !"
-                              | Draw -> Eliom_lib.alert " Draw!"
-                            end
+                           `InvalidMove -> Eliom_lib.alert "Invalid move!"
+                         | `WrongPlayer -> Eliom_lib.alert "Not your turn"
+                         | `KeepPlaying ->  Eliom_lib.alert "keep playing"
+                         | `Won -> Eliom_lib.alert "You won !"
+                         | `Lost -> Eliom_lib.alert "You lost :("
+                         | `Draw -> Eliom_lib.alert " Draw!"
                        end;
                        Lwt.return ())
                  );
@@ -284,7 +280,7 @@ let game_page game =
       div [h1 [pcdata "Welcome to this tic tac toe game!"]];
       div [board_html game; chat_html ()];
     ] in
-  let _ = [%client update_game game] in
+  (*  let _ = [%client update_game ~%game] in*)
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Tic Tac Toe"
@@ -308,7 +304,7 @@ let () =
     ~options
     (fun id () ->
       let _ = [%client (init_client () : unit)] in
-      game_page (ID id)
+      game_page (Games.ID id)
     );
 
   Eliom_registration.Html5.register
