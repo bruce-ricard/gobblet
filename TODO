@@ -1,0 +1,36 @@
+### URGENT ###
+
+- make sure game can be played: players play on their turn
+- organize library: don't export all the modules, only the ones needed
+- organize server:
+  - separate .eliom files into multiple
+  - maybe create some ml file with the main common functions
+- https: test https with non test run (port 80)
+
+### LONG TERM ###
+
+- implement timer/chess clock for games
+- chat:
+  - have a chat in each game for the players
+  - have a general chat on the welcome page
+
+- games:
+  - tictactoe:
+    - normal
+    - only X:
+      - normal
+      - looser wins
+      - 3 boards
+  - morris:
+    - 3 men
+    - 9 men
+    - 10 men
+    - 12 men
+  - checkers:
+    - 8x8
+    - 10x10
+  - hex
+  - chess
+
+
+- Nagios monitoring
