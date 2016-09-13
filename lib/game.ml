@@ -7,8 +7,8 @@ module type GAME = functor (Piece : Ttt.PIECE) ->
     val new_game : unit -> t
     val move : t -> row:int -> column:int -> player -> move_result
     val piece_at : t -> row:int -> column:int -> Piece.t option
+    val player_on : t -> player
   end
-
 
 module Game = functor (Board : Ttt.BOARD) (Piece : Ttt.PIECE) ->
   struct
@@ -26,6 +26,8 @@ module Game = functor (Board : Ttt.BOARD) (Piece : Ttt.PIECE) ->
 
     let next_player = function
         P1 -> P2 | P2 -> P1
+
+    let player_on game = game.next_player
 
     let piece_of =
       match Piece.pieces with

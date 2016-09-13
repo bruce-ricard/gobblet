@@ -17,4 +17,4 @@ Executable "test"
 
 Library "ttt"
   Path: .
-  Modules: Users, Ttt, Game, Games, User
+  Modules: Users, Ttt, Game, Games, User, GameInProgress

@@ -1,10 +1,11 @@
 open Game
 open Games
+open GameInProgress
 
 module Games = MemoryGames
 module TTTGameF = Game(Ttt.Board)
-module TTTGame = TTTGameF(Ttt.XOPiece)
-module TTTGames = Games(TTTGameF)(Ttt.XOPiece)
+module TTTGameInProgress = GameInProgress(TTTGameF)(Ttt.XOPiece)
+module TTTGames = Games(GameInProgress)(TTTGameF)(Ttt.XOPiece)
 
 class user login password =
 object
