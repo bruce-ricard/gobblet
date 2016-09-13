@@ -129,12 +129,7 @@ let row id game x =
 
 let empty_row n = row n
 
-let board_html game_id =
-  let game =
-    match TTTGames.get_game_by_id game_id with
-    | Some g -> g
-    | None -> failwith "no game"
-  in
+let board_html game_id game =
   (* TODO populate with game instead of empty*)
   table [
       row game_id game 0;
@@ -274,11 +269,39 @@ let show_my_games_page () =
 
 
 
-let game_page game =
+let game_page game_id =
+  let game =
+    match TTTGames.get_game_by_id game_id with
+    | Some g -> g
+    | None -> failwith "no game"
+  in
+  let phrase (user, piece) = (* TODO: rename this function *)
+    Printf.sprintf "%s : %s" user (piece_to_string (Some piece))
+  in
+  let turn_sentence = function
+      None -> "Enjoy watching"
+    | Some (user,_) ->
+       begin
+         match TTT.user_status game user with
+         | `Play -> "It's your turn"
+         | `Wait -> "It's your oponent's turn"
+         | `Watch -> "Enjoy watching " ^ user
+       end
+  in
+  let%lwt username =
+    Eliom_reference.get current_user
+  in
+
   let content =
     [
       div [h1 [pcdata "Welcome to this tic tac toe game!"]];
-      div [board_html game; chat_html ()];
+      div [
+          pcdata (phrase (TTT.username_and_piece game P1));
+          br ();
+          pcdata (phrase (TTT.username_and_piece game P2))
+        ];
+      div [pcdata (turn_sentence username)];
+      div [board_html game_id game; chat_html ()];
     ] in
   (*  let _ = [%client update_game ~%game] in*)
   skeleton
