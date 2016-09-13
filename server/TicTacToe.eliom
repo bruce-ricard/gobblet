@@ -35,7 +35,7 @@ let main_service =
 
 let show_my_games_service =
   Eliom_service.Http.service
-    ~path:[]
+    ~path:["games"; "tictactoe"]
     ~get_params:Eliom_parameter.unit
     ()
 
@@ -292,7 +292,7 @@ let options = {
     Eliom_registration.do_not_launch = false;
   }
 
-let () =
+let register () =
   Eliom_registration.Html5.register
     ~service:main_service
     (fun () () ->
@@ -324,3 +324,5 @@ let () =
     (fun () () ->
       (Eliom_reference.set current_user (None));
     )
+
+let () = register ()
