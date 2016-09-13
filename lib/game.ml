@@ -38,7 +38,13 @@ module Game = functor (Board : Ttt.BOARD) (Piece : Ttt.PIECE) ->
 
     let move game ~row ~column player =
       if player = game.next_player then
-        (Board.move game.board ~row ~column (piece_of player) :> move_result)
+        begin
+          let result =
+            (Board.move game.board ~row ~column (piece_of player) :> move_result)
+          in
+          game.next_player <- next_player game.next_player;
+          result
+        end
       else
         `WrongPlayer
 

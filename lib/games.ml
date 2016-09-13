@@ -50,6 +50,6 @@ module MemoryGames : GAMES =
       Not_found -> None
 
   let () =
-    ignore (new_game "bruce" "bruce1")
+    ignore (new_game "bruce" "bruce2")
 
   end

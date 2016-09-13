@@ -14,6 +14,8 @@
     module TTTGames = User.TTTGames
     module MemoryGames = User.Games
 
+    let _ = TTTGames.new_game "bruce" "bruce2"
+
     type messages =
       (int * int * int)
         [@@deriving json]
