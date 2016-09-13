@@ -31,7 +31,7 @@ module Users(User_db : USER_DB) : USERS =
       | false -> User_db.put user password; Success
 
     let log_in user password =
-      User_db.get user password
+      User_db.get (normalize user) password
 
     let get_user user =
       User_db.get user ""

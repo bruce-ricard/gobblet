@@ -22,7 +22,7 @@ module MemoryGames : GAMES =
   let games = ref []
 
   let next_id =
-    let id = ref 2 in
+    let id = ref 0 in
     function () ->
              incr id;
              ID !id

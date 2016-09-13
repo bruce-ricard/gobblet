@@ -7,6 +7,7 @@ module type GAME_IN_PROGRESS =
     val new_game : (player -> string) -> t
     val move : t -> row:int -> column:int -> string -> move_result
     val piece_at : t -> row:int -> column:int -> Piece.t option
+    val username_and_piece : t -> player -> (string * Piece.t)
   end
 
 module GameInProgress : GAME_IN_PROGRESS =
@@ -63,4 +64,9 @@ module GameInProgress : GAME_IN_PROGRESS =
          Game.move game.game ~row ~column player
 
     let piece_at game = Game.piece_at game.game
+
+    let username_and_piece game player =
+      let user = game.players player
+      and piece = Game.piece_of player
+      in user, piece
   end
