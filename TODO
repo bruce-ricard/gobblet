@@ -1,6 +1,7 @@
 ### URGENT ###
 
 - make sure game can be played: players play on their turn
+- Fix cap sensitivity in usernames
 - organize library: don't export all the modules, only the ones needed
 - organize server:
   - separate .eliom files into multiple
