@@ -1,5 +1,13 @@
 open Game
 
+type user_action = [
+    `Play
+  | `Wait
+  | `Watch
+  ]
+
+
+
 module type GAME_IN_PROGRESS =
   functor (Game : GAME) (Piece : Ttt.PIECE) ->
   sig
@@ -8,6 +16,7 @@ module type GAME_IN_PROGRESS =
     val move : t -> row:int -> column:int -> string -> move_result
     val piece_at : t -> row:int -> column:int -> Piece.t option
     val username_and_piece : t -> player -> (string * Piece.t)
+    val user_status : t -> string -> user_action
   end
 
 module GameInProgress : GAME_IN_PROGRESS =
@@ -19,12 +28,6 @@ module GameInProgress : GAME_IN_PROGRESS =
         game : Game.t;
         players : player -> string
       }
-
-    type user_action = [
-        `Play
-      | `Wait
-      | `Watch
-      ]
 
     let new_game players =
       let game = Game.new_game () in
