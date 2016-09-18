@@ -19,6 +19,9 @@
     type messages =
       (int * int * int)
         [@@deriving json]
+
+    type board_update = bool
+
 ]
 
 module TicTacToe_app =
@@ -76,6 +79,8 @@ let%client update_game game =
     done
   done
 
+let react_update_functions = ref []
+
 let move (game_id, row, column) =
   let%lwt user = Eliom_reference.get current_user in
   match user with
@@ -85,54 +90,58 @@ let move (game_id, row, column) =
        match TTTGames.get_game_by_id (Games.ID game_id) with
          None -> Lwt.return `WrongPlayer
        | Some game ->
+          let update_function = List.assoc game_id !react_update_functions in
           Lwt.wrap (fun () ->
               let result = TTT.move game ~row ~column user in
+              update_function game;
               result)
      end
 
 let%client move_rpc =  ~%(server_function [%derive.json: messages] move)
 
-let cell (Games.ID game_id) x y content =
-  let sign = piece_to_string content in
+let%client update_dom_content cell content =
+  let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
+  ignore (React.E.map (fun s -> dom_cell##.innerHTML := Js.string s) dom_cell)
+
+let%client cell_on_click () =
+  (Lwt.async (fun () ->
+       Lwt_js_events.clicks
+         dom_cell
+         (fun _ _ ->
+           let%lwt move_result = move_rpc (~%game_id, ~%x,~%y) in
+           begin
+             match move_result with
+               `InvalidMove -> Eliom_lib.alert "Invalid move!"
+             | `WrongPlayer -> Eliom_lib.alert "Not your turn"
+             | _ ->  Eliom_lib.alert "keep playing"
+           end;
+           Lwt.return ())
+     )
+  )
+
+let cell (Games.ID game_id) content =
   let cell =
     td
       ~a:[a_class ["cell"]]
-      [pcdata sign]
+      []
   in
   let _ = [%client
-              (Lwt.async (fun () ->
-                   let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
-                   update_cells_matrix.(~%x).(~%y) <-
-                     (fun s -> dom_cell##.innerHTML := Js.string s);
-                   Lwt_js_events.clicks
-                     dom_cell
-                     (fun _ _ ->
-                       let%lwt move_result = move_rpc (~%game_id, ~%x,~%y) in
-                       begin
-                         match move_result with
-                           `InvalidMove -> Eliom_lib.alert "Invalid move!"
-                         | `WrongPlayer -> Eliom_lib.alert "Not your turn"
-                         | `KeepPlaying ->  Eliom_lib.alert "keep playing"
-                         | `Won -> Eliom_lib.alert "You won !"
-                         | `Lost -> Eliom_lib.alert "You lost :("
-                         | `Draw -> Eliom_lib.alert " Draw!"
-                       end;
-                       Lwt.return ())
-                 );
-            : unit)]
-in
+              (cell_on_click ();
+               update_cell_content ~%cell content
+              : unit)]
+  in
   cell
 
 let row id game x =
-  tr [cell id x 0 (TTT.piece_at game ~row:x ~column:0);
-      cell id x 1 (TTT.piece_at game ~row:x ~column:1);
-      cell id x 2 (TTT.piece_at game ~row:x ~column:2)
+  tr [
+      cell id (React.E.map (TTT.piece_at game ~row:x ~column:0));
+      cell id (React.E.map (TTT.piece_at game ~row:x ~column:1));
+      cell id (React.E.map (TTT.piece_at game ~row:x ~column:2))
      ]
 
 let empty_row n = row n
 
 let board_html game_id game =
-  (* TODO populate with game instead of empty*)
   table [
       row game_id game 0;
       row game_id game 1;
@@ -140,10 +149,49 @@ let board_html game_id game =
     ]
 
 let chat_logs_html () =
-  ul [
-      li [pcdata "test"];
-      li [pcdata "123"]
-    ]
+  let x, ux = React.E.create () in
+  let r =  Eliom_react.Down.of_react x in
+
+  let lir = li [pcdata "0"] in
+  let html =
+    ul [
+        li [pcdata "test"];
+        li [pcdata "123"];
+        lir
+      ]
+  in
+  let _ = [%client
+              (
+              (*                Lwt.async (fun () ->*) (
+                (
+                      let dom_cell = Eliom_content.Html5.To_dom.of_element ~%lir in
+                      dom_cell##.innerHTML := Js.string "wazuuuuup";
+                      let _ =
+                        React.E.map
+                          (fun i ->
+                            dom_cell##.innerHTML := Js.string (string_of_int i)
+                          )
+                          ~%r
+                      in
+                      ()
+                    (*                      Lwt.return ()*)
+                    )
+                )
+                : unit
+              )
+          ]
+  in
+  let _ =
+    Lwt.async (fun () ->
+        let%lwt _ = Lwt_unix.sleep 3. in
+        List.fold_left
+             (fun y x -> Lwt.bind y (fun () -> ux x; Lwt_unix.sleep 3.))
+             (Lwt.return ())
+             [1;2;3;4;5;6;7;8;9;10]
+
+      ) in
+  let pr = React.E.map print_int x in
+  html
 
 let chat_input_text_html () =
   div []
