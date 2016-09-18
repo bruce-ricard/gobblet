@@ -2,7 +2,9 @@
 
 - make sure game can be played: players play on their turn
 - Fix cap sensitivity in usernames
-- organize library: don't export all the modules, only the ones needed
+- organize library:
+  - don't export all the modules, only the ones needed
+  - rename all functors Make
 - organize server:
   - separate .eliom files into multiple
   - maybe create some ml file with the main common functions
