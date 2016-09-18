@@ -1,27 +1,4 @@
-type result = [`KeepPlaying | `Won | `Lost | `Draw]
-
-type move_result =
-  [ `InvalidMove
-  | result ]
-
-module type PIECE =
-  sig
-    type t
-    val pieces : t list
-  end
-
-module type BOARD = functor (Piece : PIECE) ->
-  sig
-    type t
-    val empty_board : unit -> t
-    val move :
-      t ->
-      row:int ->
-      column:int ->
-      Piece.t ->
-      move_result
-    val piece_at : t -> row:int -> column:int -> Piece.t option
-  end
+open Types
 
 module Board : BOARD = functor (Piece : PIECE) ->
   struct
@@ -89,17 +66,20 @@ module Board : BOARD = functor (Piece : PIECE) ->
       result.(2) <- Array.copy b.(2);
       result
 
+    let board_status board =
+      match check_board board with
+      | None ->
+        if board_is_full board then
+          `Draw
+        else
+          `KeepPlaying
+      | Some piece -> `Won
+
     let move board ~row ~column piece  =
       if valid_move board ~row ~column then
         begin
           board.(row).(column) <- Some piece;
-          match check_board board with
-            None ->
-            if board_is_full board then
-              `Draw
-            else
-              `KeepPlaying
-          | Some piece -> `Won
+          `OK
         end
       else
         `InvalidMove

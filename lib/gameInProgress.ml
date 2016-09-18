@@ -1,32 +1,13 @@
-open Game
-
-type user_action = [
-    `Play
-  | `Wait
-  | `Watch
-  ]
-
-
-
-module type GAME_IN_PROGRESS =
-  functor (Game : GAME) (Piece : Ttt.PIECE) ->
-  sig
-    type t
-    val new_game : (player -> string) -> t
-    val move : t -> row:int -> column:int -> string -> move_result
-    val piece_at : t -> row:int -> column:int -> Piece.t option
-    val username_and_piece : t -> player -> (string * Piece.t)
-    val user_status : t -> string -> user_action
-  end
+open Types
 
 module GameInProgress : GAME_IN_PROGRESS =
-  functor (Game : GAME) (Piece : Ttt.PIECE) ->
+  functor (Game : GAME) (Piece : PIECE) ->
   struct
   module Game = Game(Piece)
     type t =
       {
         game : Game.t;
-        players : player -> string
+        players : player -> string;
       }
 
     let new_game players =

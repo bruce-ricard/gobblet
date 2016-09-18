@@ -17,4 +17,5 @@ Executable "test"
 
 Library "ttt"
   Path: .
-  Modules: Users, Ttt, Game, Games, User, GameInProgress
+  BuildDepends: lwt.react
+  Modules: Users, Ttt, Game, Games, User, GameInProgress, FrontAndBackendReactGame

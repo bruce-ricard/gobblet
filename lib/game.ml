@@ -1,17 +1,6 @@
-type player = P1 | P2
-type move_result = [ Ttt.move_result | `WrongPlayer ]
+open Types
 
-module type GAME = functor (Piece : Ttt.PIECE) ->
-  sig
-    type t
-    val new_game : unit -> t
-    val move : t -> row:int -> column:int -> player -> move_result
-    val piece_at : t -> row:int -> column:int -> Piece.t option
-    val player_on : t -> player
-    val piece_of : player -> Piece.t
-  end
-
-module Game = functor (Board : Ttt.BOARD) (Piece : Ttt.PIECE) ->
+module Game = functor (Board : BOARD) (Piece : PIECE) ->
   struct
     module Board = Board(Piece)
     type t = {

@@ -1,23 +1,10 @@
-open GameInProgress
-open Game
-
-type id = ID of int
-
-module type GAMES =
-  functor (GameInProgress : GAME_IN_PROGRESS) (GameF : GAME) (Piece : Ttt.PIECE) ->
-  sig
-    val new_game : string -> string -> id * GameInProgress(GameF)(Piece).t
-    val get_current_games : string -> (id * GameInProgress(GameF)(Piece).t) list
-    val get_game_by_id : id -> GameInProgress(GameF)(Piece).t option
-(*    val get_finished_games : string -> GameInProgress.t list
-    val get_challenges_sent : string -> GameInProgress.t list
-    val get_challenges_received : string -> GameInProgress.t list*)
-  end
+open Types
 
 module MemoryGames : GAMES =
-  functor (GameInProgress : GAME_IN_PROGRESS) (Game : GAME) (Piece : Ttt.PIECE) ->
+  functor  (FBGame : FB_REACT_GAME)
+             (GameInProgress : GAME_IN_PROGRESS) (Game : GAME) (Piece : PIECE) (RDB : REACT_DB) ->
   struct
-  module GameInProgress = GameInProgress(Game)(Piece)
+  module GameM = FBGame(GameInProgress)(Game)(Piece)(RDB)
 
   let games = ref []
 
@@ -33,9 +20,9 @@ module MemoryGames : GAMES =
 
   let new_game user1 user2 =
     let players = users_to_player_function user1 user2 in
-    let game = GameInProgress.new_game players in
+    let game, react_game = GameM.new_game players in
     let id = next_id () in
-    let game_with_id = id, game in
+    let game_with_id = id, react_game in
     games := game_with_id :: !games;
     game_with_id
 
