@@ -11,9 +11,18 @@
 - https: test https with non test run (port 80)
 - make the board have cool colors when you hover over it and it's your turn
 
-### LONG TERM ###
+### BEFORE BEING ABLE TO PUSH BETA ###
+
+- have actual DBs for data (games, users etc.)
+- normal and only X ttt, morris
+
+- Nagios monitoring
 
 - implement timer/chess clock for games
+
+
+### LONG TERM ###
+
 - chat:
   - have a chat in each game for the players
   - have a general chat on the welcome page
@@ -38,6 +47,3 @@
     - 10x10
   - hex
   - chess
-
-
-- Nagios monitoring
