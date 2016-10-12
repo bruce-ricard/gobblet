@@ -4,13 +4,13 @@
     open Html5
     open Html5.D
     open Lwt
-    open Ttt
+    open Types
     open Users
 
     module TTTUsers = Users_test
 
     (*    module TTTGame = TTTGameF(Ttt.XOPiece)*)
-    module TTT = User.TTTGameInProgress
+    module TTT = User.TTTFBGame
     module TTTGames = User.TTTGames
     module MemoryGames = User.Games
 
@@ -67,7 +67,7 @@ let current_user =
 let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
 
 let%shared piece_to_string =
-  let open XOPiece in function
+  let open Ttt.XOPiece in function
     None -> ""
   | Some(X) -> "X"
   | Some(O) -> "O"
@@ -87,28 +87,32 @@ let move (game_id, row, column) =
   | None -> Lwt.return `WrongPlayer
   | Some (user, _) ->
      begin
-       match TTTGames.get_game_by_id (Games.ID game_id) with
+       match TTTGames.get_game_by_id (ID game_id) with
          None -> Lwt.return `WrongPlayer
        | Some game ->
           let update_function = List.assoc game_id !react_update_functions in
           Lwt.wrap (fun () ->
-              let result = TTT.move game ~row ~column user in
-              update_function game;
+              (* this ain't gonna work, I need to have a react value on the client with
+the last move, and have a react map on the server which processes it *)
+              let result = E.map
+                             (fun game -> TTT.move game ~row ~column user;
+                                          update_function game)
+                             game in
               result)
      end
 
-let%client move_rpc =  ~%(server_function [%derive.json: messages] move)
+let%client move_rpc = ~%(server_function [%derive.json: messages] move)
 
-let%client update_dom_content cell content =
-  let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
+let%client update_dom_content cell =
+  let dom_cell = Eliom_lib.Html5.To_dom.of_element cell in
   ignore (React.E.map (fun s -> dom_cell##.innerHTML := Js.string s) dom_cell)
 
-let%client cell_on_click () =
+let%client cell_on_click game_id x y =
   (Lwt.async (fun () ->
        Lwt_js_events.clicks
          dom_cell
          (fun _ _ ->
-           let%lwt move_result = move_rpc (~%game_id, ~%x,~%y) in
+           let%lwt move_result = move_rpc (game_id, x, y) in
            begin
              match move_result with
                `InvalidMove -> Eliom_lib.alert "Invalid move!"
@@ -119,24 +123,24 @@ let%client cell_on_click () =
      )
   )
 
-let cell (Games.ID game_id) content =
+let cell (Games.ID game_id) x y content =
   let cell =
     td
       ~a:[a_class ["cell"]]
       []
   in
   let _ = [%client
-              (cell_on_click ();
-               update_cell_content ~%cell content
+              (cell_on_click ~%game_id ~%x ~%y;
+               update_cell_contentasdf ~%cell content
               : unit)]
   in
   cell
 
 let row id game x =
   tr [
-      cell id (React.E.map (TTT.piece_at game ~row:x ~column:0));
-      cell id (React.E.map (TTT.piece_at game ~row:x ~column:1));
-      cell id (React.E.map (TTT.piece_at game ~row:x ~column:2))
+      cell id x 0 (React.E.map (fun g -> TTT.piece_at g ~row:x ~column:0) game);
+      cell id x 1 (React.E.map (fun g -> TTT.piece_at g ~row:x ~column:1) game);
+      cell id x 2 (React.E.map (fun g -> TTT.piece_at g ~row:x ~column:2) game)
      ]
 
 let empty_row n = row n
@@ -322,7 +326,7 @@ let show_my_games_page () =
 let game_page game_id =
   let game =
     match TTTGames.get_game_by_id game_id with
-    | Some g -> g
+    | Some g -> (g : 'a React.event)
     | None -> failwith "no game"
   in
   let phrase (user, piece) = (* TODO: rename this function *)
