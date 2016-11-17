@@ -1,6 +1,6 @@
 open Types
 
-module MemoryGames : GAMES =
+module Make : GAMES =
   functor  (FBGame : FB_REACT_GAME)
              (GameInProgress : GAME_IN_PROGRESS) (Game : GAME) (Piece : PIECE) (RDB : REACT_DB) ->
   struct

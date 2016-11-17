@@ -20,7 +20,7 @@ module type USER_DB =
     val put : user -> password -> unit
   end
 
-module Users(User_db : USER_DB) : USERS =
+module Make(User_db : USER_DB) : USERS =
   struct
     let normalize = String.lowercase
 

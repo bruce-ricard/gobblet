@@ -1,6 +1,6 @@
 open Types
 
-module Game = functor (Board : BOARD) (Piece : PIECE) ->
+module Make = functor (Board : BOARD) (Piece : PIECE) ->
   struct
     module Board = Board(Piece)
     type t = {

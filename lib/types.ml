@@ -68,7 +68,7 @@ module type GAME_IN_PROGRESS =
 module type REACT_DB = functor
     (Game : sig type t end) ->
   sig
-    val put : int -> Game.t React.E.t * (?step:React.step -> Game.t -> unit) -> unit
+    val put : int -> Game.t React.event * (?step:React.step -> Game.t -> unit) -> unit
     val delete : int -> unit
     val get_channel : int -> Game.t React.E.t (* Make this a "down" react already, since it's only for frontend use *)
     val get_update_function : int -> (?step:React.step -> Game.t -> unit)
@@ -89,7 +89,8 @@ type id = ID of int
 
 module type GAMES =
   functor (FBGame : FB_REACT_GAME)
-            (GameInProgress : GAME_IN_PROGRESS) (GameF : GAME) (Piece : PIECE) (ReactDB : REACT_DB) ->
+            (GameInProgress : GAME_IN_PROGRESS)
+            (GameF : GAME) (Piece : PIECE) (ReactDB : REACT_DB) ->
   sig
     val new_game : string -> string -> id * GameInProgress(GameF)(Piece).t React.E.t
     val get_current_games : string -> (id * GameInProgress(GameF)(Piece).t React.E.t) list

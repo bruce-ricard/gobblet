@@ -1,6 +1,3 @@
-open Game
-open Games
-open GameInProgress
 open Types
 
 module RDB (T : sig type t end) =
@@ -15,12 +12,10 @@ module RDB (T : sig type t end) =
     let get_update_function id = snd (get id)
   end
 
-
-module Games = MemoryGames
-module TTTGameF = Game(Ttt.Board)
-module TTTGameInProgress = GameInProgress(TTTGameF)(Ttt.XOPiece)
-module TTTFBGame = FrontAndBackendReactGame.FrontAndBackendReactGame(GameInProgress)(TTTGameF)(Ttt.XOPiece)(RDB)
-module TTTGames = Games(FrontAndBackendReactGame.FrontAndBackendReactGame)(GameInProgress)(TTTGameF)(Ttt.XOPiece)(RDB)
+module TTTGameF = Game.Make(Ttt.Board)
+module TTTGameInProgress = GameInProgress.Make(TTTGameF)(Ttt.XOPiece)
+module TTTFBGame = FrontAndBackendReactGame.Make(GameInProgress.Make)(TTTGameF)(Ttt.XOPiece)(RDB)
+module TTTGames = Games.Make(FrontAndBackendReactGame.Make)(GameInProgress)(TTTGameF)(Ttt.XOPiece)(RDB)
 
 class user login password =
 object

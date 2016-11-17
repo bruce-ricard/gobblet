@@ -10,6 +10,7 @@ module FrontAndBackendReactGame : FB_REACT_GAME = functor
   struct
     module GameM = GameInProgress(GameF)(Piece)
     module ReactDB = ReactDB(GameM)
+
     type t = int
 
     let new_game (players : player -> string) =
