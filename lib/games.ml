@@ -33,8 +33,8 @@ module Make : GAMES =
     (* TODO: check that both users are actually users *)
     let players = users_to_player_function user1 user2 in
     let (game, react) = GameM.new_game players in
-    let id = (next_id ()) in
-    RDB.put id react;
+    let ID id = (next_id ()) in
+    RDB.put id (game,react);
     games := (id, game) :: !games;
     (id, (game, react))
 

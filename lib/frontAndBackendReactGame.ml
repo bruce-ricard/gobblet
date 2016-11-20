@@ -5,7 +5,7 @@ module FrontAndBackendReactGame : FB_REACT_GAME = functor
       (GameF : GAME)
       (Piece : PIECE)
       (ReactDB : REACT_DB)
-      (Games : GAMES) ->
+  ->
 
   struct
     module GameM = GameInProgress(GameF)(Piece)
@@ -13,14 +13,21 @@ module FrontAndBackendReactGame : FB_REACT_GAME = functor
 
     type t = int
 
+    let new_id =
+      let id = ref 0 in
+      function () -> incr id; !id
+
     let new_game (players : player -> string) =
       let game = GameM.new_game players in
-      let react = React.E.create () in
-      game, react
+      let react_game, update_function = React.E.create () in
+      let id = new_id () in
+      ReactDB.put id (react_game, update_function);
+      id, react_game
 
-    let move = Games.move
+    let move = GameM.move
 
-    let move game update_function ~row ~column user =
+    let move id ~row ~column user =
+      let update_function = ReactDB.get_update_function id in
         match GameM.move game ~row ~column user with
         | `OK -> update_function game; `OK
         | x ->  x

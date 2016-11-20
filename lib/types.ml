@@ -65,13 +65,15 @@ module type GAME_IN_PROGRESS =
     val user_status : t -> string -> user_action
   end
 
+type id = ID of int
+
 module type REACT_DB = functor
     (Game : sig type t end) ->
   sig
-    val put : int -> Game.t React.event * (?step:React.step -> Game.t -> unit) -> unit
-    val delete : int -> unit
-    val get_channel : int -> Game.t React.E.t (* Make this a "down" react already, since it's only for frontend use *)
-    val get_update_function : int -> (?step:React.step -> Game.t -> unit)
+    val put : id -> Game.t React.event * (?step:React.step -> Game.t -> unit) -> unit
+    val delete : id -> unit
+    val get_channel : id -> Game.t React.E.t (* Make this a "down" react already, since it's only for frontend use *)
+    val get_update_function : id -> (?step:React.step -> Game.t -> unit)
   end
 
 module type FB_REACT_GAME =
@@ -85,8 +87,6 @@ module type FB_REACT_GAME =
     val user_status : t -> string -> user_action
   end
 
-type id = ID of int
-
 module type GAMES =
   functor (FBGame : FB_REACT_GAME)
             (GameInProgress : GAME_IN_PROGRESS)
@@ -99,4 +99,20 @@ module type GAMES =
 (*    val get_finished_games : string -> GameInProgress.t list
     val get_challenges_sent : string -> GameInProgress.t list
     val get_challenges_received : string -> GameInProgress.t list*)
+  end
+
+module type EXPORT =
+  functor (GameInProgress : GAME_IN_PROGRESS)
+            (GameF : GAME)
+            (Piece : PIECE)
+            (ReactDB : REACT_DB) ->
+  sig
+    val new_game : string -> string -> id * GameInProgress(GameF)(Piece).t React.E.t
+    val get_current_games : string -> (id * GameInProgress(GameF)(Piece).t React.E.t) list
+    val get_react_game_by_id : id -> GameInProgress(GameF)(Piece).t React.E.t option
+    val get_game_by_id : id -> GameInProgress(GameF)(Piece).t option
+    val move : id -> row:int -> column:int -> string -> move_result
+    val piece_at : id -> row:int -> column:int -> Piece.t option
+    val username_and_piece : id -> player -> (string * Piece.t)
+    val user_status : id -> string -> user_action
   end

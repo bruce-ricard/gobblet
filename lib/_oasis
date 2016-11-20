@@ -18,4 +18,6 @@ Executable "test"
 Library "ttt"
   Path: .
   BuildDepends: lwt.react
-  Modules: Types, Users, Ttt, Game, Games, User, GameInProgress, FrontAndBackendReactGame
+#  InternalModules: Types, Users, Ttt, Game, Games, User, GameInProgress, FrontAndBackendReactGame
+  InternalModules: Types, Users, Ttt, Game, User, Export
+  Modules: User

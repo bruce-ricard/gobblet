@@ -37,7 +37,6 @@ module Make(User_db : USER_DB) : USERS =
       User_db.get user ""
   end
 
-
 module Test_db : USER_DB =
   struct
     type t = (user * password) list ref
@@ -59,4 +58,4 @@ module Test_db : USER_DB =
       users_o := ((login, password), new User.user login password) :: !users_o
   end
 
-module Users_test = Users(Test_db)
+module Users_test = Make(Test_db)

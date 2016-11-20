@@ -1,6 +1,6 @@
 open Types
 
-module GameInProgress : GAME_IN_PROGRESS =
+module Make : GAME_IN_PROGRESS =
   functor (Game : GAME) (Piece : PIECE) ->
   struct
   module Game = Game(Piece)

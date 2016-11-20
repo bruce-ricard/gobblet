@@ -1,6 +1,6 @@
 open Types
 
-module RDB (T : sig type t end) =
+module RDB : REACT_DB = functor (T : sig type t end) ->
   struct
     let objects = ref []
 
@@ -12,10 +12,15 @@ module RDB (T : sig type t end) =
     let get_update_function id = snd (get id)
   end
 
+(*
 module TTTGameF = Game.Make(Ttt.Board)
 module TTTGameInProgress = GameInProgress.Make(TTTGameF)(Ttt.XOPiece)
 module TTTFBGame = FrontAndBackendReactGame.Make(GameInProgress.Make)(TTTGameF)(Ttt.XOPiece)(RDB)
 module TTTGames = Games.Make(FrontAndBackendReactGame.Make)(GameInProgress)(TTTGameF)(Ttt.XOPiece)(RDB)
+ *)
+
+module TTTGameF = Game.Make(Ttt.Board)
+module TTT = Export.Make(GameInProgress.Make)(TTTGameF)(Ttt.XOPiece)(RDB)
 
 class user login password =
 object
@@ -23,7 +28,7 @@ object
   val password = password
   val mutable logged_in = true
 
-  method get_games =
-    TTTGames.get_current_games login
+  method get_games = ([] : int list)
+    (* TTTGames.get_current_games login *)
 
 end
