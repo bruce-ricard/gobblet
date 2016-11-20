@@ -9,10 +9,7 @@
 
     module TTTUsers = Users_test
 
-    (*    module TTTGame = TTTGameF(Ttt.XOPiece)*)
-    module TTT = User.TTTFBGame
-    module TTTGames = User.TTTGames
-    module MemoryGames = User.Games
+    module TTT = User.Export
 
     let _ = TTTGames.new_game "bruce" "bruce2"
 
