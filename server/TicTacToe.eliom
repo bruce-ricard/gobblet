@@ -1,24 +1,21 @@
 [%%shared
     open Eliom_lib
-    open Eliom_content
-    open Html5
-    open Html5.D
+(*    open Eliom_content
+    open Html5*)
+    open Eliom_content.Html5.D
     open Lwt
     open Types
-    open Users
+    module TTTUsers = Users.Users_test
 
-    module TTTUsers = Users_test
+    module TTT = User.TTT
 
-    module TTT = User.Export
-
-    let _ = TTTGames.new_game "bruce" "bruce2"
+    let _ = TTT.new_game "bruce" "bruce2"
 
     type messages =
       (int * int * int)
         [@@deriving json]
 
     type board_update = bool
-
 ]
 
 module TicTacToe_app =
@@ -61,13 +58,14 @@ let bus = Eliom_bus.create [%derive.json: string]
 let current_user =
   Eliom_reference.eref ~scope:Eliom_common.default_session_scope (None : (string * User.user) option)
 
-let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
-
 let%shared piece_to_string =
-  let open Ttt.XOPiece in function
+  let open Pieces.XOPiece in function
     None -> ""
   | Some(X) -> "X"
   | Some(O) -> "O"
+
+             (*
+let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
 
 let%client update_game game =
   for row = 0 to 2 do
@@ -75,8 +73,7 @@ let%client update_game game =
       update_cells_matrix.(row).(column) (piece_to_string (TTT.piece_at game ~row ~column))
     done
   done
-
-let react_update_functions = ref []
+              *)
 
 let move (game_id, row, column) =
   let%lwt user = Eliom_reference.get current_user in
@@ -84,27 +81,20 @@ let move (game_id, row, column) =
   | None -> Lwt.return `WrongPlayer
   | Some (user, _) ->
      begin
-       match TTTGames.get_game_by_id (ID game_id) with
-         None -> Lwt.return `WrongPlayer
-       | Some game ->
-          let update_function = List.assoc game_id !react_update_functions in
-          Lwt.wrap (fun () ->
+       Lwt.wrap (fun () ->
               (* this ain't gonna work, I need to have a react value on the client with
 the last move, and have a react map on the server which processes it *)
-              let result = E.map
-                             (fun game -> TTT.move game ~row ~column user;
-                                          update_function game)
-                             game in
-              result)
+           TTT.move (ID game_id) ~row ~column user
+         )
      end
 
 let%client move_rpc = ~%(server_function [%derive.json: messages] move)
 
-let%client update_dom_content cell =
-  let dom_cell = Eliom_lib.Html5.To_dom.of_element cell in
-  ignore (React.E.map (fun s -> dom_cell##.innerHTML := Js.string s) dom_cell)
+let%client update_cell_content cell content =
+  let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
+  ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string (piece_to_string c)) content)
 
-let%client cell_on_click game_id x y =
+let%client cell_on_click dom_cell game_id x y =
   (Lwt.async (fun () ->
        Lwt_js_events.clicks
          dom_cell
@@ -120,33 +110,38 @@ let%client cell_on_click game_id x y =
      )
   )
 
-let cell (Games.ID game_id) x y content =
+let cell (ID game_id) x y content =
   let cell =
     td
       ~a:[a_class ["cell"]]
       []
   in
   let _ = [%client
-              (cell_on_click ~%game_id ~%x ~%y;
-               update_cell_contentasdf ~%cell content
+           (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
+              cell_on_click dom_cell ~%game_id ~%x ~%y;
+               update_cell_content ~%cell ~%content
               : unit)]
   in
   cell
 
-let row id game x =
+let row id x =
+  let game = match TTT.get_react_game_by_id id with
+    | None -> failwith "impossible game"
+    | Some g -> g
+  in
   tr [
-      cell id x 0 (React.E.map (fun g -> TTT.piece_at g ~row:x ~column:0) game);
-      cell id x 1 (React.E.map (fun g -> TTT.piece_at g ~row:x ~column:1) game);
-      cell id x 2 (React.E.map (fun g -> TTT.piece_at g ~row:x ~column:2) game)
+      cell id x 0 (TTT.piece_at game ~row:x ~column:0);
+      cell id x 1 (TTT.piece_at game ~row:x ~column:1);
+      cell id x 2 (TTT.piece_at game ~row:x ~column:2)
      ]
 
 let empty_row n = row n
 
-let board_html game_id game =
+let board_html game_id =
   table [
-      row game_id game 0;
-      row game_id game 1;
-      row game_id game 2
+      row game_id 0;
+      row game_id 1;
+      row game_id 2
     ]
 
 let chat_logs_html () =
@@ -310,8 +305,9 @@ let show_my_games_page () =
       None -> div [pcdata "Log in to save your games"]
     | Some (_,user) ->
        let games = user#get_games in
-       ul (List.map (fun (id,game) -> li [pcdata "nada"]) games)
-          (* TODO add links towards all games *)
+       div [pcdata "add game list here"]
+      (* ul (List.map (fun (id,game) -> li [pcdata "nada"]) games)
+           TODO add links towards all games *)
   in
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
@@ -322,8 +318,8 @@ let show_my_games_page () =
 
 let game_page game_id =
   let game =
-    match TTTGames.get_game_by_id game_id with
-    | Some g -> (g : 'a React.event)
+    match TTT.get_react_game_by_id game_id with
+    | Some g -> g
     | None -> failwith "no game"
   in
   let phrase (user, piece) = (* TODO: rename this function *)
@@ -333,7 +329,7 @@ let game_page game_id =
       None -> "Enjoy watching"
     | Some (user,_) ->
        begin
-         match TTT.user_status game user with
+         match TTT.user_status game_id user with
          | `Play -> "It's your turn"
          | `Wait -> "It's your oponent's turn"
          | `Watch -> "Enjoy watching " ^ user
@@ -347,12 +343,12 @@ let game_page game_id =
     [
       div [h1 [pcdata "Welcome to this tic tac toe game!"]];
       div [
-          pcdata (phrase (TTT.username_and_piece game P1));
+          pcdata (phrase (TTT.username_and_piece game_id P1));
           br ();
-          pcdata (phrase (TTT.username_and_piece game P2))
+          pcdata (phrase (TTT.username_and_piece game_id P2))
         ];
       div [pcdata (turn_sentence username)];
-      div [board_html game_id game; chat_html ()];
+      div [board_html game_id; chat_html ()];
     ] in
   (*  let _ = [%client update_game ~%game] in*)
   skeleton
@@ -378,7 +374,7 @@ let register () =
     ~options
     (fun id () ->
       let _ = [%client (init_client () : unit)] in
-      game_page (Games.ID id)
+      game_page (ID id)
     );
 
   Eliom_registration.Html5.register

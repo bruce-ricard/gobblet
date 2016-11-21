@@ -89,9 +89,3 @@ module Board : BOARD = functor (Piece : PIECE) ->
         `InvalidMove -> failwith "Invalid Move"
       | result -> result
   end
-
-module XOPiece =
-  struct
-    type t = X | O
-    let pieces = [ X ; O ]
-  end

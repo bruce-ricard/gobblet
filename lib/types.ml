@@ -110,9 +110,10 @@ module type EXPORT =
     val new_game : string -> string -> id * GameInProgress(GameF)(Piece).t React.E.t
     val get_current_games : string -> (id * GameInProgress(GameF)(Piece).t React.E.t) list
     val get_react_game_by_id : id -> GameInProgress(GameF)(Piece).t React.E.t option
-    val get_game_by_id : id -> GameInProgress(GameF)(Piece).t option
+    (*    val get_game_by_id : id -> GameInProgress(GameF)(Piece).t option*)
     val move : id -> row:int -> column:int -> string -> move_result
-    val piece_at : id -> row:int -> column:int -> Piece.t option
+    val piece_at : GameInProgress(GameF)(Piece).t React.E.t -> row:int -> column:int
+                   -> Piece.t option React.event
     val username_and_piece : id -> player -> (string * Piece.t)
     val user_status : id -> string -> user_action
   end

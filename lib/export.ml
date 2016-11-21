@@ -8,6 +8,7 @@ module Make : EXPORT =
   struct
     module GameM = GameInProgress(GameF)(Piece)
     module ReactDB = ReactDB(GameM)
+    module Piece = Piece
 
     let games = ref []
 
@@ -59,11 +60,11 @@ module Make : EXPORT =
   let () =
     ignore (new_game "bruce" "bruce2")
 
-  let piece_at id =
-    let game = match get_game_by_id id with
+  let piece_at game ~row ~column =
+(*    let game = match get_game_by_id id with
         None -> failwith "no game with such id"
-      | Some g -> g in
-    GameM.piece_at game
+      | Some g -> g in*)
+    React.E.map (fun g -> GameM.piece_at g ~row ~column) game
 
   let username_and_piece id =
     match get_game_by_id id with

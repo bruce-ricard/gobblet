@@ -20,7 +20,7 @@ module TTTGames = Games.Make(FrontAndBackendReactGame.Make)(GameInProgress)(TTTG
  *)
 
 module TTTGameF = Game.Make(Ttt.Board)
-module TTT = Export.Make(GameInProgress.Make)(TTTGameF)(Ttt.XOPiece)(RDB)
+module TTT = Export.Make(GameInProgress.Make)(TTTGameF)(Pieces.XOPiece)(RDB)
 
 class user login password =
 object
