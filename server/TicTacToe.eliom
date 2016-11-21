@@ -81,11 +81,7 @@ let move (game_id, row, column) =
   | None -> Lwt.return `WrongPlayer
   | Some (user, _) ->
      begin
-       Lwt.wrap (fun () ->
-              (* this ain't gonna work, I need to have a react value on the client with
-the last move, and have a react map on the server which processes it *)
-           TTT.move (ID game_id) ~row ~column user
-         )
+       Lwt.return (TTT.move (ID game_id) ~row ~column user)
      end
 
 let%client move_rpc = ~%(server_function [%derive.json: messages] move)
@@ -116,11 +112,12 @@ let cell (ID game_id) x y content =
       ~a:[a_class ["cell"]]
       []
   in
+  let downcontent = Eliom_react.Down.of_react content in
   let _ = [%client
-           (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
-              cell_on_click dom_cell ~%game_id ~%x ~%y;
-               update_cell_content ~%cell ~%content
-              : unit)]
+              (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
+               cell_on_click dom_cell ~%game_id ~%x ~%y;
+               update_cell_content ~%cell ~%downcontent
+               : unit)]
   in
   cell
 
@@ -338,7 +335,6 @@ let game_page game_id =
   let%lwt username =
     Eliom_reference.get current_user
   in
-
   let content =
     [
       div [h1 [pcdata "Welcome to this tic tac toe game!"]];
