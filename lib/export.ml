@@ -10,6 +10,8 @@ module Make : EXPORT =
     module ReactDB = ReactDB(GameM)
     module Piece = Piece
 
+    type game = GameM.t React.E.t
+
     let games = ref []
 
     let next_id =
