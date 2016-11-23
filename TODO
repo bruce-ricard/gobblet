@@ -1,5 +1,10 @@
 ### URGENT ###
 
+### BUGS ###
+- An invalid move swiches the player on, it shouldn't
+
+### FEATURES ###
+
 - make sure game can be played: players play on their turn
 - Fix cap sensitivity in usernames
 - organize library:
