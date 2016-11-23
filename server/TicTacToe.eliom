@@ -100,7 +100,7 @@ let%client cell_on_click dom_cell game_id x y =
              match move_result with
                `InvalidMove -> Eliom_lib.alert "Invalid move!"
              | `WrongPlayer -> Eliom_lib.alert "Not your turn"
-             | _ ->  Eliom_lib.alert "keep playing"
+             | _ ->  ()
            end;
            Lwt.return ())
      )
