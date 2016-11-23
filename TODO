@@ -3,6 +3,7 @@
 ### BUGS ###
 - An invalid move swiches the player on, it shouldn't
 - Game keeps going after someone has won, or the game is a draw. It shouldn't.
+- UI doesn't show whose turn it is after a move is played.
 
 ### FEATURES ###
 
