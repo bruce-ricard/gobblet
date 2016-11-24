@@ -76,4 +76,14 @@ module Make : EXPORT =
   let user_status game user =
     React.E.map (fun g -> GameM.user_status g user) game
 
+  let refresh_game id =
+    let game =
+      match get_game_by_id id with
+        Some g -> g
+      | None -> failwith "no game"
+    and update_function =
+      ReactDB.get_update_function id
+    in
+    update_function game
+
   end

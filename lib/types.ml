@@ -116,4 +116,5 @@ module type EXPORT =
                    -> Piece.t option React.event
     val username_and_piece : id -> player -> (string * Piece.t)
     val user_status : game -> string -> user_action React.event
+    val refresh_game : id -> unit
   end

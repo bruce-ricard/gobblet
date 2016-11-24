@@ -86,6 +86,9 @@ let move (game_id, row, column) =
 
 let%client move_rpc = ~%(server_function [%derive.json: messages] move)
 
+let refresh id = TTT.refresh_game (ID id); Lwt.return ()
+let%client refresh = ~%(server_function [%derive.json: int] refresh)
+
 let%client update_cell_content cell content =
   let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
   ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string c) content)
@@ -350,8 +353,11 @@ let game_page game_id =
     ] in
   let ts = Eliom_react.Down.of_react (turn_sentence game username) in
   let _ = [%client
-              (update_cell_content ~%turn_sentence_div ~%ts
-               : unit)
+              (update_cell_content ~%turn_sentence_div ~%ts;
+               let ID id = ~%game_id in
+               let%lwt () = refresh id in
+               Lwt.return ()
+                : unit Lwt.t)
           ]
   in
   skeleton
