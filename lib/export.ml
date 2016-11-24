@@ -73,9 +73,7 @@ module Make : EXPORT =
       None -> failwith "no such game"
     | Some game -> GameM.username_and_piece game
 
-  let user_status  id =
-    match get_game_by_id id with
-      None -> failwith "no such game"
-    | Some game -> GameM.user_status game
+  let user_status game user =
+    React.E.map (fun g -> GameM.user_status g user) game
 
   end

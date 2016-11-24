@@ -115,5 +115,5 @@ module type EXPORT =
     val piece_at : game -> row:int -> column:int
                    -> Piece.t option React.event
     val username_and_piece : id -> player -> (string * Piece.t)
-    val user_status : id -> string -> user_action
+    val user_status : game -> string -> user_action React.event
   end

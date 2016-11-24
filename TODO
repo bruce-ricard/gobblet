@@ -54,3 +54,7 @@
     - 10x10
   - hex
   - chess
+
+- performance:
+  - make one different react object per browser, so that we don't have to
+    send the information to everybody in case a user requests a refresh.

@@ -88,7 +88,7 @@ let%client move_rpc = ~%(server_function [%derive.json: messages] move)
 
 let%client update_cell_content cell content =
   let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
-  ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string (piece_to_string c)) content)
+  ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string c) content)
 
 let%client cell_on_click dom_cell game_id x y =
   (Lwt.async (fun () ->
@@ -116,7 +116,7 @@ let cell (ID game_id) x y content =
   let _ = [%client
               (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
                cell_on_click dom_cell ~%game_id ~%x ~%y;
-               update_cell_content ~%cell ~%downcontent
+               update_cell_content ~%cell (React.E.map piece_to_string ~%downcontent)
                : unit)]
   in
   cell
@@ -311,7 +311,16 @@ let show_my_games_page () =
     ~title:"Game list"
     [content]
 
-
+let turn_sentence game user : string React.event =
+  let user = match user with
+      None -> ""
+    | Some (user,_) -> user in
+  let map = function
+    | `Play -> "It's your turn"
+    | `Wait -> "It's your oponent's turn"
+    | `Watch -> "Enjoy watching " ^ user
+  in
+  React.E.map map (TTT.user_status game user)
 
 let game_page game_id =
   let game =
@@ -322,15 +331,8 @@ let game_page game_id =
   let phrase (user, piece) = (* TODO: rename this function *)
     Printf.sprintf "%s : %s" user (piece_to_string (Some piece))
   in
-  let turn_sentence = function
-      None -> "Enjoy watching"
-    | Some (user,_) ->
-       begin
-         match TTT.user_status game_id user with
-         | `Play -> "It's your turn"
-         | `Wait -> "It's your oponent's turn"
-         | `Watch -> "Enjoy watching " ^ user
-       end
+  let turn_sentence_div =
+    div [pcdata ""]
   in
   let%lwt username =
     Eliom_reference.get current_user
@@ -343,14 +345,20 @@ let game_page game_id =
           br ();
           pcdata (phrase (TTT.username_and_piece game_id P2))
         ];
-      div [pcdata (turn_sentence username)];
+      turn_sentence_div;
       div [board_html game_id; chat_html ()];
     ] in
-  (*  let _ = [%client update_game ~%game] in*)
+  let ts = Eliom_react.Down.of_react (turn_sentence game username) in
+  let _ = [%client
+              (update_cell_content ~%turn_sentence_div ~%ts
+               : unit)
+          ]
+  in
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Tic Tac Toe"
     content
+
 
 let%client init_client () = ()
 
