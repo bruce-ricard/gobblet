@@ -79,7 +79,7 @@ module Board : BOARD = functor (Piece : PIECE) ->
       if valid_move board ~row ~column then
         begin
           board.(row).(column) <- Some piece;
-          `OK
+          `OK (board_status board)
         end
       else
         `InvalidMove

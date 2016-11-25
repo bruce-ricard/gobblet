@@ -2,14 +2,13 @@ type player = P1 | P2
 
 type result = [`KeepPlaying | `Won | `Lost | `Draw]
 
-type move_result' =
+type board_move_result =
   [
   | `InvalidMove
-  | `OK
+  | `OK of result
   ]
 
-type move_result = [ move_result' | `WrongPlayer ]
-
+type move_result = [ board_move_result | `WrongPlayer ]
 
 module type PIECE =
   sig
@@ -26,7 +25,7 @@ module type BOARD = functor (Piece : PIECE) ->
       row:int ->
       column:int ->
       Piece.t ->
-      move_result
+      board_move_result
     val piece_at : t -> row:int -> column:int -> Piece.t option
   end
 
