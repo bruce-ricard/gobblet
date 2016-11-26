@@ -78,7 +78,7 @@ let%client update_game game =
 let move (game_id, row, column) =
   let%lwt user = Eliom_reference.get current_user in
   match user with
-  | None -> Lwt.return `WrongPlayer
+  | None -> Lwt.return (`Invalid `WrongPlayer)
   | Some (user, _) ->
      begin
        Lwt.return (TTT.move (ID game_id) ~row ~column user)
@@ -101,8 +101,10 @@ let%client cell_on_click dom_cell game_id x y =
            let%lwt move_result = move_rpc (game_id, x, y) in
            begin
              match move_result with
-               `InvalidMove -> Eliom_lib.alert "Invalid move!"
-             | `WrongPlayer -> Eliom_lib.alert "Not your turn"
+               `Invalid `InvalidMove -> Eliom_lib.alert "Invalid move!"
+             | `Invalid `NotYourTurn -> Eliom_lib.alert "It's not your turn!"
+             | `Invalid `WrongPlayer -> Eliom_lib.alert "You are not playing in this game!"
+             | `Invalid `GameWasOver -> Eliom_lib.alert "Game is over!"
              | _ ->  ()
            end;
            Lwt.return ())

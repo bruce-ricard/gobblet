@@ -7,7 +7,7 @@ type game_result =
 
 type board_move_result =
   [
-  | `Invalid of [`InvalidMove]
+  | `Invalid of [`InvalidMove | `GameWasOver ]
   | `KeepPlaying
   | `GameOver of game_result
   ]
