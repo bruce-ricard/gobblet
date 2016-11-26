@@ -34,16 +34,8 @@ module Make : GAME_IN_PROGRESS =
       | None -> `Watch
 
     let move game ~row ~column user =
-(*      if user_status game user = `Play then
-        let player = match user_to_player game user with
-          |Some player -> player | None -> failwith "impossible" in
-        let result = (Board.move game.board ~row ~column (piece_of player) :> move_result) in
-        game.next_player <- next_player game.next_player;
-        result
-      else
-        `WrongPlayer*)
       match user_to_player game user with
-        None -> `WrongPlayer
+        None -> `Invalid `WrongPlayer
       | Some player ->
          Game.move game.game ~row ~column player
 

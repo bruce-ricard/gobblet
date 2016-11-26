@@ -2,13 +2,23 @@ type player = P1 | P2
 
 type result = [`KeepPlaying | `Won | `Lost | `Draw]
 
+type game_result =
+  Won | Lost | Drawn
+
 type board_move_result =
   [
-  | `InvalidMove
-  | `OK of result
+  | `Invalid of [`InvalidMove]
+  | `KeepPlaying
+  | `GameOver of game_result
   ]
 
-type move_result = [ board_move_result | `WrongPlayer ]
+type invalid_move =
+  [ `NotYourTurn | `InvalidMove | `GameWasOver | `WrongPlayer ]
+
+type move_result =
+  [ `Invalid of invalid_move
+  | `KeepPlaying
+  | `GameOver of game_result ]
 
 module type PIECE =
   sig

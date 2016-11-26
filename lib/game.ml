@@ -35,7 +35,7 @@ module Make = functor (Board : BOARD) (Piece : PIECE) ->
           result
         end
       else
-        `WrongPlayer
+        `Invalid `WrongPlayer
 
     let piece_at game = Board.piece_at game.board
 

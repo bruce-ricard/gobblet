@@ -20,4 +20,4 @@ Library "ttt"
   BuildDepends: lwt.react
 #  InternalModules: Types, Users, Ttt, Game, Games, User, GameInProgress, FrontAndBackendReactGame
   InternalModules: Ttt, Game, User, Export
-  Modules: User, Users, Types, Pieces, GameInProgress
+  Modules: User, Users, Types, Pieces
