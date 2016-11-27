@@ -70,16 +70,16 @@ module Board : BOARD = functor (Piece : PIECE) ->
       match check_board board with
       | None ->
         if board_is_full board then
-          `GameOver Drawn
+          `Draw
         else
           `KeepPlaying
-      | Some piece -> `GameOver Won
+      | Some piece -> `Won
 
     let actually_move board ~row ~column piece  =
       if valid_move board ~row ~column then
         begin
           board.(row).(column) <- Some piece;
-          board_status board
+          `Ok (board_status board)
         end
       else
         `Invalid `InvalidMove
@@ -87,7 +87,7 @@ module Board : BOARD = functor (Piece : PIECE) ->
     let move board ~row ~column piece =
       match board_status board with
         `KeepPlaying -> actually_move board ~row ~column piece
-      | `GameOver _ -> `Invalid `GameWasOver
+      | _ -> `Invalid `GameWasOver
 
     let move_unsafe board ~row ~column piece =
       match move board ~row ~column piece with

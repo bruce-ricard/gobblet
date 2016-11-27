@@ -5,13 +5,16 @@
 - Game keeps going after someone has won, or the game is a draw. It shouldn't.
 - UI doesn't show whose turn it is after a move is played.
 
+
+### --- END URGENT --- ###
+
 ### FEATURES ###
 
 - make sure game can be played: players play on their turn
 - Fix cap sensitivity in usernames
 - organize library:
   - don't export all the modules, only the ones needed
-  - rename all functors Make
+  - do we really need gameInProgress? it only adds the player names to game
 - organize server:
   - separate .eliom files into multiple
   - maybe create some ml file with the main common functions

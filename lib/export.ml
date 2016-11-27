@@ -73,8 +73,8 @@ module Make : EXPORT =
       None -> failwith "no such game"
     | Some game -> GameM.username_and_piece game
 
-  let user_status game user =
-    React.E.map (fun g -> GameM.user_status g user) game
+  let game_status game =
+    React.E.map (fun g -> GameM.game_status g) game
 
   let refresh_game id =
     let game =

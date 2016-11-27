@@ -24,14 +24,20 @@ module Make : GAME_IN_PROGRESS =
       else
         None
 
-    let user_status game user =
+    let user_status game player_on user =
       match user_to_player game user with
       | Some p ->
-         if p = Game.player_on game.game then
+         if p = player_on then
            `Play
          else
            `Wait
       | None -> `Watch
+
+    let game_status game =
+      match Game.game_status game.game with
+      | GameOver (`Won p) -> `GameOver (`Won (player_to_user game p))
+      | GameOver `Drawn -> `GameOver `Drawn
+      | PlayerOn p -> `PlayOn (user_status game p)
 
     let move game ~row ~column user =
       match user_to_player game user with

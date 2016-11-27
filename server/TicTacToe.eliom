@@ -321,11 +321,17 @@ let turn_sentence game user : string React.event =
       None -> ""
     | Some (user,_) -> user in
   let map = function
-    | `Play -> "It's your turn"
-    | `Wait -> "It's your oponent's turn"
-    | `Watch -> "Enjoy watching " ^ user
+    | `GameOver (`Won player) -> player ^ " won the game!"
+    | `GameOver `Drawn -> "Draw!"
+    | `PlayOn f ->
+       begin
+         match f user with
+         | `Play -> "It's your turn"
+         | `Wait -> "It's your oponent's turn"
+         | `Watch -> "Enjoy watching " ^ user
+       end
   in
-  React.E.map map (TTT.user_status game user)
+  React.E.map map (TTT.game_status game)
 
 let game_page game_id =
   let game =

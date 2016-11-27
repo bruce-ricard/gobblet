@@ -1,30 +1,48 @@
 type player = P1 | P2
 
-type result = [`KeepPlaying | `Won | `Lost | `Draw]
-
-type game_result =
-  Won | Lost | Drawn
+type board_status = [`KeepPlaying | `Won | `Lost | `Draw]
 
 type board_move_result =
   [
   | `Invalid of [`InvalidMove | `GameWasOver ]
-  | `KeepPlaying
-  | `GameOver of game_result
+  | `Ok of board_status
   ]
 
 type invalid_move =
   [ `NotYourTurn | `InvalidMove | `GameWasOver | `WrongPlayer ]
 
 type move_result =
-  [ `Invalid of invalid_move
-  | `KeepPlaying
-  | `GameOver of game_result ]
+  [
+  | `Invalid of invalid_move
+  | `Ok
+  ]
 
 module type PIECE =
   sig
     type t
     val pieces : t list
   end
+
+type user_action = [
+    `Play
+  | `Wait
+  | `Watch
+  ]
+
+type 'a game_result =
+  [
+  | `Won of 'a
+  | `Drawn
+  ]
+
+type game_status =
+  | GameOver of player game_result
+  | PlayerOn of player
+
+type game_in_progress_status = [
+    `PlayOn of (string -> user_action)
+  | `GameOver of string game_result
+  ]
 
 module type BOARD = functor (Piece : PIECE) ->
   sig
@@ -36,6 +54,7 @@ module type BOARD = functor (Piece : PIECE) ->
       column:int ->
       Piece.t ->
       board_move_result
+    (*    val board_status : t -> board_status*)
     val piece_at : t -> row:int -> column:int -> Piece.t option
   end
 
@@ -46,22 +65,10 @@ module type GAME = functor (Piece : PIECE) ->
     val new_game : unit -> t
     val move : t -> row:int -> column:int -> player -> move_result
     val piece_at : t -> row:int -> column:int -> Piece.t option
-    val player_on : t -> player
+    (*    val player_on : t -> player*)
     val piece_of : player -> Piece.t
+    val game_status : t -> game_status
   end
-
-type user_action = [
-    `Play
-  | `Wait
-  | `Watch
-  ]
-
-type game_status =
-  [
-    `PlayOn
-  | `Won of string
-  | `Draw
-  ]
 
 module type GAME_IN_PROGRESS =
   functor (Game : GAME) (Piece : PIECE) ->
@@ -71,7 +78,7 @@ module type GAME_IN_PROGRESS =
     val move : t -> row:int -> column:int -> string -> move_result
     val piece_at : t -> row:int -> column:int -> Piece.t option
     val username_and_piece : t -> player -> (string * Piece.t)
-    val user_status : t -> string -> user_action
+    val game_status : t -> game_in_progress_status
   end
 
 type id = ID of int
@@ -124,6 +131,6 @@ module type EXPORT =
     val piece_at : game -> row:int -> column:int
                    -> Piece.t option React.event
     val username_and_piece : id -> player -> (string * Piece.t)
-    val user_status : game -> string -> user_action React.event
+    val game_status : game -> game_in_progress_status React.event
     val refresh_game : id -> unit
   end
