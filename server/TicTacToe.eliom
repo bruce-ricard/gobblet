@@ -255,7 +255,7 @@ let header () =
   let menu =
     div ~a:[a_class ["menu"]]
         [
-          a ttt_service [pcdata "Tic Tac Toe"] 1
+          a show_my_games_service [pcdata "Tic Tac Toe"] ()
         ]
   in
   Lwt.return (
@@ -305,11 +305,13 @@ let show_my_games_page () =
   let content =
     match current_user with
       None -> div [pcdata "Log in to save your games"]
-    | Some (_,user) ->
-       let games = user#get_games in
-       div [pcdata "add game list here"]
-      (* ul (List.map (fun (id,game) -> li [pcdata "nada"]) games)
-           TODO add links towards all games *)
+    | Some (user, _) ->
+       let idgame_to_link (ID id,game) =
+         a ttt_service [pcdata (string_of_int id)] id in
+       let games = TTT.get_current_games user in
+       let links = List.map idgame_to_link games in
+       let bullets = List.map (fun link -> li [link]) links in
+       div [ul bullets]
   in
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
