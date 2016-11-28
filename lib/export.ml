@@ -24,10 +24,6 @@ module Make : EXPORT =
       P1 -> user1
     | P2 -> user2
 
-  let get_current_games user =
-    (*  List.filter (fun game ->*)
-    failwith "not implemented yet"
-
   let get_game_by_id id =
     try
       Some (List.assoc id !games)
@@ -36,6 +32,30 @@ module Make : EXPORT =
 
   let get_react_game_by_id id =
     Some (ReactDB.get_channel id)
+
+  let username_and_piece id =
+    match get_game_by_id id with
+      None -> failwith "no such game"
+    | Some game -> GameM.username_and_piece game
+
+  let get_current_games user =
+    let user_games =
+      List.filter
+        (fun (id,game) ->
+          fst (username_and_piece id P1) = user ||
+            fst (username_and_piece id P2) = user
+        )
+        !games
+    in
+    let user_ids = List.map fst user_games in
+    List.fold_left
+      (fun list id ->
+        match get_react_game_by_id id with
+          None -> list (* TODO: Add error log here *)
+        | Some game -> (id, game) :: list
+      )
+      []
+      user_ids
 
   let new_game user1 user2 =
     (* TODO: check that both users are actually users *)
@@ -67,11 +87,6 @@ module Make : EXPORT =
         None -> failwith "no game with such id"
       | Some g -> g in*)
     React.E.map (fun g -> GameM.piece_at g ~row ~column) game
-
-  let username_and_piece id =
-    match get_game_by_id id with
-      None -> failwith "no such game"
-    | Some game -> GameM.username_and_piece game
 
   let game_status game =
     React.E.map (fun g -> GameM.game_status g) game
