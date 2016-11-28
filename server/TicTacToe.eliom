@@ -309,9 +309,12 @@ let show_my_games_page () =
        let idgame_to_link (ID id,game) =
          a ttt_service [pcdata (string_of_int id)] id in
        let games = TTT.get_current_games user in
-       let links = List.map idgame_to_link games in
-       let bullets = List.map (fun link -> li [link]) links in
-       div [ul bullets]
+       match games with
+         [] -> div [pcdata "You have no games in progress, start a new one to play."]
+       | games ->
+          let links = List.map idgame_to_link games in
+          let bullets = List.map (fun link -> li [link]) links in
+          div [ul bullets]
   in
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
