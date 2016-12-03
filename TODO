@@ -2,11 +2,14 @@
 
 ### BUGS ###
 
+- Fix error when wrong game id is given in url for show game
+
 ### --- END URGENT --- ###
 
 ### FEATURES ###
 
-- make sure game can be played: players play on their turn
+- Create concept of "challenge" and "game over"
+- Add "rematch" button when game is over
 - Fix cap sensitivity in usernames
 - organize library:
   - don't export all the modules, only the ones needed

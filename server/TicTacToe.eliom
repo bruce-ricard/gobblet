@@ -34,14 +34,26 @@ let main_service =
 
 let show_my_games_service =
   Eliom_service.Http.service
-    ~path:["games"; "tictactoe"]
+    ~path:["games"; "tictactoe"; "list"]
     ~get_params:Eliom_parameter.unit
     ()
 
 let ttt_service =
   Eliom_service.App.service
-    ~path:["games"; "tictactoe"]
+    ~path:["games"; "tictactoe"; "play"]
     ~get_params:Eliom_parameter.(int "game_id")
+    ()
+
+let input_create_game_service =
+  Eliom_service.Http.service
+    ~path:["games"; "tictactoe"; "newgame"]
+    ~get_params:Eliom_parameter.unit
+    ()
+
+let create_game_service =
+  Eliom_service.Http.service
+    ~path:["games"; "tictactoe"; "newgame"]
+    ~get_params:Eliom_parameter.(string "oponent")
     ()
 
 let connection_service =
@@ -276,7 +288,7 @@ let header () =
         ]
     )
 
-let skeleton ~css ~title content =
+let skeleton ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
   let%lwt header = header () in
   Lwt.return
     (html
@@ -302,7 +314,8 @@ let welcome_page () =
 
 let show_my_games_page () =
   let%lwt current_user = Eliom_reference.get current_user in
-  let content =
+  let create_game_link = div [a input_create_game_service [pcdata "create new game"] ()] in
+  let game_list =
     match current_user with
       None -> div [pcdata "Log in to save your games"]
     | Some (user, _) ->
@@ -319,7 +332,7 @@ let show_my_games_page () =
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Game list"
-    [content]
+    [create_game_link; game_list]
 
 let turn_sentence game user : string React.event =
   let user = match user with
@@ -378,6 +391,21 @@ let game_page game_id =
     ~title:"Tic Tac Toe"
     content
 
+let create_game_form user =
+  [div
+     [
+       pcdata "Play against: ";
+       Form.input ~input_type:`Text ~name:user Form.string;
+       Form.input ~input_type:`Submit ~value:"Challenge" Form.string
+     ]
+  ]
+
+let create_game_page () =
+  let form = Form.get_form create_game_service create_game_form in
+  skeleton
+    ~title:"Tic Tac Toe --- create game"
+    [div [form]]
+
 
 let%client init_client () = ()
 
@@ -399,6 +427,22 @@ let register () =
       let _ = [%client (init_client () : unit)] in
       game_page (ID id)
     );
+
+  Eliom_registration.Html5.register
+    ~service:input_create_game_service
+    (fun () () -> (create_game_page ()));
+
+  Eliom_registration.Redirection.register
+    ~service:create_game_service
+    ~options:`TemporaryRedirect
+    (fun user_name () ->
+      let%lwt current_user = Eliom_reference.get current_user in
+      match current_user with
+      | None -> failwith "no good"
+      | Some (user, _) ->
+         let ((ID id),game) = TTT.new_game user_name user in
+         let game_service = Eliom_service.preapply ttt_service id in
+         Lwt.return game_service);
 
   Eliom_registration.Html5.register
     ~service:show_my_games_service
