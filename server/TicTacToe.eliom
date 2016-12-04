@@ -18,6 +18,8 @@
     type board_update = bool
 ]
 
+let current_user = Base.current_user
+
 module TicTacToe_app =
   Eliom_registration.App (
     struct
@@ -56,19 +58,7 @@ let create_game_service =
     ~get_params:Eliom_parameter.(string "oponent")
     ()
 
-let connection_service =
-  Eliom_service.Http.post_coservice'
-    ~post_params:Eliom_parameter.(string "name" ** string "password")
-    ()
-
-let disconnection_service =
-  Eliom_service.Http.post_coservice'
-    ~post_params:Eliom_parameter.unit
-    ()
-
 let bus = Eliom_bus.create [%derive.json: string]
-let current_user =
-  Eliom_reference.eref ~scope:Eliom_common.default_session_scope (None : (string * User.user) option)
 
 let%shared piece_to_string =
   let open Pieces.XOPiece in function
@@ -215,41 +205,6 @@ let chat_html () =
       ] in
   elt
 
-let connection_box () =
-  let%lwt user = Eliom_reference.get current_user in
-    Lwt.return
-      (match user with
-       | Some (user,_) -> p [pcdata "You are connected as "; pcdata user]
-       | None ->
-          Form.post_form ~service:connection_service
-                         (fun (name1, name2) ->
-                           [fieldset
-                              [label [pcdata "login: "];
-                               Form.input
-                                 ~input_type:`Text ~name:name1
-                                 Form.string;
-                               br ();
-                               label [pcdata "password: "];
-                               Form.input
-                                 ~input_type:`Password ~name:name2
-                                 Form.string;
-                               br ();
-                               Form.input
-                                 ~input_type:`Submit ~value:"Connect"
-                                 Form.string
-                         ]])
-                         ()
-      )
-
-let disconnect_box () =
-  Form.post_form
-    ~service:disconnection_service
-    (
-      fun () ->
-      [Form.input ~input_type:`Submit ~value:"Log out" Form.string]
-    )
-    ()
-
 let header_login () =
   let%lwt current_user = Eliom_reference.get current_user in
   match current_user with
@@ -257,10 +212,10 @@ let header_login () =
                      div
                        [
                          pcdata ("Logged in as " ^ name);
-                         disconnect_box ()
+                         Connection.disconnect_box ()
                        ]
                    )
-  | None -> connection_box ()
+  | None -> Connection.connection_box ()
 
 let header () =
   let%lwt login = header_login () in
@@ -302,7 +257,7 @@ let skeleton ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
     )
 
 let welcome_page () =
-  let%lwt cb = connection_box () in
+  let%lwt cb = Connection.connection_box () in
   let content =
     [
       pcdata "Welcome! To start playing, click Play in the menu."
@@ -446,20 +401,6 @@ let register () =
 
   Eliom_registration.Html5.register
     ~service:show_my_games_service
-    (fun () () -> show_my_games_page ());
-
-  Eliom_registration.Action.register
-    ~service:connection_service
-    (fun () (name, password) ->
-      match TTTUsers.log_in name password with
-        None -> Lwt.return ()
-      | Some user -> Eliom_reference.set current_user (Some(name,user))
-    );
-
-  Eliom_registration.Action.register
-    ~service:disconnection_service
-    (fun () () ->
-      (Eliom_reference.set current_user (None));
-    )
+    (fun () () -> show_my_games_page ())
 
 let () = register ()
