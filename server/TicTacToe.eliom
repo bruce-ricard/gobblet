@@ -5,6 +5,8 @@
     open Eliom_content.Html5.D
     open Lwt
     open Types
+    open Services
+
     module TTTUsers = Users.Users_test
 
     module TTT = User.TTT
@@ -18,46 +20,13 @@
     type board_update = bool
 ]
 
-let current_user = Base.current_user
-
 module TicTacToe_app =
   Eliom_registration.App (
     struct
       let application_name = "TicTacToe"
     end)
 
-
-let main_service =
-  Eliom_service.Http.service
-    ~path:[]
-    ~get_params:Eliom_parameter.unit
-    (*    ~https:true*)
-    ()
-
-let show_my_games_service =
-  Eliom_service.Http.service
-    ~path:["games"; "tictactoe"; "list"]
-    ~get_params:Eliom_parameter.unit
-    ()
-
-let ttt_service =
-  Eliom_service.App.service
-    ~path:["games"; "tictactoe"; "play"]
-    ~get_params:Eliom_parameter.(int "game_id")
-    ()
-
-let input_create_game_service =
-  Eliom_service.Http.service
-    ~path:["games"; "tictactoe"; "newgame"]
-    ~get_params:Eliom_parameter.unit
-    ()
-
-let create_game_service =
-  Eliom_service.Http.service
-    ~path:["games"; "tictactoe"; "newgame"]
-    ~get_params:Eliom_parameter.(string "oponent")
-    ()
-
+let current_user = Base.current_user
 let bus = Eliom_bus.create [%derive.json: string]
 
 let%shared piece_to_string =
@@ -205,56 +174,13 @@ let chat_html () =
       ] in
   elt
 
-let header_login () =
-  let%lwt current_user = Eliom_reference.get current_user in
-  match current_user with
-  | Some (name, _) -> Lwt.return (
-                     div
-                       [
-                         pcdata ("Logged in as " ^ name);
-                         Connection.disconnect_box ()
-                       ]
-                   )
-  | None -> Connection.connection_box ()
-
-let header () =
-  let%lwt login = header_login () in
-  let menu =
-    div ~a:[a_class ["menu"]]
-        [
-          a show_my_games_service [pcdata "Tic Tac Toe"] ()
-        ]
-  in
-  Lwt.return (
-      div
-        [
-          div ~a:[a_class ["header"]]
-              [
-                a main_service
-                  [
-                    div ~a:[a_class ["logo"]] [
-                          div ~a:[a_class ["logo_image"]] [pcdata "put logo here"];
-                          div ~a:[a_class ["site_name"]] [pcdata "Online board games"]
-                        ];
-                  ] ();
-                div ~a:[a_class ["header_login"]] [login]
-              ];
-          menu
-        ]
-    )
-
-let skeleton ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
-  let%lwt header = header () in
-  Lwt.return
-    (html
-     (Eliom_tools.F.head
-        ~css ~title
-        ()
-     )
-     (body
-        (header :: content)
-     )
-    )
+let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
+  Base.skeleton
+    Connection.connection_box
+    Connection.disconnect_box
+    main_service
+    show_my_games_service
+    ~css ~title content
 
 let welcome_page () =
   let%lwt cb = Connection.connection_box () in

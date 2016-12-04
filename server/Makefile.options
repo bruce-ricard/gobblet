@@ -6,9 +6,9 @@
 PROJECT_NAME := TicTacToe
 
 # Source files for the server
-SERVER_FILES := base.ml $(wildcard *.eliomi *.eliom)
+SERVER_FILES := services.ml base.ml $(wildcard *.eliomi *.eliom)
 # Source files for the client
-CLIENT_FILES := $(wildcard *.eliomi *.eliom)
+CLIENT_FILES := services.ml $(wildcard *.eliomi *.eliom)
 
 # OCamlfind packages for the server
 SERVER_PACKAGES := ttt lwt.ppx js_of_ocaml.deriving.ppx
