@@ -35,17 +35,6 @@ let%shared piece_to_string =
   | Some(X) -> "X"
   | Some(O) -> "O"
 
-             (*
-let%client update_cells_matrix = Array.make_matrix 3 3 (fun (s : string) -> ())
-
-let%client update_game game =
-  for row = 0 to 2 do
-    for column = 0 to 2 do
-      update_cells_matrix.(row).(column) (piece_to_string (TTT.piece_at game ~row ~column))
-    done
-  done
-              *)
-
 let move (game_id, row, column) =
   let%lwt user = Eliom_reference.get current_user in
   match user with
@@ -183,7 +172,6 @@ let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
     ~css ~title content
 
 let welcome_page () =
-  let%lwt cb = Connection.connection_box () in
   let content =
     [
       pcdata "Welcome! To start playing, click Play in the menu."
