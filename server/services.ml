@@ -28,3 +28,27 @@ let create_game_service =
     ~path:["games"; "tictactoe"; "newgame"]
     ~get_params:Eliom_parameter.(string "oponent")
     ()
+
+let input_user_registration_service =
+  Eliom_service.Http.service
+    ~path:["register"]
+    ~get_params:Eliom_parameter.unit
+    ()
+
+let user_registration_service =
+  Eliom_service.Http.post_service
+    ~fallback:input_user_registration_service
+    ~post_params:Eliom_parameter.
+      (string "user_name" **
+         (string "password1" ** string "password2"))
+    ()
+
+let connection_service =
+  Eliom_service.Http.post_coservice'
+    ~post_params:Eliom_parameter.(string "name" ** string "password")
+    ()
+
+let disconnection_service =
+  Eliom_service.Http.post_coservice'
+    ~post_params:Eliom_parameter.unit
+    ()

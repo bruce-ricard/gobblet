@@ -1,9 +1,12 @@
 open Eliom_lib
 open Eliom_content.Html5.D
+open Services
 
-let register_form ~service =
+module Users = Users.Users_test
+
+let register_form () =
   Form.post_form
-    ~service
+    ~service:user_registration_service
     (fun (name, (pwd1, pwd2)) ->
       [
         div
@@ -16,3 +19,22 @@ let register_form ~service =
           ]
       ]
     )
+
+let user_registration_page () =
+  Base.skeleton ~title:"Register!" [(div [])]
+
+let register () =
+  Eliom_registration.Html5.register
+    ~service:input_user_registration_service
+    (fun () () -> user_registration_page ());
+
+  Eliom_registration.Redirection.register
+    ~service:user_registration_service
+    ~options:`TemporaryRedirect
+    (fun () (user_name, (p1, p2)) ->
+      if p1 = p2 then
+        Users.register user_name p1
+      else
+        failwith "non matching passwords"
+     ;
+       Lwt.return Services.main_service )

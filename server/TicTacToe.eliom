@@ -26,7 +26,7 @@ module TicTacToe_app =
       let application_name = "TicTacToe"
     end)
 
-let current_user = Base.current_user
+let current_user = Common.current_user
 let bus = Eliom_bus.create [%derive.json: string]
 
 let%shared piece_to_string =
@@ -165,10 +165,6 @@ let chat_html () =
 
 let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
   Base.skeleton
-    Connection.connection_box
-    Connection.disconnect_box
-    main_service
-    show_my_games_service
     ~css ~title content
 
 let welcome_page () =

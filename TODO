@@ -3,6 +3,7 @@
 ### BUGS ###
 
 - Fix error when wrong game id is given in url for show game
+- Users shouldn't be TTTUsers, they should be global
 
 ### --- END URGENT --- ###
 
