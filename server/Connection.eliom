@@ -1,8 +1,6 @@
 [%%shared
     open Eliom_lib
     open Eliom_content.Html5.D
-           (*    open Lwt*)
-
     module TTT = User.TTT
     module TTTUsers = Users.Users_test
 ]

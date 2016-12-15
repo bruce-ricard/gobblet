@@ -1,5 +1,7 @@
 open Eliom_content.Html5.D
 
+let _ = let open Common in let open Connection_code in ()
+
 let header_login connection_box disconnect_box () =
   let%lwt current_user = Eliom_reference.get Common.current_user in
   match current_user with
@@ -41,11 +43,11 @@ let header connection_box disconnect_box main_service show_games () =
 let skeleton ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
   let%lwt header =
     header
-    Connection_code.connection_box
-    Connection_code.disconnect_box
-    Services.main_service
-    Services.show_my_games_service
-    () in
+      Connection_code.connection_box
+      Connection_code.disconnect_box
+      Services.main_service
+      Services.show_my_games_service
+      () in
   Lwt.return
     (html
      (Eliom_tools.F.head

@@ -1,5 +1,7 @@
 open Eliom_content.Html5.D
 
+let _ = let open Common in ()
+
 let connection_box () =
   let%lwt user = Eliom_reference.get Common.current_user in
     Lwt.return

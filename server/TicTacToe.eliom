@@ -1,7 +1,5 @@
 [%%shared
     open Eliom_lib
-(*    open Eliom_content
-    open Html5*)
     open Eliom_content.Html5.D
     open Lwt
     open Types
