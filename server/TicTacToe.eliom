@@ -5,7 +5,6 @@
     open Eliom_content.Html5.D
     open Lwt
     open Types
-    open Services
 
     module TTTUsers = Users.Users_test
 
@@ -179,13 +178,14 @@ let welcome_page () =
 
 let show_my_games_page () =
   let%lwt current_user = Eliom_reference.get current_user in
-  let create_game_link = div [a input_create_game_service [pcdata "create new game"] ()] in
+  let create_game_link =
+    div [a Services.input_create_game_service [pcdata "create new game"] ()] in
   let game_list =
     match current_user with
       None -> div [pcdata "Log in to save your games"]
     | Some (user, _) ->
        let idgame_to_link (ID id,game) =
-         a ttt_service [pcdata (string_of_int id)] id in
+         a Services.ttt_service [pcdata (string_of_int id)] id in
        let games = TTT.get_current_games user in
        match games with
          [] -> div [pcdata "You have no games in progress, start a new one to play."]
@@ -266,7 +266,7 @@ let create_game_form user =
   ]
 
 let create_game_page () =
-  let form = Form.get_form create_game_service create_game_form in
+  let form = Form.get_form Services.create_game_service create_game_form in
   skeleton
     ~title:"Tic Tac Toe --- create game"
     [div [form]]
@@ -279,6 +279,7 @@ let options = {
   }
 
 let register () =
+  let open Services in
   Eliom_registration.Html5.register
     ~service:main_service
     (fun () () ->
