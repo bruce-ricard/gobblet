@@ -36,9 +36,10 @@ let input_user_registration_service =
     ()
 
 let user_registration_service =
-  Eliom_service.Http.post_service
-    ~fallback:input_user_registration_service
-    ~post_params:Eliom_parameter.
+  Eliom_service.Http.service
+    (*    ~fallback:input_user_registration_service*)
+    ~path:["register"]
+    ~get_params:Eliom_parameter.
       (string "user_name" **
          (string "password1" ** string "password2"))
     ()
