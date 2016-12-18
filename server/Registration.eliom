@@ -7,8 +7,8 @@ let register () =
 
   Eliom_registration.Redirection.register
     ~service:Services.user_registration_service
-    ~options:`TemporaryRedirect
-    (fun  (user_name, (p1, p2)) () ->
+    (*    ~options:`TemporaryRedirect*)
+    (fun ()  (user_name, (p1, p2)) ->
       print_endline "wtf I'm here";
       let _ = [%client (Eliom_lib.alert "I'm here" : unit)] in
       begin

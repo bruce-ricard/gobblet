@@ -4,10 +4,8 @@ open Services
 
 module Users = Users.Users_test
 
-
-
 let register_form () =
-  Form.get_form
+  Form.post_form
     ~service:user_registration_service
     (fun (name, (pwd1, pwd2)) ->
       [
@@ -28,7 +26,7 @@ let register_form () =
           ]
       ]
     )
-
+    ()
 
 let user_registration_page () =
   Base.skeleton ~title:"Register!" [register_form ()]
