@@ -23,7 +23,12 @@ let connection_box () =
                                br ();
                                Form.input
                                  ~input_type:`Submit ~value:"Connect"
-                                 Form.string
+                                 Form.string;
+                               pcdata "or ";
+                               a
+                                 ~service:Services.input_user_registration_service
+                                 [pcdata "register."]
+                                 ()
                          ]])
                          ()
       )
