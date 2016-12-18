@@ -23,6 +23,11 @@ module type PIECE =
     val pieces : t list
   end
 
+type registration_result =
+  | Success
+  | UserAlreadyExists
+  | Error of string
+
 type user_action = [
     `Play
   | `Wait

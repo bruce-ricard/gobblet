@@ -14,8 +14,8 @@ let register () =
       begin
       try
       if p1 = p2 then
-        let open Users in
-        match register user_name p1 with
+        let open Types in
+        match Users.register user_name p1 with
           Success -> let _ = [%client (let () = Eliom_lib.alert "success registered!" in (): unit)] in ()
         | UserAlreadyExists -> let _ = [%client (let () = Eliom_lib.alert "UAE" in () : unit)] in ()
         | Error e -> let _ = [%client (let () = Eliom_lib.alert ("Error: ") in () : unit)] in ()

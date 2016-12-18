@@ -1,10 +1,7 @@
+open Types
+
 type user = string
 type password = string
-
-type registration_result =
-  | Success
-  | UserAlreadyExists
-  | Error of string
 
 module type USERS =
   sig
