@@ -1,3 +1,9 @@
+let set_message = Common.set_message
+
+let successful_registration_msg = "You successfully registered, please log-in to start playing."
+let user_already_exists_msg = "This user already exists, please select another one."
+let non_matching_passwords_msg = "The passwords don't match, please try again."
+
 let register () =
   let open Register in
 
@@ -9,24 +15,31 @@ let register () =
     ~service:Services.user_registration_service
     (*    ~options:`TemporaryRedirect*)
     (fun ()  (user_name, (p1, p2)) ->
-      print_endline "wtf I'm here";
-      let _ = [%client (Eliom_lib.alert "I'm here" : unit)] in
-      begin
-      try
-      if p1 = p2 then
-        let open Types in
-        match Users.register user_name p1 with
-          Success -> let _ = [%client (let () = Eliom_lib.alert "success registered!" in (): unit)] in ()
-        | UserAlreadyExists -> let _ = [%client (let () = Eliom_lib.alert "UAE" in () : unit)] in ()
-        | Error e -> let _ = [%client (let () = Eliom_lib.alert ("Error: ") in () : unit)] in ()
-      else
-        failwith "non matching passwords"
-      with
-        e -> let _ = [%client (let () = Eliom_lib.alert ("Error: ") in () : unit)] in ()
-        end;
-       let _ = [%client
-                (let _ = Eliom_lib.alert "plop" in () : unit)
-               ] in
-       Lwt.return Services.main_service )
+      Lwt.return (
+        if p1 = p2 then
+          let open Types in
+          match Users.register user_name p1 with
+            Success ->
+            begin
+              set_message successful_registration_msg;
+              Services.main_service
+            end
+          | UserAlreadyExists ->
+             begin
+               set_message user_already_exists_msg;
+               Services.input_user_registration_service
+               end
+          | Error e ->
+             begin
+               set_message ("Error:" ^ e);
+               Services.input_user_registration_service
+             end
+        else
+          begin
+            set_message non_matching_passwords_msg;
+            Services.input_user_registration_service
+          end
+        )
+    )
 
 let () = register ()
