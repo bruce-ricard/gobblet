@@ -9,9 +9,8 @@
 
 ### FEATURES ###
 
-- Create concept of "challenge" and "game over"
+- Create concepts of "challenge" and "game over"
 - Add "rematch" button when game is over
-- Create "create account" page
 - Fix cap sensitivity in usernames
 - organize library:
   - don't export all the modules, only the ones needed

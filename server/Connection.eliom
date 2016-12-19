@@ -13,7 +13,8 @@ let register () =
     (fun () (name, password) ->
       match TTTUsers.log_in name password with
         None -> Lwt.return ()
-      | Some user -> Eliom_reference.set current_user (Some(name,user))
+      | Some user ->
+           Eliom_reference.set current_user (Some(name,user))
     );
 
   Eliom_registration.Action.register
