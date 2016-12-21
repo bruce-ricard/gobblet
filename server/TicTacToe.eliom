@@ -103,62 +103,6 @@ let board_html game_id =
       row game_id 2
     ]
 
-let chat_logs_html () =
-  let x, ux = React.E.create () in
-  let r =  Eliom_react.Down.of_react x in
-
-  let lir = li [pcdata "0"] in
-  let html =
-    ul [
-        li [pcdata "test"];
-        li [pcdata "123"];
-        lir
-      ]
-  in
-  let _ = [%client
-              (
-              (*                Lwt.async (fun () ->*) (
-                (
-                      let dom_cell = Eliom_content.Html5.To_dom.of_element ~%lir in
-                      dom_cell##.innerHTML := Js.string "wazuuuuup";
-                      let _ =
-                        React.E.map
-                          (fun i ->
-                            dom_cell##.innerHTML := Js.string (string_of_int i)
-                          )
-                          ~%r
-                      in
-                      ()
-                    (*                      Lwt.return ()*)
-                    )
-                )
-                : unit
-              )
-          ]
-  in
-  let _ =
-    Lwt.async (fun () ->
-        let%lwt _ = Lwt_unix.sleep 3. in
-        List.fold_left
-             (fun y x -> Lwt.bind y (fun () -> ux x; Lwt_unix.sleep 3.))
-             (Lwt.return ())
-             [1;2;3;4;5;6;7;8;9;10]
-
-      ) in
-  let pr = React.E.map print_int x in
-  html
-
-let chat_input_text_html () =
-  div []
-
-let chat_html () =
-  let elt =
-    div [
-        h3 [pcdata "Chat window"];
-        chat_logs_html ();
-        chat_input_text_html ()
-      ] in
-  elt
 
 let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
   Base.skeleton
@@ -214,45 +158,61 @@ let turn_sentence game user : string React.event =
   in
   React.E.map map (TTT.game_status game)
 
+type 'a game_page_result =
+  | InvalidID
+  | Content of 'a
+
 let game_page game_id =
-  let game =
     match TTT.get_react_game_by_id game_id with
-    | Some g -> g
-    | None -> failwith "no game"
-  in
-  let phrase (user, piece) = (* TODO: rename this function *)
-    Printf.sprintf "%s : %s" user (piece_to_string (Some piece))
-  in
-  let turn_sentence_div =
-    div [pcdata ""]
-  in
-  let%lwt username =
-    Eliom_reference.get current_user
-  in
-  let content =
-    [
-      div [h1 [pcdata "Welcome to this tic tac toe game!"]];
-      div [
-          pcdata (phrase (TTT.username_and_piece game_id P1));
-          br ();
-          pcdata (phrase (TTT.username_and_piece game_id P2))
-        ];
-      turn_sentence_div;
-      div [board_html game_id; chat_html ()];
-    ] in
-  let ts = Eliom_react.Down.of_react (turn_sentence game username) in
-  let _ = [%client
-              (update_cell_content ~%turn_sentence_div ~%ts;
-               let ID id = ~%game_id in
-               let%lwt () = refresh id in
-               Lwt.return ()
-                : unit Lwt.t)
-          ]
-  in
+    | None -> Lwt.return InvalidID
+    | Some g ->
+       begin
+         let game = g in
+
+         let phrase (user, piece) = (* TODO: rename this function *)
+           Printf.sprintf "%s : %s" user (piece_to_string (Some piece))
+         in
+         let turn_sentence_div =
+           div [pcdata ""]
+         in
+         let%lwt username =
+           Eliom_reference.get current_user
+         in
+         let content =
+           [
+             div [h1 [pcdata "Welcome to this tic tac toe game!"]];
+             div [
+                 pcdata (phrase (TTT.username_and_piece game_id P1));
+                 br ();
+                 pcdata (phrase (TTT.username_and_piece game_id P2))
+               ];
+             turn_sentence_div;
+             div [board_html game_id; Chat_lib.chat_html ()];
+           ] in
+         let ts = Eliom_react.Down.of_react (turn_sentence game username) in
+         let _ = [%client
+                     (update_cell_content ~%turn_sentence_div ~%ts;
+                      let ID id = ~%game_id in
+                      let%lwt () = refresh id in
+                      Lwt.return ()
+                      : unit Lwt.t)
+                 ]
+         in
+         Lwt.map
+           (fun x -> Content x)
+           (skeleton
+              ~css:[["css"; "TicTacToe.css"]]
+              ~title:"Tic Tac Toe"
+              content)
+       end
+
+let invalid_id_page () =
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Tic Tac Toe"
-    content
+    [pcdata
+       ("This game doesn't exist. Go to your game list" ^
+          " and chose a game from there.")]
 
 let create_game_form user =
   [div
@@ -289,7 +249,10 @@ let register () =
     ~options
     (fun id () ->
       let _ = [%client (init_client () : unit)] in
-      game_page (ID id)
+      let%lwt page = game_page (ID id) in
+      match page  with
+      | Content content -> Lwt.return content
+      | InvalidID -> invalid_id_page ()
     );
 
   Eliom_registration.Html5.register
