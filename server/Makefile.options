@@ -26,8 +26,8 @@ PERSISTENT_DATA_BACKEND = dbm
 DEBUG := yes
 
 # User to run server with (make run.*)
-WWWUSER := www-data
-WWWGROUP := www-data
+WWWUSER := root
+WWWGROUP := staff
 
 # Port for running the server (make run.*)
 PORT := 80

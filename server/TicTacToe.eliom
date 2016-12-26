@@ -308,7 +308,7 @@ let register () =
          let game_service = Eliom_service.preapply ttt_service id in
          Lwt.return game_service);
 
-  Eliom_registration.Html5.register
+  TicTacToe_app.register
     ~service:show_my_games_service
     (fun () () -> show_my_games_page ())
 

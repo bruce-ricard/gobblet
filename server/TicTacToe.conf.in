@@ -4,7 +4,7 @@
 <!-- %%WARNING%% -->
 <ocsigen>
   <server>
-    <port>%%PORT%%</port>
+    <port protocol="HTTP">%%PORT%%</port>
     %%% Only set for running, not for testing
     %%USERGROUP%%
     <logdir>%%LOGDIR%%</logdir>

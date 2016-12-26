@@ -2,11 +2,11 @@ let main_service =
   Eliom_service.Http.service
     ~path:[]
     ~get_params:Eliom_parameter.unit
-    (*    ~https:true*)
+    ~https:true
     ()
 
 let show_my_games_service =
-  Eliom_service.Http.service
+  Eliom_service.App.service
     ~path:["games"; "tictactoe"; "list"]
     ~get_params:Eliom_parameter.unit
     ()
