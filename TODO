@@ -4,6 +4,12 @@
 
 - Fix error when wrong game id is given in url for show game
 - Users shouldn't be TTTUsers, they should be global
+- don't allow spaces or other strange characters in usernames.
+- If you create a game against someone, it's case sensitive, and doesn't create the
+  game against the player you expect. You have to log-in with the correct case sensitivity
+  to be able to play.
+- Fix caps sensitivity in username. It should be normalized in the DB, but players can
+  still login with different cap sensitivity.
 
 ### --- END URGENT --- ###
 
@@ -15,9 +21,6 @@
 - organize library:
   - don't export all the modules, only the ones needed
   - do we really need gameInProgress? it only adds the player names to game
-- organize server:
-  - separate .eliom files into multiple
-  - maybe create some ml file with the main common functions
 - https: test https with non test run (port 80)
 - make the board have cool colors when you hover over it and it's your turn
 
@@ -62,3 +65,11 @@
 - performance:
   - make one different react object per browser, so that we don't have to
     send the information to everybody in case a user requests a refresh.
+
+- code:
+  - have a library in lib, an intermediate level API/DAO with the types the
+    server really needs, and the server calls that. For example, the game library
+    should return type unit on move, but the API should return unit Lwt.t on move.
+    game_game_by_id should return a game option in the library, but maybe in the API
+    we just want to return a game and return an exception if in our usecase we are
+    always supposed to check/know that the id exists before we query.

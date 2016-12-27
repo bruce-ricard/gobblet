@@ -18,4 +18,5 @@ oasis setup
 make
 sudo make install
 cd ../server
-make test.byte
+make byte
+sudo make install.byte
