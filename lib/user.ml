@@ -8,12 +8,9 @@ module RDB : REACT_DB = functor (T : sig type t end) ->
     let delete id = objects := List.filter (fun (x,_) -> x <> id) !objects
 
     let get id =
-      try
-        Some (List.assoc id !objects)
-      with
-        Not_found -> None
-    let get_channel id = Option.map fst (get id)
-    let get_update_function id = Option.map snd (get id)
+       (List.assoc id !objects)
+    let get_channel id = fst (get id)
+    let get_update_function id = snd (get id)
   end
 
 (*

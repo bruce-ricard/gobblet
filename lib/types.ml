@@ -93,7 +93,7 @@ module type REACT_DB = functor
   sig
     val put : id -> Game.t React.event * (?step:React.step -> Game.t -> unit) -> unit
     val delete : id -> unit
-    val get_channel : id -> Game.t React.E.t (* Make this a "down" react already, since it's only for frontend use *)
+    val get_channel : id -> Game.t React.event (* Make this a "down" react already, since it's only for frontend use *)
     val get_update_function : id -> (?step:React.step -> Game.t -> unit)
   end
 
