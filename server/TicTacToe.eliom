@@ -189,7 +189,7 @@ let game_page game_id =
                  pcdata (phrase (TTT.username_and_piece game_id P2))
                ];
              turn_sentence_div;
-             div [board_html game_id; Chat_lib.chat_html ()];
+             div [board_html game_id(*; Chat_lib.chat_html ()*)];
            ] in
          let ts = Eliom_react.Down.of_react (turn_sentence game username) in
          let _ = [%client
