@@ -17,6 +17,8 @@
     type board_update = bool
 ]
 
+let () = let open Chat_lib in ()
+
 module TicTacToe_app =
   Eliom_registration.App (
     struct

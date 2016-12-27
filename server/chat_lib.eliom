@@ -47,7 +47,8 @@ let chat_input () =
 let chat_input_text_html () =
   div []
 
-  (*
+let chat_logs_html () = div []
+
 let chat_html () =
   let elt =
     div [
@@ -56,4 +57,3 @@ let chat_html () =
         chat_input_text_html ()
       ] in
   elt
-   *)
