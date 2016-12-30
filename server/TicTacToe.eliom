@@ -14,8 +14,7 @@
       (int * int * int)
         [@@deriving json]
 
-    type board_update = bool
-]
+    type board_update = bool]
 
 let () = let open Chat_lib in ()
 
@@ -26,7 +25,6 @@ module TicTacToe_app =
     end)
 
 let current_user = Common.current_user
-let bus = Eliom_bus.create [%derive.json: string]
 
 let%shared piece_to_string =
   let open Pieces.XOPiece in function
@@ -109,16 +107,6 @@ let board_html game_id =
 let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
   Base.skeleton
     ~css ~title content
-
-let welcome_page () =
-  let content =
-    [
-      pcdata "Welcome! To start playing, click Play in the menu."
-    ] in
-  skeleton
-    ~css:[["css"; "TicTacToe.css"]]
-    ~title:"Board games"
-    content
 
 let show_my_games_page () =
   let%lwt current_user = Eliom_reference.get current_user in
@@ -240,11 +228,6 @@ let options = {
 
 let register () =
   let open Services in
-  Eliom_registration.Html5.register
-    ~service:main_service
-    (fun () () ->
-      welcome_page ()
-    );
 
   TicTacToe_app.register
     ~service:ttt_service
