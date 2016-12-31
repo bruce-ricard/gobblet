@@ -6,7 +6,8 @@
 
     module TTTUsers = Users.Users_test
 
-    module TTT = User.TTT
+    (*    module TTT = User.TTT*)
+    module TTT = User.TTTXonly
 
     let _ = TTT.new_game "bruce" "bruce2"
 
@@ -26,11 +27,10 @@ module TicTacToe_app =
 
 let current_user = Common.current_user
 
-let%shared piece_to_string =
-  let open Pieces.XOPiece in function
+let%shared piece_to_string = function
     None -> ""
-  | Some(X) -> "X"
-  | Some(O) -> "O"
+  | Some(`X) -> "X"
+  | Some(`O) -> "O"
 
 let move (game_id, row, column) =
   let%lwt user = Eliom_reference.get current_user in

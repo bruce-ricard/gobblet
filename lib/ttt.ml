@@ -39,14 +39,15 @@ module Board : BOARD = functor (Piece : PIECE) ->
                                                    | _ -> None
 
     let check_board (board : t) : Piece.t option =
-      List.fold_left (fun result element ->
+      List.fold_left
+        (fun result element ->
           match result, element with
             None, None -> None
           | Some(x), None | None, Some(x) -> Some(x)
           | Some(x), Some(y) -> if x = y then Some x else failwith "impossible check_board"
         )
-                     None
-                     (List.map all_same (lines board))
+        None
+        (List.map all_same (lines board))
 
     let board_is_full board =
       let result = ref true in
@@ -69,10 +70,10 @@ module Board : BOARD = functor (Piece : PIECE) ->
     let board_status board =
       match check_board board with
       | None ->
-        if board_is_full board then
+         if board_is_full board then
           `Draw
-        else
-          `KeepPlaying
+         else
+           `KeepPlaying
       | Some piece -> `Won
 
     let actually_move board ~row ~column piece  =
