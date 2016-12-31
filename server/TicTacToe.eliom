@@ -6,10 +6,10 @@
 
     module TTTUsers = Users.Users_test
 
-    (*    module TTT = User.TTT*)
-    module TTT = User.TTTXonly
+    module TTTBasic = User.TTT
+    module TTTXonly = User.TTTXonly
 
-    let _ = TTT.new_game "bruce" "bruce2"
+    let _ = TTTBasic.new_game "bruce" "bruce2"
 
     type messages =
       (int * int * int)
@@ -38,12 +38,12 @@ let move (game_id, row, column) =
   | None -> Lwt.return (`Invalid `WrongPlayer)
   | Some (user, _) ->
      begin
-       Lwt.return (TTT.move (ID game_id) ~row ~column user)
+       Lwt.return (TTTBasic.move (ID game_id) ~row ~column user)
      end
 
 let%client move_rpc = ~%(server_function [%derive.json: messages] move)
 
-let refresh id = TTT.refresh_game (ID id); Lwt.return ()
+let refresh id = TTTBasic.refresh_game (ID id); Lwt.return ()
 let%client refresh = ~%(server_function [%derive.json: int] refresh)
 
 let%client update_cell_content cell content =
@@ -84,14 +84,14 @@ let cell (ID game_id) x y content =
   cell
 
 let row id x =
-  let game = match TTT.get_react_game_by_id id with
+  let game = match TTTBasic.get_react_game_by_id id with
     | None -> failwith "impossible game"
     | Some g -> g
   in
   tr [
-      cell id x 0 (TTT.piece_at game ~row:x ~column:0);
-      cell id x 1 (TTT.piece_at game ~row:x ~column:1);
-      cell id x 2 (TTT.piece_at game ~row:x ~column:2)
+      cell id x 0 (TTTBasic.piece_at game ~row:x ~column:0);
+      cell id x 1 (TTTBasic.piece_at game ~row:x ~column:1);
+      cell id x 2 (TTTBasic.piece_at game ~row:x ~column:2)
      ]
 
 let empty_row n = row n
@@ -118,7 +118,7 @@ let show_my_games_page () =
     | Some (user, _) ->
        let idgame_to_link (ID id,game) =
          a Services.ttt_service [pcdata (string_of_int id)] id in
-       let games = TTT.get_current_games user in
+       let games = TTTBasic.get_current_games user in
        match games with
          [] -> div [pcdata "You have no games in progress, start a new one to play."]
        | games ->
@@ -146,14 +146,14 @@ let turn_sentence game user : string React.event =
          | `Watch -> "Enjoy watching " ^ user
        end
   in
-  React.E.map map (TTT.game_status game)
+  React.E.map map (TTTBasic.game_status game)
 
 type 'a game_page_result =
   | InvalidID
   | Content of 'a
 
 let game_page game_id =
-    match TTT.get_react_game_by_id game_id with
+    match TTTBasic.get_react_game_by_id game_id with
     | None -> Lwt.return InvalidID
     | Some g ->
        begin
@@ -172,9 +172,9 @@ let game_page game_id =
            [
              div [h1 [pcdata "Welcome to this tic tac toe game!"]];
              div [
-                 pcdata (phrase (TTT.username_and_piece game_id P1));
+                 pcdata (phrase (TTTBasic.username_and_piece game_id P1));
                  br ();
-                 pcdata (phrase (TTT.username_and_piece game_id P2))
+                 pcdata (phrase (TTTBasic.username_and_piece game_id P2))
                ];
              turn_sentence_div;
              div [board_html game_id(*; Chat_lib.chat_html ()*)];
@@ -252,7 +252,7 @@ let register () =
       match current_user with
       | None -> failwith "no good"
       | Some (user, _) ->
-         let ((ID id),game) = TTT.new_game user_name user in
+         let ((ID id),game) = TTTBasic.new_game user_name user in
          let game_service = Eliom_service.preapply ttt_service id in
          Lwt.return game_service);
 

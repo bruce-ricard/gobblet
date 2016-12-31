@@ -38,7 +38,7 @@ module Test_db : USER_DB =
   struct
     type t = (user * password) list ref
 
-    let users = [("bruce", "123"); ("bruce2", "123"); ("bruce3", "123"); ("arthur", "aeer")]
+    let users = [("bruce", ""); ("bruce2", ""); ("bruce3", ""); ("arthur", "")]
     let users_o = ref ((List.map (fun (name, passwd) ->
                             (name, passwd), new User.user name passwd)) users)
 
