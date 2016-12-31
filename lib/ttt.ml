@@ -1,6 +1,6 @@
 open Types
 
-module Board : BOARD = functor (Piece : PIECE) ->
+module Board (W : WINNER_WINS) : BOARD = functor (Piece : PIECE) ->
   struct
     type t = Piece.t option array array
     let empty_board () : t = Array.make_matrix 3 3 None
@@ -74,7 +74,7 @@ module Board : BOARD = functor (Piece : PIECE) ->
           `Draw
          else
            `KeepPlaying
-      | Some piece -> `Won
+      | Some piece ->  if W.wins then `Won else `Lost
 
     let actually_move board ~row ~column piece  =
       if valid_move board ~row ~column then

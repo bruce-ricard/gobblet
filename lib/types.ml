@@ -49,6 +49,11 @@ type game_in_progress_status = [
   | `GameOver of string game_result
   ]
 
+module type WINNER_WINS =
+  sig
+    val wins : bool
+  end
+
 module type BOARD = functor (Piece : PIECE) ->
   sig
     type t

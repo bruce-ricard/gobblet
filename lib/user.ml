@@ -13,9 +13,23 @@ module RDB : REACT_DB = functor (T : sig type t end) ->
     let get_update_function id = snd (get id)
   end
 
-module TTTGameF = Game.Make(Ttt.Board)
-module TTT = Export.Make(GameInProgress.Make)(TTTGameF)(Pieces.XOPiece)(RDB)
-module TTTXonly = Export.Make(GameInProgress.Make)(TTTGameF)(Pieces.XPiece)(RDB)
+module WW =
+  struct
+    let wins = true
+  end
+
+module WL =
+  struct
+    let wins = false
+  end
+
+module WBoard = Ttt.Board(WW)
+module LBoard = Ttt.Board(WL)
+
+module WTTTGameF = Game.Make(WBoard)
+module LTTTGameF = Game.Make(LBoard)
+module TTT = Export.Make(GameInProgress.Make)(WTTTGameF)(Pieces.XOPiece)(RDB)
+module TTTXonly = Export.Make(GameInProgress.Make)(LTTTGameF)(Pieces.XPiece)(RDB)
 
 class user login password =
 object
