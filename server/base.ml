@@ -42,7 +42,7 @@ let header () =
       None -> contents
     | Some message ->
        begin
-         Eliom_reference.set Common.message_next_page None;
+         Lwt.ignore_result (Eliom_reference.set Common.message_next_page None);
          contents @ [br(); pcdata message]
        end
   in

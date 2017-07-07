@@ -1,6 +1,6 @@
 let dbh = PGOCaml.connect ()
 
-let create_user username password_hash =
+let put username password_hash =
   PGSQL(dbh) "insert into users values ($username, $password_hash)"
 
 type check_response =
@@ -8,7 +8,7 @@ type check_response =
   | CorrectPassword
   | WrongPassword
 
-let check_password username (password_hash: string) =
+let get username (password_hash: string) =
   match
     PGSQL(dbh) "
               select password_hash
@@ -24,3 +24,13 @@ let check_password username (password_hash: string) =
   | _ -> failwith (Printf.sprintf
                      "Multiple users for user \"%s\""
                      username)
+
+let exists username =
+  let users = PGSQL(dbh) "
+                          select 1 from users
+                          where id=$username
+                          " in
+  match users with
+  | [] -> false
+  | [_] -> true
+  | _ -> assert false

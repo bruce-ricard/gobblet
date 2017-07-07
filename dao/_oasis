@@ -7,10 +7,10 @@ License:     GPL-3.0
 BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
-Library "daol"
+Library "ttt-daos"
   Path:       .
   BuildTools: ocamlbuild
-  Modules: DaoL
+  Modules: PostgresDao
   BuildDepends: pgocaml
 
 Executable "initDB"

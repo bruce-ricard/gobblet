@@ -6,15 +6,15 @@ type password = string
 module type USERS =
   sig
     val register : user -> password -> registration_result
-    val get_user : user -> User.user option
+    (*    val get_user : user -> User.user option*)
     val log_in : user -> password -> User.user option (* TODO maybe make this a logged in user ?*)
   end
 
 module type USER_DB =
   sig
-    val get : user -> password -> User.user option
+    val get : user -> password -> bool
     val exists : user -> bool
-    val put : user -> password -> unit
+    val put : user -> password -> bool
   end
 
 module Make(User_db : USER_DB) : USERS =
@@ -25,10 +25,16 @@ module Make(User_db : USER_DB) : USERS =
       let user = normalize user in
       match User_db.exists user with
         true -> UserAlreadyExists
-      | false -> User_db.put user password; Success
+      | false -> if User_db.put user password then
+                   Success
+                 else
+                   Error("Error while adding new user")
 
     let log_in user password =
-      User_db.get (normalize user) password
+      if (User_db.get (normalize user) password) then
+        Some (new  User.user user password)
+      else
+        None
 
     let get_user user =
       User_db.get user ""
@@ -47,12 +53,14 @@ module Test_db : USER_DB =
 
     let get user password =
       try
-        Some (List.assoc (user, password) !users_o)
+        ignore (List.assoc (user, password) !users_o);
+        true
       with
-        Not_found -> None
+        Not_found -> false
 
     let put login password =
-      users_o := ((login, password), new User.user login password) :: !users_o
+      users_o := ((login, password), new User.user login password) :: !users_o;
+      true
   end
 
 module Users_test = Make(Test_db)
