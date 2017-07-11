@@ -1,14 +1,20 @@
-let dbh = PGOCaml.connect ()
+let dbh = PGOCaml.connect
+            (*~host:"localhost"
+            ~port:5433
+            ~user:"ubuntu"
+            (*            ~password:""*)
+            ~database:"ubuntu" *)
+            ()
 
-let put username password_hash =
-  PGSQL(dbh) "insert into users values ($username, $password_hash)"
+let put_hash username password_hash =
+  PGSQL(dbh) "insert into users values ($username, $password_hash)";
+  true
 
-type check_response =
-  | InvalidUser
-  | CorrectPassword
-  | WrongPassword
+let (put : string -> Sha256.t -> bool) username password_hash  =
+  put_hash username (Sha256.to_hex password_hash)
 
-let get username (password_hash: string) =
+let get username (password_hash: Sha256.t) =
+  let password_hash = Sha256.to_hex password_hash in
   match
     PGSQL(dbh) "
               select password_hash
@@ -16,11 +22,8 @@ let get username (password_hash: string) =
               where id=$username
                 "
   with
-    [] -> InvalidUser
-  | [pwh] -> if pwh = password_hash then
-               CorrectPassword
-             else
-               WrongPassword
+    [] -> false
+  | [pwh] -> pwh = password_hash
   | _ -> failwith (Printf.sprintf
                      "Multiple users for user \"%s\""
                      username)

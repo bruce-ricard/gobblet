@@ -1,6 +1,6 @@
-open Types
+open Ttt_game_lib_types
 
-module Make : GAME_IN_PROGRESS =
+module Make =
   functor (Game : GAME) (Piece : PIECE) ->
   struct
   module Game = Game(Piece)
@@ -51,4 +51,9 @@ module Make : GAME_IN_PROGRESS =
       let user = game.players player
       and piece = Game.piece_of player
       in user, piece
+
+    let store game = failwith "not implemented"
+
+    let restore storage = failwith "not implemented"
+
   end

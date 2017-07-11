@@ -2,8 +2,6 @@ open Eliom_lib
 open Eliom_content.Html5.D
 open Services
 
-module Users = Users.Users_test
-
 let register_form () =
   Form.post_form
     ~service:user_registration_service

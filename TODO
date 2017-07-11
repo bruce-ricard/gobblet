@@ -1,9 +1,12 @@
 ### URGENT ###
 
+- add a game_db to server_lib_games functor, to which the games will be stored, and add them to postgres DB
+- add ID generator to server_lib_games functor, which will produce id for the games.
+- make the react DB faster, by using a hashtable maybe
+
 ### BUGS ###
 
 - Fix error when wrong game id is given in url for show game
-- Users shouldn't be TTTUsers, they should be global
 - don't allow spaces or other strange characters in usernames.
 - If you create a game against someone, it's case sensitive, and doesn't create the
   game against the player you expect. You have to log-in with the correct case sensitivity
@@ -50,7 +53,7 @@
     - gobblet
       - junior (3x3, 3 sizes)
       - normal (4x4, 4 sizes)
-    - 4 in a row (puissance 4)
+    - 4 in a row (puissance 4) (connect 4)
   - morris:
     - 3 men
     - 9 men

@@ -1,0 +1,13 @@
+OASISFormat: 0.4
+Name:        Common lib
+Version:     0.0.1
+Synopsis:    Library containing types and functions needed by both the server
+  and client
+Authors:     Bruce Ricard
+License:     LGPL-2.1 with OCaml linking exception
+Plugins:     META (0.4), DevFiles (0.4)
+
+Library "ttt-common-lib"
+  Path:       .
+  BuildTools: ocamlbuild
+  Modules: Ttt_common_lib_types

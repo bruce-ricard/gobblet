@@ -1,4 +1,4 @@
-open Types
+open Ttt_game_lib_types
 
 module Make = functor (Board : BOARD) (Piece : PIECE) ->
   struct
@@ -17,8 +17,6 @@ module Make = functor (Board : BOARD) (Piece : PIECE) ->
 
     let next_player = function
         P1 -> P2 | P2 -> P1
-
-    (*    let player_on game = game.next_player*)
 
     let piece_of =
       match Piece.pieces with

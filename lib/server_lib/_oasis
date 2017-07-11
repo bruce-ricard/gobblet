@@ -1,0 +1,18 @@
+Name: Server lib
+Version: 0.1.1
+Synopsis: Tic tac toe server library
+Authors: Bruce Ricard <bruce.ricard@gmail.com>
+License: LGPL with OCaml linking exception
+
+Description: Contains library functions to be used by the Tictactoe server.
+
+
+OASISFormat: 0.4
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Library "ttt-server-lib"
+  Path: .
+  BuildDepends: ttt-game-lib, ttt-user-lib, ttt-common-lib, ttt-daos, lwt.react
+  InternalModules:
+  Modules: Ttt_server_lib_games, Ttt_server_lib_types

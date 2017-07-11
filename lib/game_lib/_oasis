@@ -11,13 +11,13 @@ OASISFormat: 0.4
 BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
+Library "ttt-game-lib"
+  Path: .
+  BuildDepends:
+  InternalModules: Game_in_progress, Game_internal, Tictactoe_board
+  Modules: Ttt_game_lib_types, Ttt_game_lib_pieces, Ttt_game_lib_games
+
 Executable "test"
   Path: .
   MainIs: test.ml
-
-Library "ttt"
-  Path: .
-  BuildDepends: lwt.react
-#  InternalModules: Types, Users, Ttt, Game, Games, User, GameInProgress, FrontAndBackendReactGame
-  InternalModules: Ttt, Game, User, GameInProgress, Export
-  Modules: User, Users, Types, Pieces
+  BuildDepends: ttt-game-lib

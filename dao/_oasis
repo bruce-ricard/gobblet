@@ -11,9 +11,14 @@ Library "ttt-daos"
   Path:       .
   BuildTools: ocamlbuild
   Modules: PostgresDao
-  BuildDepends: pgocaml
+  BuildDepends: pgocaml, pgocaml.syntax, sha
 
 Executable "initDB"
   Path: .
   BuildDepends: pgocaml, pgocaml.syntax
   MainIs: initDB.ml
+
+Executable "test"
+  Path: .
+  BuildDepends: pgocaml, pgocaml.syntax, ttt-daos
+  MainIs: test.ml

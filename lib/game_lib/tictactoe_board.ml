@@ -1,6 +1,6 @@
-open Types
+open Ttt_game_lib_types
 
-module Board (W : WINNER_WINS) : BOARD = functor (Piece : PIECE) ->
+module Make (W : WINNER_WINS) : BOARD = functor (Piece : PIECE) ->
   struct
     type t = Piece.t option array array
     let empty_board () : t = Array.make_matrix 3 3 None
@@ -94,4 +94,36 @@ module Board (W : WINNER_WINS) : BOARD = functor (Piece : PIECE) ->
       match move board ~row ~column piece with
         `InvalidMove -> failwith "Invalid Move"
       | result -> result
+
+    let serialize board =
+      let result = Bytes.make 9 '-' in
+      for i = 0 to 2 do
+        for j = 0 to 2 do
+          match board.(i).(j) with
+          | Some piece -> Bytes.set result (3*i + j) (Piece.serialize piece)
+          | None -> ()
+        done
+      done;
+      Bytes.to_string result
+
+    exception Deserialize_error
+
+    let deserialize s =
+      let board = empty_board () in
+      try
+        for i = 0 to 2 do
+          for j = 0 to 2 do
+            match s.[3*i + j] with
+            | '-' -> ()
+            | c ->
+               begin
+                 match Piece.deserialize c with
+                 | None -> raise Deserialize_error (* TODO: log error*)
+                 | piece -> board.(i).(j) <- piece
+               end
+          done
+        done;
+        Some board
+      with
+      | Deserialize_error -> None
   end

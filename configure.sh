@@ -12,6 +12,11 @@ opam depext conf-gmp.1 -y && opam depext conf-m4.1 -y && opam depext conf-pkg-co
 opam depext conf-libpcre.1 -y && opam depext conf-openssl.1 -y && opam depext conf-zlib.1 -y && opam depext dbm.1.0 -y
 opam install eliom.5.0.0 -y
 opam install extlib -y
+opam install sha -y
+opam install fmt -y
+opam install logs -y
+opam install core -y
+
 
 cd lib
 oasis setup

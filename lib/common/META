@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: f1580a07ce23e76cf0c77294cb400905)
+version = "0.0.1"
+description =
+"Library containing types and functions needed by both the server and client"
+archive(byte) = "ttt-common-lib.cma"
+archive(byte, plugin) = "ttt-common-lib.cma"
+archive(native) = "ttt-common-lib.cmxa"
+archive(native, plugin) = "ttt-common-lib.cmxs"
+exists_if = "ttt-common-lib.cma"
+# OASIS_STOP
+

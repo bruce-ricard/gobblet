@@ -2,22 +2,23 @@
     open Eliom_lib
     open Eliom_content.Html5.D
     open Lwt
-    open Types
-
-    module TTTUsers = Users.Users_test
-
-    module TTTBasic = User.TTT
-    module TTTXonly = User.TTTXonly
-
-    let _ = TTTBasic.new_game "bruce" "bruce2"
 
     type messages =
       (int * int * int)
         [@@deriving json]
 
-    type board_update = bool]
+    type board_update = bool
+]
 
-let () = let open Chat_lib in ()
+open Ttt_game_lib_types
+
+module TTTUsers = Ttt_user_lib_users
+
+module User = Ttt_user_lib_user
+
+module TTTBasic = Common.Tic_tac_toe_classical
+(*module TTTXonly = Ttt_game_lib_games.TicTacToeXonly*)
+
 
 module TicTacToe_app =
   Eliom_registration.App (
@@ -27,7 +28,7 @@ module TicTacToe_app =
 
 let current_user = Common.current_user
 
-let%shared piece_to_string = function
+let%shared (piece_to_string : Ttt_game_lib_pieces.XOPiece.t option -> string) = function
     None -> ""
   | Some(`X) -> "X"
   | Some(`O) -> "O"
@@ -38,12 +39,20 @@ let move (game_id, row, column) =
   | None -> Lwt.return (`Invalid `WrongPlayer)
   | Some (user, _) ->
      begin
-       Lwt.return (TTTBasic.move (ID game_id) ~row ~column user)
+       let start_time = Core.Time.now () in
+       let result = TTTBasic.move (Ttt_common_lib_types.ID game_id)
+                                  ~row ~column user in
+       let end_time = Core.Time.now () in
+       let elapsed = Core.Time.abs_diff start_time end_time in
+       Logs.debug (fun m -> m "Move executed in %s"
+                              (Core.Time.Span.to_string elapsed)
+                  );
+       Lwt.return result
      end
 
 let%client move_rpc = ~%(server_function [%derive.json: messages] move)
 
-let refresh id = TTTBasic.refresh_game (ID id); Lwt.return ()
+let refresh id = TTTBasic.refresh_game (Ttt_common_lib_types.ID id); Lwt.return ()
 let%client refresh = ~%(server_function [%derive.json: int] refresh)
 
 let%client update_cell_content cell content =
@@ -68,7 +77,7 @@ let%client cell_on_click dom_cell game_id x y =
      )
   )
 
-let cell (ID game_id) x y content =
+let cell (Ttt_common_lib_types.ID game_id) x y content =
   let cell =
     td
       ~a:[a_class ["cell"]]
@@ -89,9 +98,9 @@ let row id x =
     | Some g -> g
   in
   tr [
-      cell id x 0 (TTTBasic.piece_at game ~row:x ~column:0);
-      cell id x 1 (TTTBasic.piece_at game ~row:x ~column:1);
-      cell id x 2 (TTTBasic.piece_at game ~row:x ~column:2)
+      cell id x 0 (TTTBasic.piece_at id ~row:x ~column:0);
+      cell id x 1 (TTTBasic.piece_at id ~row:x ~column:1);
+      cell id x 2 (TTTBasic.piece_at id ~row:x ~column:2)
      ]
 
 let empty_row n = row n
@@ -116,7 +125,7 @@ let show_my_games_page () =
     match current_user with
       None -> div [pcdata "Log in to save your games"]
     | Some (user, _) ->
-       let idgame_to_link (ID id,game) =
+       let idgame_to_link (Ttt_common_lib_types.ID id,game) =
          a Services.ttt_service [pcdata (string_of_int id)] id in
        let games = TTTBasic.get_current_games user in
        match games with
@@ -179,10 +188,10 @@ let game_page game_id =
              turn_sentence_div;
              div [board_html game_id(*; Chat_lib.chat_html ()*)];
            ] in
-         let ts = Eliom_react.Down.of_react (turn_sentence game username) in
+         let ts = Eliom_react.Down.of_react (turn_sentence game_id username) in
          let _ = [%client
                      (update_cell_content ~%turn_sentence_div ~%ts;
-                      let ID id = ~%game_id in
+                      let Ttt_common_lib_types.ID id = ~%game_id in
                       let%lwt () = refresh id in
                       Lwt.return ()
                       : unit Lwt.t)
@@ -200,9 +209,11 @@ let invalid_id_page () =
   skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Tic Tac Toe"
-    [pcdata
-       ("This game doesn't exist. Go to your game list" ^
-          " and chose a game from there.")]
+    [
+      pcdata "This game doesn't exist. Go to your ";
+      a Services.show_my_games_service [pcdata "game list"] ();
+      pcdata " and chose a game from there."
+    ]
 
 let create_game_form user =
   [div
@@ -234,7 +245,7 @@ let register () =
     ~options
     (fun id () ->
       let _ = [%client (init_client () : unit)] in
-      let%lwt page = game_page (ID id) in
+      let%lwt page = game_page (Ttt_common_lib_types.ID id) in
       match page  with
       | Content content -> Lwt.return content
       | InvalidID -> invalid_id_page ()
@@ -252,7 +263,7 @@ let register () =
       match current_user with
       | None -> failwith "no good"
       | Some (user, _) ->
-         let ((ID id),game) = TTTBasic.new_game user_name user in
+         let ((Ttt_common_lib_types.ID id),game) = TTTBasic.new_game user_name user in
          let game_service = Eliom_service.preapply ttt_service id in
          Lwt.return game_service);
 
