@@ -1,4 +1,4 @@
-let set_message = Common.set_message
+let set_message = Common.set_message_next_page
 
 let successful_registration_msg = "You successfully registered, please log-in to start playing."
 let user_already_exists_msg = "This user already exists, please select another one."

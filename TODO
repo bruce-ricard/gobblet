@@ -4,6 +4,7 @@
 - add ID generator to server_lib_games functor, which will produce id for the games.
 - make the react DB faster, by using a hashtable maybe
 
+
 ### BUGS ###
 
 - Fix error when wrong game id is given in url for show game
@@ -13,6 +14,11 @@
   to be able to play.
 - Fix caps sensitivity in username. It should be normalized in the DB, but players can
   still login with different cap sensitivity.
+
+- Fix module types to not be functors. If a type is needed in the types of
+  the functions, add that type in the module type as an abstract type
+- Show message when wrong password/username is entered to log-in
+- From the page list page, wrong log in show odd log messages
 
 ### --- END URGENT --- ###
 

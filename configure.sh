@@ -1,6 +1,6 @@
-sudo apt-get update
-yes | sudo apt-get install opam
-yes | sudo apt-get install postgresql
+sudo apt-get update --yes
+sudo apt-get install opam --yes
+sudo apt-get install postgresql --yes
 opam init -y
 eval `opam config env`
 eval `opam config env`

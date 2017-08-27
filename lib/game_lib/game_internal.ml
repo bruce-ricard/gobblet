@@ -1,14 +1,13 @@
 open Ttt_game_lib_types
 
-module Make = functor (Board : BOARD) (Piece : PIECE) ->
+module Make (Board : BOARD) : GAME_INTERNAL
+  with type piece = Board.piece =
   struct
-    module Board = Board(Piece)
-
     type t = {
         board : Board.t;
         mutable game_status : game_status
       }
-
+    type piece = Board.piece
     let new_game () =
       {
         board = Board.empty_board ();
@@ -19,7 +18,7 @@ module Make = functor (Board : BOARD) (Piece : PIECE) ->
         P1 -> P2 | P2 -> P1
 
     let piece_of =
-      match Piece.pieces with
+      match Board.pieces with
       | [x] -> (function _ -> x)
       | [x;y] -> (function P1 -> x | P2 -> y)
       | _ -> failwith "Invalid number of pieces"

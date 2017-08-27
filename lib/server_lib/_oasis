@@ -13,6 +13,11 @@ Plugins: META (0.4), DevFiles (0.4)
 
 Library "ttt-server-lib"
   Path: .
-  BuildDepends: ttt-game-lib, ttt-user-lib, ttt-common-lib, ttt-daos, lwt.react
+  BuildDepends: ttt-game-lib, ttt-user-lib, ttt-common-lib, ttt-daos, lwt.react, logs, lwt.ppx
   InternalModules:
   Modules: Ttt_server_lib_games, Ttt_server_lib_types
+
+Executable "test"
+  Path: .
+  MainIs: test.ml
+  BuildDepends: ttt-server-lib

@@ -8,6 +8,7 @@ module type USERS =
     val register : user -> password -> registration_result
     (*    val get_user : user -> Ttt_user_lib_user.user option*)
     val log_in : user -> password -> Ttt_user_lib_user.user option (* TODO maybe make this a logged in user ?*)
+    val exists : user -> bool
   end
 
 module type USER_DB =
@@ -52,6 +53,8 @@ module Make(User_db : USER_DB) : USERS =
 
 (*    let get_user user =
       User_db.get user ""*)
+
+    let exists = User_db.exists
   end
 
 module Test_db : USER_DB =

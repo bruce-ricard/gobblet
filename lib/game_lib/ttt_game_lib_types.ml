@@ -17,7 +17,7 @@ type move_result =
   | `Ok
   ]
 
-type game_storage_status =
+type serialized_game =
   {
     player1 : string;
     player2 : string;
@@ -58,43 +58,48 @@ module type WINNER_WINS =
     val wins : bool
   end
 
-module type BOARD = functor (Piece : PIECE) ->
+module type BOARD =
   sig
     type t
+    type piece
+
     val empty_board : unit -> t
+    val pieces : piece list
     val move :
       t ->
       row:int ->
       column:int ->
-      Piece.t ->
+      piece ->
       board_move_result
     (*    val board_status : t -> board_status*)
-    val piece_at : t -> row:int -> column:int -> Piece.t option
+    val piece_at : t -> row:int -> column:int -> piece option
     val serialize : t -> string
     val deserialize : string -> t option
   end
 
 
-module type GAME = functor (Piece : PIECE) ->
+
+module type GAME_INTERNAL =
   sig
     type t
+    type piece
     val new_game : unit -> t
     val move : t -> row:int -> column:int -> player -> move_result
-    val piece_at : t -> row:int -> column:int -> Piece.t option
+    val piece_at : t -> row:int -> column:int -> piece option
     (*    val player_on : t -> player*)
-    val piece_of : player -> Piece.t
+    val piece_of : player -> piece
     val game_status : t -> game_status
   end
 
 module type GAME_IN_PROGRESS =
-  functor (Piece : PIECE) ->
   sig
     type t
+    type piece
     val new_game : (player -> string) -> t
     val move : t -> row:int -> column:int -> string -> move_result
-    val piece_at : t -> row:int -> column:int -> Piece.t option
-    val username_and_piece : t -> player -> (string * Piece.t)
+    val piece_at : t -> row:int -> column:int -> piece option
+    val username_and_piece : t -> player -> (string * piece)
     val game_status : t -> game_in_progress_status
-    val store : t -> game_storage_status
-    val restore : game_storage_status -> t option
+    val store : t -> serialized_game
+    val restore : serialized_game -> t option
   end

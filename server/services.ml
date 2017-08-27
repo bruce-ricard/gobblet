@@ -17,18 +17,18 @@ let ttt_service =
     ~get_params:Eliom_parameter.(int "game_id")
     ()
 
-let input_create_game_service =
-  Eliom_service.Http.service
+let create_challenge_service =
+  Eliom_service.App.service
     ~path:["games"; "tictactoe"; "newgame"]
-    ~get_params:Eliom_parameter.unit
+    ~get_params:Eliom_parameter.(string "opponent")
     ()
 
-let create_game_service =
+(*let create_game_service =
   Eliom_service.Http.service
     ~path:["games"; "tictactoe"; "newgame"]
-    ~get_params:Eliom_parameter.(string "oponent")
+    ~get_params:Eliom_parameter.(string "opponent")
     ()
-
+ *)
 let input_user_registration_service =
   Eliom_service.Http.service
     ~path:["register"]

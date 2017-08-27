@@ -1,15 +1,16 @@
 open Ttt_game_lib_types
 
-module Make =
-  functor (Game : GAME) (Piece : PIECE) ->
+module Make (Game : GAME_INTERNAL)
+       : GAME_IN_PROGRESS with type piece = Game.piece =
+
   struct
-  module Game = Game(Piece)
+
     type t =
       {
         game : Game.t;
         players : player -> string;
       }
-
+    type piece = Game.piece
     let new_game players =
       let game = Game.new_game () in
       {game ; players}

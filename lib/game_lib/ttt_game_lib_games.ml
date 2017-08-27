@@ -8,8 +8,8 @@ module WL =
     let wins = false
   end
 
-module WBoard = Tictactoe_board.Make(WW)
-module LBoard = Tictactoe_board.Make(WL)
+module WBoard = Tictactoe_board.Make(WW)(Ttt_game_lib_pieces.XOPiece)
+module LBoard = Tictactoe_board.Make(WL)(Ttt_game_lib_pieces.XOPiece)
 
 module WTTTGameF = Game_internal.Make(WBoard)
 module LTTTGameF = Game_internal.Make(LBoard)

@@ -6,7 +6,7 @@
 PROJECT_NAME := TicTacToe
 
 # Source files for the server
-SERVER_FILES := common.ml connection_code.ml register.ml services.ml base.ml $(wildcard *.eliomi *.eliom)
+SERVER_FILES := common.ml connection_code.ml register.ml services.ml $(wildcard *.eliomi *.eliom)
 # Source files for the client
 CLIENT_FILES := services.ml $(wildcard *.eliomi *.eliom)
 

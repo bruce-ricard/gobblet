@@ -1,8 +1,14 @@
 open Ttt_game_lib_types
 
-module Make (W : WINNER_WINS) : BOARD = functor (Piece : PIECE) ->
+module Make (W : WINNER_WINS) (Piece : PIECE)
+       : BOARD with type piece = Piece.t
+  =
   struct
+    module Piece = Piece
+    type piece = Piece.t
+
     type t = Piece.t option array array
+    let pieces = Piece.pieces
     let empty_board () : t = Array.make_matrix 3 3 None
 
     let piece_at board ~row ~column =
