@@ -1,5 +1,6 @@
 sudo apt-get update
 yes | sudo apt-get install opam
+yes | sudo apt-get install postgresql
 opam init -y
 eval `opam config env`
 eval `opam config env`
@@ -16,12 +17,4 @@ opam install sha -y
 opam install fmt -y
 opam install logs -y
 opam install core -y
-
-
-cd lib
-oasis setup
-make
-sudo make install
-cd ../server
-make byte
-sudo make install.byte
+opam install pgocaml -y
