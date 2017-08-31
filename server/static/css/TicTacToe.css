@@ -35,8 +35,11 @@ body {
 }
 
 .header_login {
-
     float: right;
+}
+
+.user_message {
+    background-color: yellow;
 }
 
 form {
@@ -62,6 +65,7 @@ table {
     margin:0px auto;
 
 }
+
 td:nth-child(2) {
     border-color:black;
     border-style:solid ;

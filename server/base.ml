@@ -43,7 +43,9 @@ let header () =
     | Some message ->
        begin
          Lwt.ignore_result (Eliom_reference.set Common.message_next_page None);
-         contents @ [br(); pcdata message]
+         contents @ [br();
+                     div ~a:[a_class ["user_message"]] [pcdata message]
+                    ]
        end
   in
   Lwt.return (
