@@ -26,7 +26,7 @@ module Make(User_db : USER_DB) : USERS =
       Sha256.string string_to_hash
 
     let is_valid_username username =
-      let username_regexp = Str.regexp "^[A-Za-Z0-9_-]+$"
+      let username_regexp = Str.regexp "^[A-Za-z0-9_-]+$"
       and length = String.length username in
       length >= 3 && length <= 30 &&
         Str.string_match username_regexp username 0
