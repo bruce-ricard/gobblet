@@ -5,6 +5,8 @@ let chat_logs_elt =
   ul [
     ]
 
+(*
+
 let%client chat_form_handler input_text_field submit_button =
   let dom_text = Eliom_content.Html5.To_dom.of_input input_text_field in
   let dom_button = Eliom_content.Html5.To_dom.of_element submit_button in
@@ -57,3 +59,4 @@ let chat_html () =
         chat_input_text_html ()
       ] in
   elt
+ *)

@@ -4,7 +4,6 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
        : BOARD with type piece = Piece.t
   =
   struct
-    module Piece = Piece
     type piece = Piece.t
 
     type t = Piece.t option array array

@@ -9,11 +9,11 @@
      [@@deriving json]
 
  type board_update = bool
- module Piece = Ttt_game_lib_pieces.XOPiece
+ module Piece = Ttt_game_lib_pieces.XPiece
 ]
 
 [%%server
- module Game = Common.TicTacToeClassical
+ module Game = Common.TicTacToeXOnly
  module Games = Common.Games
 
  open Ttt_game_lib_types
@@ -26,13 +26,13 @@
 let%shared (piece_to_string : Piece.t option -> string) = function
     None -> ""
   | Some(`X) -> "X"
-  | Some(`O) -> "O"
 
-let get_game id : Common.TicTacToeClassical.game option =
+let get_game id =
   match Games.get_game id with
   | None -> None
-  | Some (`TicTacToeClassical game) -> Some game
-  | _ -> Logs.err (fun m -> m "game with id %d is not TTT classical" id#get_id); None
+  | Some (`TicTacToeXOnly game) -> Some game
+  | _ ->
+     Logs.err (fun m -> m "game with id %d is not TTT X only" id#get_id); None
 
 let move row column game user =
   let start_time = Core.Time.now () in
@@ -50,11 +50,10 @@ let move (game_id, row, column) =
   | None -> Lwt.return (`Invalid `WrongPlayer)
   | Some (user, _) ->
      begin
-       match Games.get_game (new id game_id) with
+       match get_game (new id game_id) with
        | None -> (*Lwt.return (`Invalid `NoSuchId)*) assert false
-       | Some (`TicTacToeClassical game) ->
+       | Some game ->
           move row column game user
-       | _ -> assert false
      end
 
 let%client move_rpc = ~%(server_function [%derive.json: move_messages] move)
@@ -217,7 +216,7 @@ let register () =
   let open Services in
 
   Base.TicTacToe_app.register
-    ~service:ttt_classical_service
+    ~service:ttt_xonly_service
     ~options
     (fun id_int () ->
       let _ = [%client (init_client () : unit)] in

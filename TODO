@@ -1,7 +1,7 @@
 ### URGENT ###
 
+- change the get_games from the GAMES to return just a react.event, not extended. Instead of updating the list on each change, rather update it every couple of seconds, it will be better for the UI.
 - add a game_db to server_lib_games functor, to which the games will be stored, and add them to postgres DB
-- add ID generator to server_lib_games functor, which will produce id for the games.
 - make the react DB faster, by using a hashtable maybe
 
 

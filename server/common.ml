@@ -1,38 +1,9 @@
 open Ttt_common_lib_types
 
-module GameRDB : Ttt_server_lib_types.REACT_DB = functor (T : sig type t end) ->
+module Challenge_DB : Ttt_server_lib_types.CHALLENGES =
   struct
-    let objects = ref []
+    type challenge = Ttt_server_lib_challenge.t
 
-    let put id t =
-      Logs.debug (fun m -> m "Inserted game %d into RDB" id#get_id);
-      objects := (id#get_id,t) :: !objects
-
-    let delete id = objects := List.filter (fun (x,_) -> x <> id#get_id)
-                                           !objects
-
-    let get id =
-      try
-        let event = List.assoc id#get_id !objects in
-        Logs.debug (fun m -> m "Found game event %d" id#get_id);
-        Some (event)
-      with
-        Not_found ->
-        Logs.debug (fun m -> m "NOT found game event %d" id#get_id);
-        None
-
-    let get_channel id =
-      Core.Std.Option.map (get id) ~f:fst
-
-    let get_update_function id =
-      match get id with
-      | Some (_,f) -> f
-      | None -> failwith "no such ID"
-  end
-
-module Challenge_DB =
-  struct
-    type challenge = (string * string option * int)
     type t = {
         event_listener: unit React.event;
         trigger_event: unit -> unit;
@@ -53,8 +24,8 @@ module Challenge_DB =
         ^ " ]"
 
     let challenges_to_string () =
-      list_to_string string_of_int
-      @@ List.map (fun (_,_,id) -> id) !challenges
+      list_to_string (fun i -> string_of_int (i#get_id))
+      @@ List.map Ttt_server_lib_challenge.id !challenges
 
     let log_debug_challenges () =
       Logs.debug (fun m -> m "challenges: %s" (challenges_to_string ()))
@@ -66,42 +37,53 @@ module Challenge_DB =
 
     let event_listener t = t.event_listener
 
-    let create db challenger ?opponent id =
+    let create db challenger ?opponent game_name id =
+      let challenge =
+        Ttt_server_lib_challenge.create ?game_name challenger ?opponent id in
       log_debug_challenges ();
-      challenges := !challenges @ [(challenger, opponent, id#get_id)];
+      challenges :=
+        !challenges @ [challenge];
       log_debug_challenges ();
-      db.trigger_event ()
+      (*db.trigger_event ();*)
+      challenge
 
     let public_challenges_for_user db user =
-      let filter_function = function
-        | challenger,None,_ -> user != challenger
+      let filter_function challenge =
+        match Ttt_server_lib_challenge.opponent challenge with
+        | None ->
+           let challenger = Ttt_server_lib_challenge.challenger challenge in
+           user <> challenger
         | _ -> false
       in
+
       let publics = List.filter filter_function
                                 !challenges
       in
-      List.map (function challenger,_,id -> new id id,challenger) publics
+      publics
 
     let private_challenges_for_user db user =
-      let filter_function = function
-        | _, Some(challengee), _ -> user = challengee
+      let filter_function challenge =
+        match Ttt_server_lib_challenge.opponent challenge with
+          Some(opp) -> user = opp
         | _ -> false
       in
       let privates = List.filter filter_function
                                  !challenges
       in
-      List.map (function challenger,_,id -> new id id,challenger) privates
+      privates
 
 
     let rec remove_id id =
       let open Ttt_server_lib_types in
       function
         [] -> [], Id_not_present
-      | (user,_,id2 as x) :: xs -> if id#get_id = id2 then
-                                       xs, Deleted(user)
-                                   else
-                                     let a,b = remove_id id xs in
-                                     x :: a, b
+      | challenge :: xs ->
+         let id2 = (Ttt_server_lib_challenge.id challenge)#get_id in
+         if id#get_id = id2 then
+           xs, Deleted(challenge)
+         else
+           let a,b = remove_id id xs in
+           challenge :: a, b
 
     let remove db id =
       (* TODO: there will be race conditions here, fix *)
@@ -113,7 +95,7 @@ module Challenge_DB =
          begin
            challenges := list;
            log_debug_challenges ();
-           db.trigger_event ();
+           (*db.trigger_event ();*)
            d
          end
       |  Id_not_present -> Id_not_present
@@ -125,25 +107,18 @@ module Challenge_DB =
            method unlock = Lwt_mutex.unlock db.mutex
          end)
 
-
-  end
-
-module Challenge_react_db : Ttt_server_lib_types.CHALLENGE_REACT_DB =
-  struct
-    let table = Hashtbl.create 10
-
-    let create id =
-      let react, update_function = React.E.create () in
-      Hashtbl.add table id#get_id update_function;
-      react
-
-    let accept id =
-      try
-        let update_function = Hashtbl.find table id#get_id in
-        update_function ();
-        Hashtbl.remove table id#get_id
-      with
-        Not_found -> failwith "internal server error: challenge react db accept"
+    let send_updates db =
+      let trigger = db.trigger_event in
+      let rec aux () =
+        let open Lwt in
+        Lwt.async (fun () ->
+            let%lwt () = Lwt_unix.sleep 3. in
+            Logs.debug (fun m -> m "updating challenges");
+            trigger ();
+            Lwt.return (aux())
+          )
+      in
+      aux ()
   end
 
 module HashMapSetInternal
@@ -193,10 +168,9 @@ end
       Hashtbl.replace table key (ValueSet.remove value set)
   end
 
-module GamesByIdAndUser
-         (Games : Set.OrderedType) =
+module GamesByIdAndUser : Ttt_server_lib_types.GAME_DB =
   struct
-    type game = Games.t
+    type game = Ttt_server_lib_types.named_api_game
 
     module Users =
       struct
@@ -214,7 +188,7 @@ module GamesByIdAndUser
     module ValueSet = (UsersToIdSet.ValueSet)
 
     type t = {
-        index1 :  (int, (Games.t * Users.t * Users.t)) Hashtbl.t;
+        index1 :  (int, (game * Users.t * Users.t)) Hashtbl.t;
         index2 : UsersToIdSet.t;
       }
 
@@ -223,7 +197,8 @@ module GamesByIdAndUser
         index2 = UsersToIdSet.create 30;
       }
 
-    let put_game id user1 user2 game =
+    let (put_game : Ttt_common_lib_types.id ->
+                    string -> string -> game -> unit) = fun id user1 user2 game ->
       Hashtbl.add table.index1 id#get_id (game, user1, user2);
       UsersToIdSet.add table.index2 user1 id#get_id;
       UsersToIdSet.add table.index2 user2 id#get_id
@@ -287,11 +262,17 @@ module Users = Ttt_user_lib_users.Make(PostgresDao)
 
 module TTT =
   struct
-    include Ttt_game_lib_games.TicTacToeClassical
+    type t = Ttt_server_lib_game_list.TicTacToeClassical.game
     let compare = Pervasives.compare
   end
 
-module GameDB = GamesByIdAndUser(TTT)
+module GameDB : Ttt_server_lib_types.GAME_DB = GamesByIdAndUser
+
+module TTTXonly =
+  struct
+    include Ttt_game_lib_games.TicTacToeXOnly
+    let compare = Pervasives.compare
+  end
 
 module MockGameArchiveDB =
   struct
@@ -305,6 +286,19 @@ module MockGameArchiveDB =
     let get_games_for_user user = []
   end
 
+module MockXGameArchiveDB =
+  struct
+    type game = TTTXonly.t
+    let put_game id game =
+      Logs.info (fun m -> m "Mock archiving game %d" id#get_id)
+
+    let get_game id =
+      None
+
+    let get_games_for_user user = []
+  end
+
+
 module IdGenerator =
   struct
     let current = ref 0
@@ -314,23 +308,19 @@ module IdGenerator =
       new id (!current)
   end
 
-
-module Tic_tac_toe_classical : Ttt_server_lib_types.GAMES
-       with type piece = Ttt_game_lib_pieces.XOPiece.t
-                           =
+module Games : Ttt_server_lib_types.GAMES =
   Ttt_server_lib_games.Make
-    (Ttt_game_lib_games.TicTacToeClassical)
     (Challenge_DB)
     (IdGenerator)
-    (GameRDB)
-    (Challenge_react_db)
     (GameDB)
     (MockGameArchiveDB)
     (Users)
 
-let () =
-  let open Tic_tac_toe_classical in
-  ()
+module TicTacToeClassical =
+  Ttt_server_lib_game_list.TicTacToeClassical
+
+module TicTacToeXOnly =
+  Ttt_server_lib_game_list.TicTacToeXOnly
 
 
 let reporter ppf =

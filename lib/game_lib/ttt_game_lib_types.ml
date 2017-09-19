@@ -77,8 +77,6 @@ module type BOARD =
     val deserialize : string -> t option
   end
 
-
-
 module type GAME_INTERNAL =
   sig
     type t

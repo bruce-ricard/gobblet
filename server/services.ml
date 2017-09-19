@@ -7,28 +7,28 @@ let main_service =
 
 let show_my_games_service =
   Eliom_service.App.service
-    ~path:["games"; "tictactoe"; "list"]
+    ~path:["games"; "list"]
     ~get_params:Eliom_parameter.unit
     ()
 
-let ttt_service =
+let game_dispatch_service =
   Eliom_service.App.service
-    ~path:["games"; "tictactoe"; "play"]
+    ~path:["games"; "play"]
+    ~get_params:(Eliom_parameter.int "game_id")
+    ()
+
+let ttt_classical_service =
+  Eliom_service.App.service
+    ~path:["games"; "tictactoe"; "classical"; "play"]
     ~get_params:Eliom_parameter.(int "game_id")
     ()
 
-let create_challenge_service =
+let ttt_xonly_service =
   Eliom_service.App.service
-    ~path:["games"; "tictactoe"; "newgame"]
-    ~get_params:Eliom_parameter.(string "opponent")
+    ~path:["games"; "tictactoe"; "xonly"; "play"]
+    ~get_params:Eliom_parameter.(int "game_id")
     ()
 
-(*let create_game_service =
-  Eliom_service.Http.service
-    ~path:["games"; "tictactoe"; "newgame"]
-    ~get_params:Eliom_parameter.(string "opponent")
-    ()
- *)
 let input_user_registration_service =
   Eliom_service.Http.service
     ~path:["register"]
@@ -53,7 +53,7 @@ let disconnection_service =
     ~post_params:Eliom_parameter.unit
     ()
 
-let chat_service =
+(*let chat_service =
   Eliom_service.App.post_coservice'
     ~post_params:Eliom_parameter.(string "message")
-    ()
+    ()*)
