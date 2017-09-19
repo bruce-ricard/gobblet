@@ -2,6 +2,12 @@ open Eliom_content.Html5.D
 
 let _ = let open Common in let open Connection_code in ()
 
+module TicTacToe_app =
+  Eliom_registration.App (
+      struct
+        let application_name = "TicTacToe"
+      end)
+
 let header_login () =
   let%lwt current_user = Eliom_reference.get Common.current_user in
   match current_user with
@@ -47,7 +53,7 @@ let header () =
   let menu =
     div ~a:[a_class ["menu"]]
         [
-          a Services.show_my_games_service [pcdata "Tic Tac Toe"] ()
+          a Services.show_my_games_service [pcdata "Play"] ()
         ]
   in
   let%lwt message_eref = Eliom_reference.get Common.message_next_page in
