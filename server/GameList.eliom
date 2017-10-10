@@ -230,14 +230,14 @@ let challenge_elements user =
   in
   element
 
-let show_my_games_page () =
+let game_list_page () =
   let%lwt current_user = Eliom_reference.get current_user in
   let game_list =
     match current_user with
       None -> div [pcdata "Log in to save your games"]
     | Some (user, _) ->
        let idgame_to_link (id, opp) =
-         a Services.ttt_classical_service [pcdata opp] id#get_id in
+         a Services.game_dispatch_service [pcdata opp] id#get_id in
        let games = Games.get_current_games user in
        let games_display =
          match games with
@@ -247,7 +247,8 @@ let show_my_games_page () =
             let bullets = List.map (fun link -> li [link]) links in
             [ul bullets]
        in
-       div (challenge_form () :: (challenge_elements user) :: games_display)
+       div (games_display @ challenge_form () :: (challenge_elements user) ::
+                               [])
   in
   Base.skeleton
     ~css:[["css"; "TicTacToe.css"]]
@@ -259,6 +260,6 @@ let eliom_register () =
 
   Base.TicTacToe_app.register
     ~service:show_my_games_service
-    (fun () () -> show_my_games_page ())
+    (fun () () -> game_list_page ())
 
 let () = eliom_register ()
