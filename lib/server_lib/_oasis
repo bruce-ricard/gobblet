@@ -14,7 +14,7 @@ Plugins: META (0.4), DevFiles (0.4)
 Library "ttt-server-lib"
   Path: .
   BuildDepends: ttt-game-lib, ttt-user-lib, ttt-common-lib, ttt-daos, lwt.react, logs, lwt.ppx, core, threads
-  InternalModules: Internal_types, Internal_types2
+  InternalModules: Internal_types
   Modules: Ttt_server_lib_games, Ttt_server_lib_types, Ttt_server_lib_challenge, Ttt_server_lib_game_api, Ttt_server_lib_game_list
 
 Executable "test"

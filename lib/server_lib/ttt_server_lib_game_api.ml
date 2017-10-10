@@ -1,4 +1,4 @@
-open Internal_types2
+open Internal_types
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 

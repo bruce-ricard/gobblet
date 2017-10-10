@@ -1,5 +1,4 @@
 open Ttt_common_lib_types
-open Internal_types
 
 type t = {
     id : id;

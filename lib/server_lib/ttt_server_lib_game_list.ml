@@ -1,5 +1,3 @@
-open Internal_types
-
 module TicTacToeClassical =
   Ttt_server_lib_game_api.Make(Ttt_game_lib_games.TicTacToeClassical)
 

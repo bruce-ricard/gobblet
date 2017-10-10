@@ -1,7 +1,7 @@
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 
-include Internal_types2
+include Internal_types
 
 type named_db_game =
   [
