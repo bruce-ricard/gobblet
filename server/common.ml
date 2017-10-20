@@ -258,7 +258,7 @@ module GamesByIdAndUser : Ttt_server_lib_types.GAME_DB =
         (ValueSet.elements @@ UsersToIdSet.get_set table.index2 user)
   end
 
-module Users = Ttt_user_lib_users.Make(PostgresDao)
+module Users = Ttt_user_lib_users.Make(UsersPostgresDao)
 
 module TTT =
   struct
@@ -270,7 +270,7 @@ module GameDB : Ttt_server_lib_types.GAME_DB = GamesByIdAndUser
 
 module TTTXonly =
   struct
-    include Ttt_game_lib_games.TicTacToeXOnly
+    include Ttt_server_lib_game_list.TTTXOI
     let compare = Pervasives.compare
   end
 
@@ -321,7 +321,6 @@ module TicTacToeClassical =
 
 module TicTacToeXOnly =
   Ttt_server_lib_game_list.TicTacToeXOnly
-
 
 let reporter ppf =
   let report src level ~over k msgf =

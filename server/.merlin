@@ -1,3 +1,7 @@
 S .
 B _server
 B _client
+
+PKG ttt-server-lib lwt.ppx js_of_ocaml.deriving.ppx logs logs.fmt core
+
+PKG eliom.ppx eliom.server eliom.client eliom.ppx.client

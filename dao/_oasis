@@ -10,8 +10,8 @@ Plugins: META (0.4), DevFiles (0.4)
 Library "ttt-daos"
   Path:       .
   BuildTools: ocamlbuild
-  Modules: PostgresDao
-  BuildDepends: pgocaml, pgocaml.syntax, sha
+  Modules: UsersPostgresDao#, RatingPostgresDao
+  BuildDepends: pgocaml, pgocaml.syntax, sha, logs, ttt-common-lib
 
 Executable "initDB"
   Path: .

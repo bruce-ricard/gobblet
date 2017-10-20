@@ -7,12 +7,6 @@ type remove_challenge =
       | Id_not_present
       | Deleted of challenge
 
-type 'a fb_game = {
-    game : 'a;
-    event : 'a React.event;
-    update : ?step:React.step -> 'a -> unit
-  }
-
 module type CHALLENGES =
   sig
     type t

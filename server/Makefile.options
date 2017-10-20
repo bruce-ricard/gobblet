@@ -11,7 +11,7 @@ SERVER_FILES := common.ml connection_code.ml register.ml services.ml $(wildcard 
 CLIENT_FILES := services.ml $(wildcard *.eliomi *.eliom)
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := ttt-server-lib lwt.ppx js_of_ocaml.deriving.ppx logs logs.fmt core
+SERVER_PACKAGES := ttt-server-lib lwt.ppx js_of_ocaml.deriving.ppx logs logs.fmt core ttt-daos
 # OCamlfind packages for the client
 CLIENT_PACKAGES := ttt-game-lib ttt-common-lib lwt.ppx js_of_ocaml.deriving.ppx js_of_ocaml.ppx logs
 

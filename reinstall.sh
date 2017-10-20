@@ -5,17 +5,17 @@ ocamlfind remove ttt-user-lib
 ocamlfind remove ttt-common-lib
 
 
-cd dao
-make distclean
-make
-make install
-cd ..
-
 cd lib/common
 make distclean
 make
 make install
 cd ../..
+
+cd dao
+make distclean
+make
+make install
+cd ..
 
 cd lib/game_lib
 make distclean

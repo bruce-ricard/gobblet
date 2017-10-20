@@ -17,3 +17,23 @@ create table tic_tac_toe_games
 id serial not null primary key,
 game text not null
 );
+
+create schema ratings;
+
+create table ratings.tictactoeclassical
+(
+username varchar(30) not null primary key REFERENCES users (id),
+rating numeric(6,2) not null,
+rd numeric(5,2) not null,
+sigma numeric(10) not null,
+number_games integer not null
+);
+
+create table ratings.tictactoexonly
+(
+username varchar(30) not null primary key REFERENCES users (id),
+rating numeric(6,2) not null,
+rd numeric(5,2) not null,
+sigma numeric(10) not null,
+number_games integer not null
+);

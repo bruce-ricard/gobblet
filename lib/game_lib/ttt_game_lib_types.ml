@@ -77,6 +77,28 @@ module type BOARD =
     val deserialize : string -> t option
   end
 
+type draw_report = {
+    player1 : string;
+    player2 : string;
+  }
+
+type decisive_report = {
+    winner : string;
+    loser : string;
+  }
+
+type report_result =
+  | Draw of draw_report
+  | Decisive of decisive_report
+
+module type REPORTER =
+  sig
+    type t
+    val get : unit -> t
+    val report_game_end :
+      t -> report_result -> unit
+  end
+
 module type GAME_INTERNAL =
   sig
     type t

@@ -191,10 +191,13 @@ module Make
           Error(Printf.sprintf "\"%s\" is not a valid player." challenger)
         end
 
-
-    let game_api_to_game_db : (named_api_game -> named_db_game) = function
-      | `TicTacToeClassical game -> `TicTacToeClassical game.game
-      | `TicTacToeXOnly game -> assert false (*`TicTacToeXOnly game.game*)
+    let game_api_to_game_db : (named_api_game -> named_db_game) =
+      let open Ttt_server_lib_game_list in
+      function
+      | `TicTacToeClassical game ->
+         `TicTacToeClassical game.TicTacToeClassical.game
+      | `TicTacToeXOnly game ->
+         `TicTacToeXOnly game.TicTacToeXOnly.game
 
     let archive_game id =
       match Game_DB.get_game id with

@@ -1,6 +1,7 @@
 open Ttt_game_lib_types
 
 module Make (Game : GAME_INTERNAL)
+            (Reporter : REPORTER)
        : GAME_IN_PROGRESS with type piece = Game.piece =
 
   struct
@@ -11,6 +12,7 @@ module Make (Game : GAME_INTERNAL)
         players : player -> string;
       }
     type piece = Game.piece
+
     let new_game players =
       let game = Game.new_game () in
       {game ; players}
@@ -40,11 +42,32 @@ module Make (Game : GAME_INTERNAL)
       | GameOver `Drawn -> `GameOver `Drawn
       | PlayerOn p -> `PlayOn (user_status game p)
 
+    let other_player = function
+        P1 -> P2 | P2 -> P1
+
     let move game ~row ~column user =
       match user_to_player game user with
         None -> `Invalid `WrongPlayer
       | Some player ->
-         Game.move game.game ~row ~column player
+         let result =
+           Game.move game.game ~row ~column player
+         in
+         let () = match Game.game_status game.game with
+           | GameOver (`Won p) ->
+              let winner = game.players p
+              and loser = game.players (other_player p) in
+              Reporter.report_game_end
+                (Reporter.get ())
+                (Decisive {winner; loser})
+           | GameOver(`Drawn) ->
+              let player1 = game.players P1
+              and player2 = game.players P2 in
+              Reporter.report_game_end
+                (Reporter.get ())
+                (Draw {player1; player2})
+         | _ -> ()
+         in
+         result
 
     let piece_at game = Game.piece_at game.game
 
@@ -56,5 +79,4 @@ module Make (Game : GAME_INTERNAL)
     let store game = failwith "not implemented"
 
     let restore storage = failwith "not implemented"
-
   end

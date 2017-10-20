@@ -18,7 +18,7 @@
 
  open Ttt_game_lib_types
 
- module TTTUsers = Ttt_user_lib_users
+ module TTTUsers = Common.Users
 
  let current_user = Common.current_user
 ]
@@ -158,8 +158,29 @@ let game_page game_id =
   | None -> Lwt.return InvalidID
   | Some game ->
      begin
-       let phrase (user, piece) = (* TODO: rename this function *)
-         Printf.sprintf "%s : %s" user (piece_to_string (Some piece))
+       let rating user =
+         match TTTUsers.formatted_rating
+                 user
+                 `TicTacToeClassical
+         with
+         | None -> (Logs.err (fun m -> m "No rating for user %s" user); "-")
+         | Some s -> s
+       in
+       let phrase () =
+         let (user1, piece1) = Game.username_and_piece game P1
+         and (user2, piece2) = Game.username_and_piece game P2 in
+         let u1rating = rating user1
+         and u2rating = rating user2 in
+
+         (* TODO: rename this function *)
+         Printf.sprintf
+           "%s (%s) (%s) Vs. %s (%s) (%s)"
+           user1
+           u1rating
+           (piece_to_string (Some piece1))
+           user2
+           u2rating
+           (piece_to_string (Some piece2))
        in
        let turn_sentence_div =
          div [pcdata ""]
@@ -171,9 +192,7 @@ let game_page game_id =
          [
            div [h1 [pcdata "Welcome to this tic tac toe game!"]];
            div [
-               pcdata (phrase (Game.username_and_piece game P1));
-               br ();
-               pcdata (phrase (Game.username_and_piece game P2))
+               pcdata (phrase ())
              ];
            turn_sentence_div;
            div [board_html game_id(*; Chat_lib.chat_html ()*)];

@@ -11,5 +11,5 @@ let rec users_to_string = function
                                 (users_to_string us)
 
 let () =
-  ignore (PostgresDao.put "b3" (Sha256.string "dada"));
+  ignore (UsersPostgresDao.put "b5" (Sha256.string "dada"));
   print_endline (users_to_string (read ()))

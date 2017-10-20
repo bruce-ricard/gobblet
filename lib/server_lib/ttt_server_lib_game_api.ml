@@ -8,6 +8,13 @@ module Make (Game : GAME_IN_PROGRESS) (*:
   and type game = Game.t fb_game)*)
   =
   struct
+
+    type 'a fb_game = {
+        game : 'a;
+        event : 'a React.event;
+        update : ?step:React.step -> 'a -> unit
+      }
+
     type piece = Game.piece
     type game = Game.t fb_game
 

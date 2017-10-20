@@ -12,6 +12,6 @@ Plugins: META (0.4), DevFiles (0.4)
 
 Library "ttt-user-lib"
   Path: .
-  BuildDepends: sha
+  BuildDepends: sha, ttt-common-lib
   InternalModules:
   Modules: Ttt_user_lib_types, Ttt_user_lib_user, Ttt_user_lib_users

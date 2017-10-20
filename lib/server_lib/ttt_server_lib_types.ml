@@ -5,8 +5,8 @@ include Internal_types
 
 type named_db_game =
   [
-  | `TicTacToeClassical of Ttt_game_lib_games.TicTacToeClassical.t
-  | `TicTacToeXOnly of Ttt_game_lib_games.TicTacToeXOnly.t
+  | `TicTacToeClassical of Ttt_server_lib_game_list.TTTCI.t
+  | `TicTacToeXOnly of Ttt_server_lib_game_list.TTTXOI.t
   ]
 
 type named_api_game =
