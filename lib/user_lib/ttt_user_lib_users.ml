@@ -110,6 +110,3 @@ module Test_db : USER_DB =
       true
 
   end
-
-(*module Users_test = Make(Test_db)*)
-    (*module UsersM = Make(PostgresDao)*)
