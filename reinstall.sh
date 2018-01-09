@@ -1,3 +1,7 @@
+#/bin/sh
+
+set -e
+
 ocamlfind remove ttt-daos
 ocamlfind remove ttt-server-lib
 ocamlfind remove ttt-game-lib
