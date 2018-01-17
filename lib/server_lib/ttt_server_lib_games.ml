@@ -2,17 +2,32 @@ open Ttt_server_lib_types
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 
-module Make
-         (Challenges : CHALLENGES)
-         (Id_generator : GAME_ID_GENERATOR)
-         (Game_DB : GAME_DB)
-         (Game_archive_db : GAME_ARCHIVE_DB)
-         (User_DB : sig val exists : string -> bool end)
-       : GAMES =
+module type GAME_LIST =
+sig end
 
+module Make
+         (Challenges : Ttt_server_lib_types.CHALLENGES)
+         (Id_generator : GAME_ID_GENERATOR)
+         (Game_archive_db : GAME_ARCHIVE_DB)
+         (Game_DB : GAME_DB
+          with type tttc = Game_archive_db.tttc fb_game
+           and type tttxo = Game_archive_db.tttxo fb_game)
+         (Tttc : GAME with type game = Game_DB.tttc)
+         (Tttxo : GAME with type game = Game_DB.tttxo)
+         (User_DB : sig val exists : string -> bool end)
+       : GAMES with
+         type tttc = Game_DB.tttc
+       and type tttxo = Game_DB.tttxo
+       and type ngame = Game_DB.ngame
+  =
   struct
     module Games = Ttt_server_lib_game_list
     module Challenge = Ttt_server_lib_challenge
+
+    type tttc = Game_DB.tttc
+    type tttxo = Game_DB.tttxo
+
+    type ngame = (tttc, tttxo) named_game
 
     let challenge_db = Challenges.load ()
 
@@ -50,7 +65,7 @@ module Make
       Game_DB.get_game
 
     let random_game () =
-      let random_int = Random.int 3 in
+      let random_int = Random.int 2 in
       match random_int with
         0 -> `TicTacToeClassical
       | 1 -> `TicTacToeXOnly
@@ -60,16 +75,16 @@ module Make
            `TicTacToeClassical
          end
 
-    let new_game_creator game_name players : named_api_game =
+    let new_game_creator game_name players =
       let game_name = match game_name with
         | None -> random_game ()
         | Some g -> g in
       let open Ttt_server_lib_game_list in
       match game_name with
       | `TicTacToeClassical ->
-         `TicTacToeClassical (TicTacToeClassical.new_game players)
+         `TicTacToeClassical (Tttc.new_game players)
       | `TicTacToeXOnly ->
-         `TicTacToeXOnly (TicTacToeXOnly.new_game players)
+         `TicTacToeXOnly (Tttxo.new_game players)
 
     let new_game ?random_side:(random_side=true) game_name id user1 user2 =
       if user1 = user2 then
@@ -191,7 +206,7 @@ module Make
           Error(Printf.sprintf "\"%s\" is not a valid player." challenger)
         end
 
-    let game_api_to_game_db : (named_api_game -> named_db_game) =
+    let game_api_to_game_db =
       let open Ttt_server_lib_game_list in
       function
       | `TicTacToeClassical game ->

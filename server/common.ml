@@ -1,5 +1,54 @@
 open Ttt_common_lib_types
 
+let reporter ppf =
+  let report src level ~over k msgf =
+    let k _ = over (); k () in
+    let ts = Core.Time.(to_string @@ now ()) in
+    msgf @@ fun ?header ?tags fmt ->
+            Format.kfprintf k ppf ("[%s]%a @[" ^^ fmt ^^ "@]@.")
+                            ts Logs.pp_header (level, header)
+  in
+  { Logs.report = report }
+
+let init_logs () =
+  Logs.set_reporter (reporter (Format.std_formatter));
+  Logs.set_level (Some Logs.Debug)
+
+let () = init_logs (); Logs.info (fun m -> m "logs initialized")
+
+module PostgresConfig =
+  struct
+    let host = None
+    let port = None
+    let user = None
+    let password = None
+    let database = None
+  end
+
+module Dao = UsersPostgresDao.Make(PostgresConfig)
+
+module GameList = Ttt_server_lib_game_list.Make(Dao)
+
+module TicTacToeClassical =
+  GameList.TicTacToeClassical
+
+module TicTacToeXOnly =
+  GameList.TicTacToeXOnly
+
+module ApiGameTypes =
+  struct
+    type tttc = GameList.TicTacToeClassical.game
+    type tttxo = GameList.TicTacToeXOnly.game
+    type ngame = (tttc, tttxo) Ttt_server_lib_types.named_game
+  end
+
+module DbGameTypes =
+  struct
+    type tttc = GameList.TTTCI.t
+    type tttxo = GameList.TTTXOI.t
+    type ngame = (tttc, tttxo) Ttt_server_lib_types.named_game
+  end
+
 module Challenge_DB : Ttt_server_lib_types.CHALLENGES =
   struct
     type challenge = Ttt_server_lib_challenge.t
@@ -168,9 +217,9 @@ end
       Hashtbl.replace table key (ValueSet.remove value set)
   end
 
-module GamesByIdAndUser : Ttt_server_lib_types.GAME_DB =
+module GamesByIdAndUser =
   struct
-    type game = Ttt_server_lib_types.named_api_game
+    include ApiGameTypes
 
     module Users =
       struct
@@ -188,7 +237,7 @@ module GamesByIdAndUser : Ttt_server_lib_types.GAME_DB =
     module ValueSet = (UsersToIdSet.ValueSet)
 
     type t = {
-        index1 :  (int, (game * Users.t * Users.t)) Hashtbl.t;
+        index1 :  (int, (ngame * Users.t * Users.t)) Hashtbl.t;
         index2 : UsersToIdSet.t;
       }
 
@@ -198,7 +247,7 @@ module GamesByIdAndUser : Ttt_server_lib_types.GAME_DB =
       }
 
     let (put_game : Ttt_common_lib_types.id ->
-                    string -> string -> game -> unit) = fun id user1 user2 game ->
+                    string -> string -> ngame -> unit) = fun id user1 user2 game ->
       Hashtbl.add table.index1 id#get_id (game, user1, user2);
       UsersToIdSet.add table.index2 user1 id#get_id;
       UsersToIdSet.add table.index2 user2 id#get_id
@@ -258,25 +307,24 @@ module GamesByIdAndUser : Ttt_server_lib_types.GAME_DB =
         (ValueSet.elements @@ UsersToIdSet.get_set table.index2 user)
   end
 
-module Users = Ttt_user_lib_users.Make(UsersPostgresDao)
+module Users = Ttt_user_lib_users.Make(Dao)
 
 module TTT =
   struct
-    type t = Ttt_server_lib_game_list.TicTacToeClassical.game
+    type t = GameList.TicTacToeClassical.game
     let compare = Pervasives.compare
   end
 
-module GameDB : Ttt_server_lib_types.GAME_DB = GamesByIdAndUser
-
 module TTTXonly =
   struct
-    include Ttt_server_lib_game_list.TTTXOI
+    include GameList.TTTXOI
     let compare = Pervasives.compare
   end
 
 module MockGameArchiveDB =
   struct
-    type game = TTT.t
+    include DbGameTypes
+
     let put_game id game =
       Logs.info (fun m -> m "Mock archiving game %d" id#get_id)
 
@@ -285,19 +333,6 @@ module MockGameArchiveDB =
 
     let get_games_for_user user = []
   end
-
-module MockXGameArchiveDB =
-  struct
-    type game = TTTXonly.t
-    let put_game id game =
-      Logs.info (fun m -> m "Mock archiving game %d" id#get_id)
-
-    let get_game id =
-      None
-
-    let get_games_for_user user = []
-  end
-
 
 module IdGenerator =
   struct
@@ -308,35 +343,17 @@ module IdGenerator =
       new id (!current)
   end
 
-module Games : Ttt_server_lib_types.GAMES =
+module Games : Ttt_server_lib_types.GAMES
+       with type tttc = GamesByIdAndUser.tttc
+        and type tttxo = GamesByIdAndUser.tttxo =
   Ttt_server_lib_games.Make
     (Challenge_DB)
     (IdGenerator)
-    (GameDB)
     (MockGameArchiveDB)
+    (GamesByIdAndUser)
+    (TicTacToeClassical)
+    (TicTacToeXOnly)
     (Users)
-
-module TicTacToeClassical =
-  Ttt_server_lib_game_list.TicTacToeClassical
-
-module TicTacToeXOnly =
-  Ttt_server_lib_game_list.TicTacToeXOnly
-
-let reporter ppf =
-  let report src level ~over k msgf =
-    let k _ = over (); k () in
-    let ts = Core.Time.(to_string @@ now ()) in
-    msgf @@ fun ?header ?tags fmt ->
-            Format.kfprintf k ppf ("[%s]%a @[" ^^ fmt ^^ "@]@.")
-                            ts Logs.pp_header (level, header)
-  in
-  { Logs.report = report }
-
-let init_logs () =
-  Logs.set_reporter (reporter (Format.std_formatter));
-  Logs.set_level (Some Logs.Debug)
-
-let () = init_logs (); Logs.info (fun m -> m "logs initialized")
 
 let current_user =
   Eliom_reference.eref

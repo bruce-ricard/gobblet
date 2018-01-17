@@ -10,6 +10,8 @@ let rec users_to_string = function
   | (id, pwd, None) :: us -> Printf.sprintf "<%s, %s>\n" id "-" ^
                                 (users_to_string us)
 
+module DAO = UsersPostgresDao.Make(PostgresConfiguration.EmptyConfig)
+
 let () =
-  ignore (UsersPostgresDao.put "b5" (Sha256.string "dada"));
+  ignore (DAO.put "b5" (Sha256.string "dada"));
   print_endline (users_to_string (read ()))

@@ -4,8 +4,14 @@ open Ttt_common_lib_types
 type challenge = Ttt_server_lib_challenge.t
 
 type remove_challenge =
-      | Id_not_present
-      | Deleted of challenge
+  | Id_not_present
+  | Deleted of challenge
+
+type 'a fb_game = {
+    game : 'a;
+    event : 'a React.event;
+    update : ?step:React.step -> 'a -> unit
+  }
 
 type 'a fb_game = {
     game : 'a;

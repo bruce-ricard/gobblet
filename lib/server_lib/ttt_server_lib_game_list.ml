@@ -6,26 +6,34 @@ module TrivialReporter =
       Logs.info (fun m -> m "Reporting end of game !!");
       ()
   end
-(*
-module Ratings(Game : sig
-             val game_name : unit -> Ttt_common_lib_types.game_name
-           end) =
-  struct
-    let get_rating user =
-      UsersPostgresDao.get_rating user (Game.game_name ())
+
+module type DAO =
+  sig
+    open Ttt_common_lib_types
+
+(*    val get : string -> Sha256.t -> bool
+    val exists :
+      [< `TicTacToeClassical | `TicTacToeXOnly ] ->
+      'a -> Ttt_common_lib_types.rating option*)
+    val get_rating : game_name -> string -> rating option
+    val set_rating :
+      game_name -> string -> Ttt_common_lib_types.rating -> bool
   end
- *)
-module TTTClassicaRatings =
-  Ratings.Make(UsersPostgresDao)
-    (struct let game () = `TicTacToeClassical end)
 
-module TTTCReporter = Reporter.Make(TTTClassicaRatings)
+module Make(Dao : DAO) =
+  struct
+    module TTTClassicaRatings =
+      Ratings.Make(Dao)
+        (struct let game () = `TicTacToeClassical end)
 
-module TTTCI = Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)
-module TTTXOI = Ttt_game_lib_games.TicTacToeXOnly(TrivialReporter)
+    module TTTCReporter = Reporter.Make(TTTClassicaRatings)
 
-module TicTacToeClassical =
-  Ttt_server_lib_game_api.Make(TTTCI)
+    module TTTCI = Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)
+    module TTTXOI = Ttt_game_lib_games.TicTacToeXOnly(TrivialReporter)
 
-module TicTacToeXOnly  =
-  Ttt_server_lib_game_api.Make(TTTXOI)
+    module TicTacToeClassical =
+      Ttt_server_lib_game_api.Make(TTTCI)
+
+    module TicTacToeXOnly  =
+      Ttt_server_lib_game_api.Make(TTTXOI)
+  end

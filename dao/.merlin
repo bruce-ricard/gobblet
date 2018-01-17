@@ -2,3 +2,5 @@ S .
 B _build
 
 PKG ttt-common-lib
+PKG logs
+PKG pgocaml
