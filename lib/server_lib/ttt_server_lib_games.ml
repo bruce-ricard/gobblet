@@ -195,9 +195,9 @@ module Make
       let open Ttt_server_lib_game_list in
       function
       | `TicTacToeClassical game ->
-         `TicTacToeClassical game.TicTacToeClassical.game
+         `TicTacToeClassical game.game
       | `TicTacToeXOnly game ->
-         `TicTacToeXOnly game.TicTacToeXOnly.game
+         `TicTacToeXOnly game.game
 
     let archive_game id =
       match Game_DB.get_game id with
