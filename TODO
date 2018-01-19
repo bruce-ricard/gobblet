@@ -4,7 +4,6 @@
 - add a game_db to server_lib_games functor, to which the games will be stored, and add them to postgres DB
 - make the react DB faster, by using a hashtable maybe
 
-
 ### BUGS ###
 
 - Fix error when wrong game id is given in url for show game
@@ -21,6 +20,12 @@
 - From the page list page, wrong log in show odd log messages
 
 ### --- END URGENT --- ###
+
+### NON URGENT BUGS ###
+- Games should store the ratings of the players for display. Currently if you
+  load an old game from the archive the `current` ratings of the players will
+  be displayed, we probably want to see the ratings from the time the game started
+  (or maybe ended).
 
 ### FEATURES ###
 
@@ -39,6 +44,7 @@
 - normal and only X ttt, morris
 
 - Nagios monitoring
+- Datadog
 
 - implement timer/chess clock for games
 
