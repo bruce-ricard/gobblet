@@ -1,0 +1,12 @@
+postgres = {
+  (* Postgres host *)
+  host = ""
+  (* Postgres port *)
+  port = ""
+  (* Postgres database *)
+  database = ""
+  (* Postgres user *)
+  user = ""
+  (* Postgres password *)
+  password = ""
+}

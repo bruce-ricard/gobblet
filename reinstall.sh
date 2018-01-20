@@ -3,6 +3,7 @@
 set -e
 
 ocamlfind remove ttt-daos
+ocamlfind remove ttt-config-file
 ocamlfind remove ttt-server-lib
 ocamlfind remove ttt-game-lib
 ocamlfind remove ttt-user-lib
@@ -38,6 +39,12 @@ make distclean
 make
 make install
 cd ../..
+
+cd config_file
+make distclean
+make
+make install
+cd ..
 
 cd server
 make distclean

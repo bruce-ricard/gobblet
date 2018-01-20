@@ -6,12 +6,12 @@
 PROJECT_NAME := TicTacToe
 
 # Source files for the server
-SERVER_FILES := common.ml connection_code.ml register.ml services.ml $(wildcard *.eliomi *.eliom)
+SERVER_FILES := common.ml connection_code.ml register.ml services.ml config_parser.ml $(wildcard *.eliomi *.eliom)
 # Source files for the client
 CLIENT_FILES := services.ml $(wildcard *.eliomi *.eliom)
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := ttt-server-lib lwt.ppx js_of_ocaml.deriving.ppx logs logs.fmt core ttt-daos
+SERVER_PACKAGES := ttt-server-lib lwt.ppx js_of_ocaml.deriving.ppx logs logs.fmt core ttt-daos ttt-config-file config-file
 # OCamlfind packages for the client
 CLIENT_PACKAGES := ttt-game-lib ttt-common-lib lwt.ppx js_of_ocaml.deriving.ppx js_of_ocaml.ppx logs
 

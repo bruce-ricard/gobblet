@@ -1,0 +1,19 @@
+OASISFormat: 0.4
+Name:        server configuration library
+Version:     0.0.1
+Synopsis:    Generates and reads configuration files for the gobblet server
+Authors:     Bruce Ricard
+License:     LGPL-2.1 with OCaml linking exception
+Plugins:     DevFiles (0.4), META (0.4)
+
+Library "ttt-config-file"
+  Path:       .
+  BuildTools: ocamlbuild
+  BuildDepends: config-file
+  Modules:    Config_reader
+
+Executable create_config
+  Path:       .
+  BuildTools: ocamlbuild
+  BuildDepends: ttt-config-file
+  MainIs:     create_config.ml

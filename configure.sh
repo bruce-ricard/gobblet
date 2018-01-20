@@ -18,3 +18,4 @@ opam install fmt -y
 opam install logs -y
 opam install core -y
 opam install pgocaml -y
+opam install config-file -y

@@ -32,6 +32,9 @@ lib/myocamlbuild.ml
 lib/*.mldylib
 lib/*.mllib
 
+# config files
+
+server/config/config
 
 # emacs
 *~

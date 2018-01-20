@@ -16,16 +16,7 @@ let init_logs () =
 
 let () = init_logs (); Logs.info (fun m -> m "logs initialized")
 
-module PostgresConfig =
-  struct
-    let host = None
-    let port = None
-    let user = None
-    let password = None
-    let database = None
-  end
-
-module Dao = UsersPostgresDao.Make(PostgresConfig)
+module Dao = UsersPostgresDao.Make(Config_parser.PostgresConfig)
 
 module GameList = Ttt_server_lib_game_list.Make(Dao)
 
