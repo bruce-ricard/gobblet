@@ -13,12 +13,6 @@ type 'a fb_game = {
     update : ?step:React.step -> 'a -> unit
   }
 
-type 'a fb_game = {
-    game : 'a;
-    event : 'a React.event;
-    update : ?step:React.step -> 'a -> unit
-  }
-
 module type CHALLENGES =
   sig
     type t
