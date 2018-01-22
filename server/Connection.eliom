@@ -20,6 +20,7 @@ let register () =
          end
       | Some user ->
          begin
+           let name = user#normalized_name in
            Logs.info (fun m -> m "%s just logged in" name);
            let%lwt () = Eliom_reference.set Common.message_next_page
                                             (welcome_message name) in
