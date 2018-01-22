@@ -26,16 +26,12 @@ let connection_form_fun (name, pwd) =
   ]
 
 let connection_box () =
-  let%lwt user = Eliom_reference.get Common.current_user in
-    Lwt.return
-      (match user with
-       | Some (user,_) -> p [pcdata "You are connected as "; pcdata user]
-       | None ->
-          Form.post_form
-            ~service:Services.connection_service
-            connection_form_fun
-            ()
-      )
+  Lwt.return
+    (Form.post_form
+       ~service:Services.connection_service
+       connection_form_fun
+       ()
+    )
 
 let disconnect_box () =
   Form.post_form

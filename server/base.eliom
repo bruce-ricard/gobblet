@@ -9,12 +9,14 @@ module TicTacToe_app =
       end)
 
 let header_login () =
-  let%lwt current_user = Eliom_reference.get Common.current_user in
+  let%lwt current_user =
+    Eliom_reference.get Common.current_user in
   match current_user with
   | Some (name, _) -> Lwt.return (
                      div
                        [
-                         pcdata ("Logged in as " ^ name);
+                         pcdata ("Logged in as " ^
+                                   (String.capitalize name));
                          Connection_code.disconnect_box ()
                        ]
                    )
@@ -27,7 +29,6 @@ let%client remove_message_in_5 dom =
         (fun () -> dom##.innerHTML := Js.string "")
     )
 
-
 let%client show_instant_message event message_element =
   let message_dom =
     Eliom_content.Html5.To_dom.of_element message_element in
@@ -39,7 +40,9 @@ let%client show_instant_message event message_element =
     event
 
 let set_instant_message_ref () =
-  Eliom_reference.set Common.instant_message_ref (Some (React.E.create ()))
+  Eliom_reference.set
+    Common.instant_message_ref
+    (Some (React.E.create ()))
 
 let init_instant_message_ref () =
   let%lwt ref = Eliom_reference.get Common.instant_message_ref in
@@ -56,7 +59,8 @@ let header () =
           a Services.show_my_games_service [pcdata "Play"] ()
         ]
   in
-  let%lwt message_eref = Eliom_reference.get Common.message_next_page in
+  let%lwt message_eref =
+    Eliom_reference.get Common.message_next_page in
   let message = match message_eref with
       None -> []
     | Some message ->
@@ -73,7 +77,8 @@ let header () =
     Eliom_reference.get Common.instant_message_ref in
   let instant_message_event =
     match instant_message_ref with
-      None -> Logs.err (fun m -> m "None instant message ref"); assert false
+      None -> Logs.err (fun m -> m "None instant message ref");
+              assert false
     | Some (event,_) -> event
   in
   let down_event =
