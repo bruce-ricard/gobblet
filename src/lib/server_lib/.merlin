@@ -1,0 +1,7 @@
+S .
+B _build
+
+PKG ttt.lib.common
+PKG ttt.lib.game
+PKG ttt.daos
+PKG glicko2 logs lwt.react

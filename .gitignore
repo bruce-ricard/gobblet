@@ -12,11 +12,11 @@
 _build/
 
 # ocsigen temp files
-server/local/
-server/_client/TicTacToe
-server/_server/
-server/_deps/
-server/.depend
+src/server/local/
+src/server/_client/TicTacToe
+src/server/_server/
+src/server/_deps/
+src/server/.depend
 
 # ocamlbuild targets
 a.out
@@ -34,7 +34,7 @@ lib/*.mllib
 
 # config files
 
-server/config/config
+src/server/config/config
 
 # emacs
 *~

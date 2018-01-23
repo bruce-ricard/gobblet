@@ -1,7 +1,0 @@
-S .
-B _build
-
-PKG ttt-common-lib
-PKG ttt-game-lib
-PKG ttt-daos
-PKG glicko2 logs lwt.react

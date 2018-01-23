@@ -2,9 +2,6 @@ open Ttt_server_lib_types
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 
-module type GAME_LIST =
-sig end
-
 module Make
          (Challenges : Ttt_server_lib_types.CHALLENGES)
          (Id_generator : GAME_ID_GENERATOR)
@@ -229,10 +226,14 @@ module Make
 
     let _ =
       Lwt.async (fun () ->
-          let%lwt () = Lwt_unix.sleep 5. in
-          Logs.debug (fun m -> m "KIKOO");
-          let id = Id_generator.next() in
-          Lwt.return (ignore (new_game (Some `TicTacToeClassical)
-                                       id "bruce" "bruce2"))
+          Lwt.bind
+            (Lwt_unix.sleep 5.)
+            (fun () ->
+              let id = Id_generator.next() in
+              Lwt.return (ignore (new_game (Some `TicTacToeClassical)
+                                    id "bruce" "bruce2")
+                )
+            )
         )
+
   end

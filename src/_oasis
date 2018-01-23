@@ -1,0 +1,49 @@
+OASISFormat: 0.4
+Name:        ttt
+Version:     0.0.1
+Synopsis:    Tic Tac Toe
+Authors:     Bruce Ricard
+License:     GPL-3.0
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Library "ttt.daos"
+  Path: dao
+  BuildTools: ocamlbuild
+  Modules: PostgresConfiguration, UsersPostgresDao#, RatingPostgresDao
+  BuildDepends: pgocaml, pgocaml.syntax, sha, logs, ttt.lib.common
+
+Library "ttt.lib.common"
+  Path: lib/common
+  BuildTools: ocamlbuild
+  Modules: Ttt_common_lib_types
+
+Library "ttt.lib.user"
+  Path: lib/user_lib
+  BuildDepends: sha, ttt.lib.common
+  InternalModules:
+  Modules: Ttt_user_lib_types, Ttt_user_lib_user, Ttt_user_lib_users
+
+Library "ttt.lib.game"
+  Path: lib/game_lib
+  BuildDepends:
+  InternalModules: Game_in_progress, Game_internal, Tictactoe_board
+  Modules: Ttt_game_lib_types, Ttt_game_lib_pieces, Ttt_game_lib_games
+
+Library "ttt.lib.server"
+  Path: lib/server_lib
+  BuildDepends: lwt.syntax, ttt.lib.game, ttt.lib.user, ttt.lib.common, ttt.daos, lwt.react, lwt.ppx, logs, core, threads, glicko2
+  InternalModules: Reporter, Ratings
+  Modules: Ttt_server_lib_games, Ttt_server_lib_types, Ttt_server_lib_challenge, Ttt_server_lib_game_api, Ttt_server_lib_game_list, Internal_types
+
+Library "ttt.config-file"
+  Path: config_file
+  BuildTools: ocamlbuild
+  BuildDepends: config-file
+  Modules:    Config_reader
+
+Executable create_config
+  Path: config_file
+  BuildTools: ocamlbuild
+  BuildDepends: ttt.config-file
+  MainIs:     create_config.ml
