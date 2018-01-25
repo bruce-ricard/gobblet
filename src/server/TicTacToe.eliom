@@ -36,7 +36,7 @@ let get_game id : Common.TicTacToeClassical.game option =
 
 let move row column game user =
   let start_time = Core.Time.now () in
-  let result = Game.move game ~row ~column user in
+  let result = Game.place game ~row ~column user in
   let end_time = Core.Time.now () in
   let elapsed = Core.Time.abs_diff start_time end_time in
   Logs.debug (fun m -> m "Move executed in %s"

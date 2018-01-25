@@ -45,12 +45,12 @@ module Make (Game : GAME_INTERNAL)
     let other_player = function
         P1 -> P2 | P2 -> P1
 
-    let move game ~row ~column user =
+    let place game square user =
       match user_to_player game user with
         None -> `Invalid `WrongPlayer
       | Some player ->
          let result =
-           Game.move game.game ~row ~column player
+           Game.place game.game square player
          in
          let () = match Game.game_status game.game with
            | GameOver (`Won p) ->
@@ -68,6 +68,8 @@ module Make (Game : GAME_INTERNAL)
          | _ -> ()
          in
          result
+
+    let move game move name = `Ok
 
     let piece_at game = Game.piece_at game.game
 

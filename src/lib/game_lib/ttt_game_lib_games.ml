@@ -20,3 +20,4 @@ module Xonly = Game_internal.Make(XWinBoard)
 
 module TicTacToeClassical = Game_in_progress.Make(Classical)
 module TicTacToeXOnly = Game_in_progress.Make(Xonly)
+module ThreeMenMorris = Game_in_progress.Make(Classical)

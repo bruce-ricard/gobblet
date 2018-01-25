@@ -58,6 +58,16 @@ module type WINNER_WINS =
     val wins : bool
   end
 
+type square = {
+    row: int;
+    column: int;
+  }
+
+type move = {
+    origin: square;
+    destination: square;
+  }
+
 module type BOARD =
   sig
     type t
@@ -65,13 +75,16 @@ module type BOARD =
 
     val empty_board : unit -> t
     val pieces : piece list
-    val move :
+    val place :
       t ->
-      row:int ->
-      column:int ->
+      square ->
       piece ->
       board_move_result
-    (*    val board_status : t -> board_status*)
+
+    val move :
+      t ->
+      move ->
+      board_move_result
     val piece_at : t -> row:int -> column:int -> piece option
     val serialize : t -> string
     val deserialize : string -> t option
@@ -104,7 +117,8 @@ module type GAME_INTERNAL =
     type t
     type piece
     val new_game : unit -> t
-    val move : t -> row:int -> column:int -> player -> move_result
+    val place : t -> square -> player -> move_result
+    val move : t -> move -> player -> move_result
     val piece_at : t -> row:int -> column:int -> piece option
     (*    val player_on : t -> player*)
     val piece_of : player -> piece
@@ -116,7 +130,8 @@ module type GAME_IN_PROGRESS =
     type t
     type piece
     val new_game : (player -> string) -> t
-    val move : t -> row:int -> column:int -> string -> move_result
+    val place : t -> square -> string -> move_result
+    val move : t -> move -> string -> move_result
     val piece_at : t -> row:int -> column:int -> piece option
     val username_and_piece : t -> player -> (string * piece)
     val game_status : t -> game_in_progress_status

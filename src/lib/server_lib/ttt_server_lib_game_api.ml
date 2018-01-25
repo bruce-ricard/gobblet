@@ -2,13 +2,8 @@ open Internal_types
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 
-module Make (Game : GAME_IN_PROGRESS) :
-(GAME
- with type piece = Game.piece
-  and type game = Game.t fb_game)
-  =
+module Make (Game : GAME_IN_PROGRESS) =
   struct
-
     type piece = Game.piece
     type game = Game.t fb_game
 
@@ -20,10 +15,12 @@ module Make (Game : GAME_IN_PROGRESS) :
         update
       }
 
-    let move game ~row ~column user =
-      let result = Game.move game.game ~row ~column user in
+    let place game ~row ~column user =
+      let result = Game.place game.game {row; column} user in
       game.update game.game;
       result
+
+    let move game move user = `Ok `KeepPlaying
 
     let username_and_piece game player =
       Game.username_and_piece game.game player

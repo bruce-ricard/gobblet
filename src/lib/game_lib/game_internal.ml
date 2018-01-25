@@ -8,6 +8,7 @@ module Make (Board : BOARD) : GAME_INTERNAL
         mutable game_status : game_status
       }
     type piece = Board.piece
+
     let new_game () =
       {
         board = Board.empty_board ();
@@ -39,13 +40,13 @@ module Make (Board : BOARD) : GAME_INTERNAL
       | `Lost -> game.game_status <- GameOver (`Won (next_player (player_on game)))
       | `Draw -> game.game_status <- GameOver `Drawn
 
-    let move game ~row ~column player : move_result =
+    let place game square player : move_result =
       match game.game_status with
       | PlayerOn playerOn ->
          if player = playerOn then
            begin
              let board_result =
-               Board.move game.board ~row ~column (piece_of player)
+               Board.place game.board square (piece_of player)
              in
              match board_result with
              | `Ok status -> (update_game_status game status; `Ok)
@@ -54,6 +55,8 @@ module Make (Board : BOARD) : GAME_INTERNAL
          else
            `Invalid `NotYourTurn
       | GameOver _ -> `Invalid `GameWasOver
+
+    let move game move player = `Ok
 
     let piece_at game = Board.piece_at game.board
 

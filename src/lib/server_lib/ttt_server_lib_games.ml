@@ -2,6 +2,12 @@ open Ttt_server_lib_types
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 
+module type GAME =
+  sig
+    type game
+    val new_game : (player -> string) -> game
+  end
+
 module Make
          (Challenges : Ttt_server_lib_types.CHALLENGES)
          (Id_generator : GAME_ID_GENERATOR)

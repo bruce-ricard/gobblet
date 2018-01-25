@@ -13,10 +13,41 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
     let piece_at board ~row ~column =
       board.(row).(column)
 
-    let valid_move board ~row ~column =
-      match board.(row).(column) with
-        None -> true
-      | Some(_) -> false
+    let square_is_occupied board {row; column} =
+      match piece_at board ~row ~column with
+      | Some _ -> true
+      | None -> false
+
+    let square_is_free board square =
+      not @@ square_is_occupied board square
+
+    let valid_placement board ~row ~column =
+      square_is_free board {row; column}
+
+    let squares_are_linked
+          ({row = x1; column = y1} as s1)
+          ({row = x2; column = y2} as s2)
+      =
+      let is_center row column =
+        row = 1 && column = 1 in
+      s1 <> s2 && (
+        (x1 = x2 && (y2 = y1 + 1 || y2 = y1 - 1))
+        || (y1 = y2 && (x2 = x1 + 1 || x2 = x1 -1))
+        || (((is_center x1 y1) || (is_center x2 y2)) &&
+              ((x2 = x1 + 1 && y2 = y1 + 1)
+               || (x2 = x1 + 1 && y2 = y1 - 1)
+               || (x2 = x1 - 1 && y2 = y1 + 1)
+               || (x2 = x1 - 1 && y2 = y1 - 1))
+           )
+      )
+
+      let valid_move
+          board
+          {origin; destination}
+      =
+      (square_is_occupied board origin)
+      && (square_is_free board destination)
+      && (squares_are_linked origin destination)
 
     let lines board =
       let column n =
@@ -81,8 +112,8 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
            `KeepPlaying
       | Some piece ->  if W.wins then `Won else `Lost
 
-    let actually_move board ~row ~column piece  =
-      if valid_move board ~row ~column then
+    let actually_place board ~row ~column piece  =
+      if valid_placement board ~row ~column then
         begin
           board.(row).(column) <- Some piece;
           `Ok (board_status board)
@@ -90,15 +121,27 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
       else
         `Invalid `InvalidMove
 
-    let move board ~row ~column piece =
+    let place board {row; column} piece =
       match board_status board with
-        `KeepPlaying -> actually_move board ~row ~column piece
+      | `KeepPlaying -> actually_place board ~row ~column piece
       | _ -> `Invalid `GameWasOver
 
-    let move_unsafe board ~row ~column piece =
-      match move board ~row ~column piece with
-        `InvalidMove -> failwith "Invalid Move"
-      | result -> result
+    let actually_move board move =
+      if valid_move board move then
+        begin
+          let {origin; destination} = move in
+          let piece = board.(origin.row).(origin.column) in
+          board.(origin.row).(origin.column) <- None;
+          board.(destination.row).(destination.column) <- piece;
+          `Ok (board_status board)
+        end
+      else
+        `Invalid `InvalidMove
+
+    let move board move =
+      match board_status board with
+      | `KeepPlaying -> actually_move board move
+      | _ -> `Invalid `GameWasOver
 
     let serialize board =
       let result = Bytes.make 9 '-' in
