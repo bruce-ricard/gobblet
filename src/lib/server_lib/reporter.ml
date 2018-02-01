@@ -17,12 +17,12 @@ module Make(Ratings : RATINGS) =
       let open Ttt_game_lib_types in
       function {rating; rating_deviation; sigma} ->
         let open Glicko2 in
-        {rating; rating_deviation; sigma}
+        {rating; rating_deviation; volatility = sigma}
 
     let from_glicko_player : 'a -> Ttt_common_lib_types.rating =
       let open Glicko2 in
-      function {rating; rating_deviation; sigma} ->
-        {rating; rating_deviation; sigma}
+      function {rating; rating_deviation; volatility} ->
+        {rating; rating_deviation; sigma = volatility}
 
     let initial_rating () =
       let open Ttt_game_lib_types in
@@ -73,6 +73,7 @@ module Make(Ratings : RATINGS) =
 
     let compute_rate_result result =
       let open Ttt_game_lib_types in
+      Logs.debug (fun m -> m "computing rate result");
       let game_result =
         match result with
         | Draw {player1; player2} ->
@@ -80,8 +81,11 @@ module Make(Ratings : RATINGS) =
         | Decisive {winner; loser} ->
            create_win_result ~winner ~loser
       in
+      Logs.debug (fun m -> m "about to call Glicko2");
+      let result = Glicko2.rate game_result.result in
+      Logs.debug (fun m -> m "called Glicko2");
       {
-        result = Glicko2.rate game_result.result;
+        result;
         player1 = game_result.player1;
         player2 = game_result.player2;
       }
@@ -89,16 +93,29 @@ module Make(Ratings : RATINGS) =
     let report_game_end () result =
       Logs.debug (fun m -> m "Game end reported");
       let rate_result = compute_rate_result result in
-      let newP1rating =
-        from_glicko_player
-          rate_result.result.Glicko2.new_player1
-      and newP2rating =
-        from_glicko_player
-          rate_result.result.Glicko2.new_player2
-      in
-      let _ = Ratings.set_rating rate_result.player1 newP1rating
-      and _ = Ratings.set_rating rate_result.player2 newP2rating
-      in
-      ()
+      Logs.debug (fun m -> m "rate result computed");
+      match rate_result.result with
+        Glicko2.NewRatings(new_ratings) ->
+        begin
+          let newP1rating =
+            from_glicko_player
+              new_ratings.Glicko2.new_player1
+          and newP2rating =
+            from_glicko_player
+              new_ratings.Glicko2.new_player2
+          in
+          Logs.debug (fun m -> m "new ratings computed");
+          let _ = Ratings.set_rating rate_result.player1 newP1rating in
+          Logs.debug (fun m -> m "p1 rating sent");
+          let _ = Ratings.set_rating rate_result.player2 newP2rating in
+          Logs.debug (fun m -> m "p2 rating sent");
+          ()
+        end
+      | Glicko2.InvalidVolatility ->
+         Logs.err (fun m -> m "Invalid Volatility while trying to rate")
+      | Glicko2.InternalError ->
+         Logs.err (fun m ->
+             m "Glicko2 internal error while trying to rate"
+           )
 
   end

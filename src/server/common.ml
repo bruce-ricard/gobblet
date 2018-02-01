@@ -153,7 +153,6 @@ module Challenge_DB : Ttt_server_lib_types.CHALLENGES =
         let open Lwt in
         Lwt.async (fun () ->
             let%lwt () = Lwt_unix.sleep 3. in
-            Logs.debug (fun m -> m "updating challenges");
             trigger ();
             Lwt.return (aux())
           )
@@ -365,13 +364,3 @@ let instant_message_ref =
     (None :
        (string React.event * ((?step:React.step -> string -> unit))) option
     )
-
-(*
-let instant_message_react =
-  let%lwt event, _ = Eliom_reference.get instant_message_ref in
-  Lwt.return event
-
-let send_instant_message m =
-  let%lwt _, send = Eliom_reference.get instant_message_ref in
-  Lwt.return (send m)
- *)

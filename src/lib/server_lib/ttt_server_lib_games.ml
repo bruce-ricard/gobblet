@@ -236,7 +236,19 @@ module Make
             (Lwt_unix.sleep 5.)
             (fun () ->
               let id = Id_generator.next() in
-              Lwt.return (ignore (new_game (Some `TicTacToeClassical)
+              ignore (new_game
+                 ~random_side:false
+                 (Some `TicTacToeClassical)
+                 id "bruce" "bruce2");
+              let id = Id_generator.next() in
+              ignore (new_game
+                 ~random_side:false
+                 (Some `TicTacToeClassical)
+                 id "bruce" "bruce2");
+              let id = Id_generator.next() in
+              Lwt.return (ignore (new_game
+                                    ~random_side:false
+                                    (Some `TicTacToeClassical)
                                     id "bruce" "bruce2")
                 )
             )
