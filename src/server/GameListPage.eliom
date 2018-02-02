@@ -49,7 +49,7 @@ let create_challenge_by_id (game_id, opp) =
   match int_id with
   | Some id ->
      let game = parse_game_id id in
-     create_challenge game opp
+     create_challenge game (String.lowercase opp)
   | None -> Lwt.return (`Error "Invalid game ID")
 
 let accept_challenge id_int =
