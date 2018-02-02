@@ -40,13 +40,13 @@ module Make (Board : BOARD) : GAME_INTERNAL
       | `Lost -> game.game_status <- GameOver (`Won (next_player (player_on game)))
       | `Draw -> game.game_status <- GameOver `Drawn
 
-    let place game square player : move_result =
+    let act game player action =
       match game.game_status with
       | PlayerOn playerOn ->
          if player = playerOn then
            begin
              let board_result =
-               Board.place game.board square (piece_of player)
+               action ()
              in
              match board_result with
              | `Ok status -> (update_game_status game status; `Ok)
@@ -56,7 +56,13 @@ module Make (Board : BOARD) : GAME_INTERNAL
            `Invalid `NotYourTurn
       | GameOver _ -> `Invalid `GameWasOver
 
-    let move game move player = `Ok
+
+    let place game square player : move_result =
+      act game player
+          (fun () -> Board.place game.board square (piece_of player))
+
+    let move game move player =
+      act game player (fun () -> Board.move game.board move)
 
     let piece_at game = Board.piece_at game.board
 

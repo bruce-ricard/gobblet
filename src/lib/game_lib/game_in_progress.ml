@@ -45,31 +45,38 @@ module Make (Game : GAME_INTERNAL)
     let other_player = function
         P1 -> P2 | P2 -> P1
 
-    let place game square user =
+    let report_if_game_over game =
+      match Game.game_status game.game with
+      | GameOver (`Won p) ->
+         let winner = game.players p
+         and loser = game.players (other_player p) in
+         Reporter.report_game_end
+           (Reporter.get ())
+           (Decisive {winner; loser})
+      | GameOver(`Drawn) ->
+         let player1 = game.players P1
+         and player2 = game.players P2 in
+         Reporter.report_game_end
+           (Reporter.get ())
+           (Draw {player1; player2})
+      | _ -> ()
+
+    let act game user action =
       match user_to_player game user with
-        None -> `Invalid `WrongPlayer
+      | None -> `Invalid `WrongPlayer
       | Some player ->
-         let result =
-           Game.place game.game square player
+         let result = action player
          in
-         let () = match Game.game_status game.game with
-           | GameOver (`Won p) ->
-              let winner = game.players p
-              and loser = game.players (other_player p) in
-              Reporter.report_game_end
-                (Reporter.get ())
-                (Decisive {winner; loser})
-           | GameOver(`Drawn) ->
-              let player1 = game.players P1
-              and player2 = game.players P2 in
-              Reporter.report_game_end
-                (Reporter.get ())
-                (Draw {player1; player2})
-         | _ -> ()
-         in
+         report_if_game_over game;
          result
 
-    let move game move name = `Ok
+    let place game square user =
+      act game user
+          (Game.place game.game square)
+
+    let move game move user =
+      act game user
+          (Game.move game.game move)
 
     let piece_at game = Game.piece_at game.game
 
