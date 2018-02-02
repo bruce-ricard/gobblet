@@ -1,3 +1,7 @@
+server = {
+  log_level = DEBUG
+}
+
 postgres = {
   (* Postgres host *)
   host = ""
