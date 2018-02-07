@@ -1,0 +1,74 @@
+* {
+    font-family: sans-serif;
+}
+
+html {
+    background-color: #efdecd;
+}
+
+body {
+    width: 50%;
+    margin: auto;
+    background-color: white;
+}
+
+.header {
+    width: 100%;
+    overflow: auto;
+    background-color: #efdecd;
+}
+
+.logo {
+    float: left;
+}
+
+.logo_image {
+    float: left;
+    border: 3px solid red;
+    width: 50px;
+    font-size: 1vw;
+}
+
+.site_name {
+    float: left;
+    font-size: 3vw;
+}
+
+.header_login {
+    float: right;
+}
+
+.user_message {
+    background-color: yellow;
+}
+
+.instant_message {
+    background-color: yellow;
+}
+
+form {
+
+}
+
+div {
+    text-align: center;
+    emargin:auto
+}
+
+td {
+    height:100px;
+    width:100px;
+    text-align:center;
+    font-size:50px;
+    font-weight:bold;
+}
+
+#board {
+    overflow: hidden
+}
+
+canvas {
+    border-spacing:0;
+    cursor:default;
+    margin:0px auto;
+}
