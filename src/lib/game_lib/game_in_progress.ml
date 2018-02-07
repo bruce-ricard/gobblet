@@ -65,10 +65,13 @@ module Make (Game : GAME_INTERNAL)
       match user_to_player game user with
       | None -> `Invalid `WrongPlayer
       | Some player ->
-         let result = action player
-         in
-         report_if_game_over game;
-         result
+         let result = action player in
+         (match result with
+          | `Ok -> report_if_game_over game
+          | `Invalid _ ->
+             Logs.debug (fun m -> m "Not reporting, invalid move")
+         );
+             result
 
     let place game square user =
       act game user
