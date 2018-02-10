@@ -237,7 +237,9 @@ module GamesByIdAndUser =
       }
 
     let (put_game : Ttt_common_lib_types.id ->
-                    string -> string -> ngame -> unit) = fun id user1 user2 game ->
+                    string -> string -> ngame -> unit) =
+      fun id user1 user2 game ->
+
       Hashtbl.add table.index1 id#get_id (game, user1, user2);
       UsersToIdSet.add table.index2 user1 id#get_id;
       UsersToIdSet.add table.index2 user2 id#get_id

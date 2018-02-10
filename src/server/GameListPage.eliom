@@ -248,7 +248,7 @@ let game_list_page () =
             [ul bullets]
        in
        div (games_display @ challenge_form () :: (challenge_elements user) ::
-                               [])
+                              [])
   in
   Base.skeleton
     ~css:[["css"; "TicTacToe.css"]]
