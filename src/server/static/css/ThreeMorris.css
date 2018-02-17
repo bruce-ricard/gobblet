@@ -72,3 +72,17 @@ canvas {
     cursor:default;
     margin:0px auto;
 }
+
+.wood-piece {
+    width: 64px;
+    height: 64px;
+    display: inline-block;
+}
+
+.white-piece1 {
+    background: url(/games/pieces.png) 0 0;
+}
+
+.black-piece1 {
+    background: url(/games/pieces.png) -128px -128px;
+}

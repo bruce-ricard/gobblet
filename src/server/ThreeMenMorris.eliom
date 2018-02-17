@@ -105,6 +105,15 @@ let register () =
               div ~a:[a_id "board"] [
                     canvas_elt;
                     span ~a:[a_class ["clear"]] [];
+                  ];
+              let open Wood_pieces in
+              div
+                [
+                  white_piece1 ();
+                  black_piece1 ();
+                  br ();
+                  black_piece1 ();
+                  white_piece1 ();
                 ]
             ]
         ]

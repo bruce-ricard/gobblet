@@ -1,4 +1,3 @@
-
 let main_service =
   Eliom_service.Http.service
     ~path:[]
@@ -34,6 +33,12 @@ let ttt_3morris_service =
   Eliom_service.App.service
     ~path:["games"; "3morris"; "play"]
     ~get_params:Eliom_parameter.(int "game_id")
+    ()
+
+let image_piece_service =
+  Eliom_service.App.service
+    ~path:["games"; "pieces.png"]
+    ~get_params:Eliom_parameter.unit
     ()
 
 let input_user_registration_service =
