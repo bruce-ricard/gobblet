@@ -59,8 +59,3 @@ let disconnection_service =
   Eliom_service.Http.post_coservice'
     ~post_params:Eliom_parameter.unit
     ()
-
-(*let chat_service =
-  Eliom_service.App.post_coservice'
-    ~post_params:Eliom_parameter.(string "message")
-    ()*)
