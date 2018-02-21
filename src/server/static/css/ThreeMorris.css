@@ -71,6 +71,7 @@ canvas {
     border-spacing:0;
     cursor:default;
     margin:0px auto;
+    display: inline-block;
 }
 
 .wood-piece {

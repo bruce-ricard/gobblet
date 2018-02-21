@@ -25,8 +25,6 @@
  let current_user = Common.current_user
 ]
 
-(* jessica *)
-
 let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
               ?title:(title="Three men Morris")
               content =
@@ -57,7 +55,7 @@ let%client draw ctx ((x1, y1), (x2, y2)) =
 let%client draw_dot ctx x y =
   let color = CSS.Color.string_of_t (CSS.Color.rgb 1 2 3) in
   ctx##.strokeStyle := (Js.string color);
-  ctx##.lineWidth := float 20;
+  ctx##.lineWidth := float 40;
   ctx##beginPath;
   ctx##(arc (float x) (float y) 1. 0. 0.1 (Js.bool true));
   ctx##stroke;
@@ -68,7 +66,6 @@ let init_board_canvas () = ()
 let%client init_client () =
   let canvas = Html5.To_dom.of_canvas ~%canvas_elt in
   let st = canvas##.style in
-  st##.position := Js.string "absolute";
   st##.zIndex := Js.string "-1";
   let ctx = canvas##(getContext (Dom_html._2d_)) in
   ctx##.lineCap := Js.string "round";
@@ -102,7 +99,10 @@ let register () =
           div [
               pcdata "3 men morris page";
               br ();
-              div ~a:[a_id "board"] [
+              div ~a:[
+                    a_id "board";
+                  ]
+                  [
                     canvas_elt;
                     span ~a:[a_class ["clear"]] [];
                   ];
