@@ -61,6 +61,63 @@ let%client draw_dot ctx x y =
   ctx##stroke;
   ()
 
+[%%client
+ module Html = Dom_html
+]
+
+let%client lwt_wrap f =
+  let (t, w) = Lwt.task () in
+  let cont x = Lwt.wakeup w x in
+  f cont;
+  t
+
+let%client load_image src =
+  let img = Html.createImg Html.document in
+  lwt_wrap
+    (fun c ->
+      img##.onload := Html.handler (fun _ -> c (); Js._false);
+      img##.src := src;
+    )
+  >>= fun () -> Lwt.return img
+
+let%client draw_piece color ~row ~column ctx =
+  let draw sprite color =
+    let sourceX, sourceY = match color with
+      | `White -> (0., 0.)
+      | `Black -> (0., 128.)
+
+    and sourceWidth = 64.
+    and sourceHeight = 64.
+    and destX = float_of_int (column * 200 + 50)
+    and destY = float_of_int (row * 200 + 50)
+    and destWidth = 100.
+    and destHeight = 100.
+    in
+
+    ctx##drawImage_full
+      sprite
+      sourceX
+      sourceY
+      sourceWidth
+      sourceHeight
+      destX
+      destY
+      destWidth
+      destHeight
+  in
+
+  let piece_sprite =
+    load_image (Js.string "/games/pieces.png") in
+
+  Lwt.async (
+      fun () ->
+      piece_sprite >>= (
+        fun sprite ->
+        draw sprite color;
+        Lwt.return ()
+      )
+    )
+
 let init_board_canvas () = ()
 
 let%client init_client () =
@@ -85,7 +142,10 @@ let%client init_client () =
   draw_dot ctx 300 500;
   draw_dot ctx 500 100;
   draw_dot ctx 500 300;
-  draw_dot ctx 500 500
+  draw_dot ctx 500 500;
+  draw_piece `White ~row:0 ~column:1 ctx;
+  draw_piece `White ~row:1 ~column:1 ctx;
+  draw_piece `Black ~row:2 ~column:2 ctx
 
 let register () =
   let open Services in
@@ -106,15 +166,6 @@ let register () =
                     canvas_elt;
                     span ~a:[a_class ["clear"]] [];
                   ];
-              let open Wood_pieces in
-              div
-                [
-                  white_piece1 ();
-                  black_piece1 ();
-                  br ();
-                  black_piece1 ();
-                  white_piece1 ();
-                ]
             ]
         ]
     )
