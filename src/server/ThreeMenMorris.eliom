@@ -25,6 +25,59 @@
  let current_user = Common.current_user
 ]
 
+let last_square_clicked =
+  Eliom_reference.eref
+    ~scope:Eliom_common.default_session_scope
+    (None : Ttt_game_lib_types.square option)
+
+let move destination game user =
+  let%lwt origin = Eliom_reference.get last_square_clicked in
+  match origin with
+  | None ->
+     begin
+       Logs.debug (fun m -> m "sending placement");
+       let result =
+         Game.place game destination.row destination.column user
+       in
+       let%lwt () =
+         match result with
+          | `Ok -> Lwt.return ()
+          | _ -> Eliom_reference.set
+                   last_square_clicked
+                   (Some destination)
+       in
+       Lwt.return result
+     end
+  | Some(origin) ->
+     begin
+       Logs.debug (fun m -> m "sending move");
+       let open Ttt_game_lib_types in
+       let%lwt () = Eliom_reference.set last_square_clicked None in
+       let result =
+         Game.move game {origin; destination} user
+       in
+       Lwt.return result
+     end
+
+let click_square (game_id, row, column) =
+  let%lwt user = Eliom_reference.get current_user in
+  match user with
+  | None -> Lwt.return (`Invalid `WrongPlayer)
+  | Some (user, _) ->
+     begin
+       match Games.get_game (new id game_id) with
+       | None -> (*Lwt.return (`Invalid `NoSuchId)*) assert false
+       | Some (`TicTacToeClassical game) ->
+          Logs.err (fun m -> m "Wrong game, should be 3 Morris!!!");
+          let new_square =
+            Ttt_game_lib_types.{row; column;} in
+          move new_square game user
+       | _ -> assert false
+     end
+
+let%client click_rpc =
+  ~%(server_function [%derive.json: move_messages] click_square)
+
 let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
               ?title:(title="Three men Morris")
               content =
@@ -120,7 +173,28 @@ let%client draw_piece color ~row ~column ctx =
 
 let init_board_canvas () = ()
 
-let%client init_client () =
+let%client position_to_square x y =
+  let is_around x v =
+    abs (x - v) <= 50
+  in
+  let (<=>) = is_around in
+
+  let position_1d x =
+    if x <=> 100 then
+      Some(0)
+    else if x <=> 300 then
+      Some(1)
+    else if x <=> 500 then
+      Some(2)
+    else
+      None
+  in
+  match (position_1d x), (position_1d y) with
+  | (Some x),(Some y) -> Some(x,y)
+  | _ -> None
+
+
+let%client init_client game_id =
   let canvas = Html5.To_dom.of_canvas ~%canvas_elt in
   let st = canvas##.style in
   st##.zIndex := Js.string "-1";
@@ -145,7 +219,30 @@ let%client init_client () =
   draw_dot ctx 500 500;
   draw_piece `White ~row:0 ~column:1 ctx;
   draw_piece `White ~row:1 ~column:1 ctx;
-  draw_piece `Black ~row:2 ~column:2 ctx
+  draw_piece `Black ~row:2 ~column:2 ctx;
+  Lwt.async (fun () ->
+      Lwt_js_events.mousedowns
+        canvas
+        (
+          fun ev _ ->
+          let x0, y0 = Dom_html.elementClientPosition canvas in
+          let x,y = ((ev##.clientX - x0), (ev##.clientY - y0)) in
+          Printf.printf "you clicked on (%d,%d)" x y;
+          (match position_to_square x y with
+           | Some(x,y) ->
+              begin
+                Printf.printf "which is square (%d,%d)\n" x y;
+                click_rpc (game_id,x,y) >>=
+                  (fun x -> Lwt.return (Some(x)))
+              end
+           | None ->
+              begin
+                Printf.printf "which is not a square\n";
+                Lwt.return None
+              end
+          ) >>= (fun _ -> Lwt.return ())
+        )
+    )
 
 let register () =
   let open Services in
@@ -153,12 +250,10 @@ let register () =
   Base.TicTacToe_app.register
     ~service:ttt_3morris_service
     (fun id_int () ->
-      let _ = [%client (init_client () : unit)] in
+      let _ = [%client (init_client ~%id_int : unit)] in
       let () = init_board_canvas () in
       skeleton [
           div [
-              pcdata "3 men morris page";
-              br ();
               div ~a:[
                     a_id "board";
                   ]

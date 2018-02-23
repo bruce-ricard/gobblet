@@ -20,7 +20,7 @@ module Make (Game : GAME_IN_PROGRESS) =
       game.update game.game;
       result
 
-    let move game move user = `Ok `KeepPlaying
+    let move game move user = `Ok
 
     let username_and_piece game player =
       Game.username_and_piece game.game player

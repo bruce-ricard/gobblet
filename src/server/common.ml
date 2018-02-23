@@ -26,6 +26,9 @@ module TicTacToeClassical =
 module TicTacToeXOnly =
   GameList.TicTacToeXOnly
 
+module ThreeMenMorris =
+  GameList.ThreeMenMorris
+
 module ApiGameTypes =
   struct
     type tttc = GameList.TicTacToeClassical.game
