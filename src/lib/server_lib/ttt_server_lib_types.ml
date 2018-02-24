@@ -14,8 +14,6 @@ type ('a,'b) named_game =
   | `TicTacToeXOnly of 'b
   ]
 
-type ('a, 'b) named_api_game = ('a fb_game, 'b fb_game) named_game
-
 module type GAME_DB =
   sig
     (* TODO : remove the users from this function
