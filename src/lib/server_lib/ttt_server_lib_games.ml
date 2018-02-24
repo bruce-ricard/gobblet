@@ -256,12 +256,16 @@ module Make
                  (Some `TicTacToeClassical)
                  id "bruce" "bruce2");
               let id = Id_generator.next() in
-              Lwt.return (ignore (new_game
-                                    ~random_side:false
-                                    (Some `TicTacToeClassical)
-                                    id "bruce" "bruce2")
-                )
+              ignore (new_game
+                        ~random_side:false
+                        (Some `TicTacToeClassical)
+                        id "bruce" "bruce2");
+              let id = Id_generator.next() in
+              ignore (new_game
+                        ~random_side:false
+                        (Some `ThreeMenMorris)
+                        id "bruce" "bruce2");
+              Lwt.return ()
             )
         )
-
   end

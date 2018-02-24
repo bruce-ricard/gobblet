@@ -32,7 +32,13 @@ let get_game id : Common.TicTacToeClassical.game option =
   match Games.get_game id with
   | None -> None
   | Some (`TicTacToeClassical game) -> Some game
-  | _ -> Logs.err (fun m -> m "game with id %d is not TTT classical" id#get_id); None
+  | _ ->
+     begin
+       Logs.err
+         (fun m -> m "game with id %d is not TTT classical"
+                     id#get_id);
+       None
+     end
 
 let move row column game user =
   let start_time = Core.Time.now () in
@@ -57,13 +63,17 @@ let move (game_id, row, column) =
        | _ -> assert false
      end
 
-let%client move_rpc = ~%(server_function [%derive.json: move_messages] move)
+let%client move_rpc =
+  ~%(server_function [%derive.json: move_messages]
+                     move
+    )
 
 let refresh id_int =
   let game = get_game (new id id_int) in
   Lwt.return
     (match game with
-      None -> Logs.warn (fun m -> m "Cannot refresh game, id doesn't exist")
+       None -> Logs.warn
+                 (fun m -> m "Cannot refresh game, id doesn't exist")
     | Some game ->
        Game.refresh_game game)
 
@@ -71,7 +81,9 @@ let%client refresh = ~%(server_function [%derive.json: int] refresh)
 
 let%client update_cell_content cell content =
   let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
-  ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string c) content)
+  ignore (React.E.map
+            (fun c -> dom_cell##.innerHTML := Js.string c)
+            content)
 
 let%client cell_on_click dom_cell game_id x y =
   (Lwt.async (fun () ->
@@ -104,7 +116,8 @@ let cell game_id x y
               (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
                cell_on_click dom_cell ~%game_id_int ~%x ~%y;
                update_cell_content ~%cell (React.E.map piece_to_string ~%downcontent)
-               : unit)]
+               : unit)
+          ]
   in
   cell
 
@@ -119,8 +132,6 @@ let row id x =
       cell id x 2 (Game.piece_at game ~row:x ~column:2)
      ]
 
-let empty_row n = row n
-
 let board_html game_id =
   table [
       row game_id 0;
@@ -131,23 +142,6 @@ let board_html game_id =
 let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
   Base.skeleton
     ~css ~title content
-
-let turn_sentence game user : string React.event =
-  let user = match user with
-      None -> ""
-    | Some (user,_) -> user in
-  let map = function
-    | `GameOver (`Won player) -> player ^ " won the game!"
-    | `GameOver `Drawn -> "Draw!"
-    | `PlayOn f ->
-       begin
-         match f user with
-         | `Play -> "It's your turn"
-         | `Wait -> "It's your oponent's turn"
-         | `Watch -> "Enjoy watching " ^ user
-       end
-  in
-  React.E.map map (Game.game_status game)
 
 type 'a game_page_result =
   | InvalidID
@@ -163,7 +157,8 @@ let game_page game_id =
                  user
                  `TicTacToeClassical
          with
-         | None -> (Logs.err (fun m -> m "No rating for user %s" user); "-")
+         | None -> (Logs.err (fun m -> m "No rating for user %s" user);
+                    "-")
          | Some s -> s
        in
        let phrase () =
@@ -198,8 +193,14 @@ let game_page game_id =
            div [board_html game_id(*; Chat_lib.chat_html ()*)];
          ] in
        let id_int = game_id#get_id in
-       let ts = Eliom_react.Down.of_react (turn_sentence game username) in
-       Logs.debug (fun m -> m "game_page %d about to send" game_id#get_id);
+       let status = Game.game_status game in
+       let ts = Eliom_react.Down.of_react
+                  (Game_page_common.turn_sentence
+                     status
+                     username) in
+       Logs.debug
+         (fun m -> m "game_page %d about to send"
+                     game_id#get_id);
        let _ = [%client
                    (update_cell_content ~%turn_sentence_div ~%ts;
                     let%lwt () = refresh ~%id_int in
@@ -215,16 +216,6 @@ let game_page game_id =
             ~title:"Tic Tac Toe"
             content)
      end
-
-let invalid_id_page () =
-  skeleton
-    ~css:[["css"; "TicTacToe.css"]]
-    ~title:"Tic Tac Toe"
-    [
-      pcdata "This game doesn't exist. Go to your ";
-      a Services.show_my_games_service [pcdata "game list"] ();
-      pcdata " and chose a game from there."
-    ]
 
 let%client init_client () = ()
 
@@ -245,7 +236,8 @@ let register () =
       | Content content ->
          Logs.debug (fun m -> m "sending game page content");
          Lwt.return content
-      | InvalidID -> invalid_id_page ()
+      | InvalidID ->
+         Invalid_id_page.html ()
     )
 
 let () = register ()

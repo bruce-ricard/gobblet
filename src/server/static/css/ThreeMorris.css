@@ -64,7 +64,23 @@ td {
 }
 
 #board {
-    overflow: hidden
+    position: relative;
+    overflow: hidden;
+    height: 600px;
+    width: 600px;
+    z-index: 1;
+}
+
+#board_canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+#pieces_canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 
 canvas {

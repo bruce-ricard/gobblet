@@ -1,4 +1,3 @@
-
 module XOPiece =
   struct
     type t = [ `X | `O ]

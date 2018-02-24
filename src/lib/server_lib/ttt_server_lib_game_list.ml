@@ -28,8 +28,10 @@ module Make(Dao : DAO) =
 
     module TTTCReporter = Reporter.Make(TTTClassicaRatings)
 
-    module TTTCI = Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)
-    module TTTXOI = Ttt_game_lib_games.TicTacToeXOnly(TrivialReporter)
+    module TTTCI =
+      Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)
+    module TTTXOI =
+      Ttt_game_lib_games.TicTacToeXOnly(TrivialReporter)
     module ThreeMenMorrisInternal =
       Ttt_game_lib_games.ThreeMenMorris(TrivialReporter)
 

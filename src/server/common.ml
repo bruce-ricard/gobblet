@@ -345,7 +345,8 @@ module IdGenerator =
 
 module Games : Ttt_server_lib_types.GAMES
        with type tttc = GamesByIdAndUser.tttc
-        and type tttxo = GamesByIdAndUser.tttxo =
+        and type tttxo = GamesByIdAndUser.tttxo
+        and type three_men_morris = GamesByIdAndUser.three_men_morris =
   Ttt_server_lib_games.Make
     (Challenge_DB)
     (IdGenerator)
