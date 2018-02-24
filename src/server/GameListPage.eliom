@@ -172,8 +172,9 @@ let%client game_name_to_string = function
   | Some game ->
      begin
        match game with
-       | `TicTacToeClassical -> "tic tac toe classical"
-       | `TicTacToeXOnly -> "tic tac toe x only"
+       | `TicTacToeClassical -> "Tic Tac Toe classical"
+       | `TicTacToeXOnly -> "Tic Tac Toe X only"
+       | `ThreeMenMorris -> "Three men morris"
      end
 
 let%client challenge_html challenge =

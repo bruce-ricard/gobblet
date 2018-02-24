@@ -16,6 +16,8 @@ let dispatch game id =
           Eliom_service.preapply Services.ttt_classical_service id
        | `TicTacToeXOnly _ ->
           Eliom_service.preapply Services.ttt_xonly_service id
+       | `ThreeMenMorris _ ->
+          Eliom_service.preapply Services.ttt_3morris_service id
      end
 
 let register () =

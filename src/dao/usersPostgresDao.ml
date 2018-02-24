@@ -101,9 +101,15 @@ module Make(Config : CONFIG) =
              "
         )
 
+    let get_3menmorris_rating username =
+      Logs.err (fun m -> m "Not getting 3 men morris rating, not implemented yet");
+      (*Some(data_to_rating (100.,1.,0.01))*)
+      None
+
     let get_rating = function
       | `TicTacToeClassical -> get_tictactoeclassical_rating
       | `TicTacToeXOnly -> get_tictactoexonly_rating
+      | `ThreeMenMorris -> get_3menmorris_rating
 
 
     let upsert_ttt_classical username rating rating_deviation sigma =
@@ -132,6 +138,10 @@ module Make(Config : CONFIG) =
         );
       true
 
+    let upsert_3_men_morris username rating rating_deviation sigma =
+      Logs.err (fun m -> m "Not setting 3 men morris rating, not implemented yet");
+      true
+
     let set_rating
           game
           username =
@@ -142,8 +152,9 @@ module Make(Config : CONFIG) =
         and rating_deviation = string_of_float rating_deviation
         and sigma = string_of_float sigma in
         let upsert = match game with
-            `TicTacToeClassical -> upsert_ttt_classical
+          | `TicTacToeClassical -> upsert_ttt_classical
           | `TicTacToeXOnly -> upsert_ttt_xonly
+          | `ThreeMenMorris -> upsert_3_men_morris
         in
         upsert username rating rating_deviation sigma
   end

@@ -8,10 +8,11 @@ module type GAME_ID_GENERATOR =
 
 include Internal_types
 
-type ('a,'b) named_game =
+type ('a,'b,'c) named_game =
   [
   | `TicTacToeClassical of 'a
   | `TicTacToeXOnly of 'b
+  | `ThreeMenMorris of 'c
   ]
 
 module type GAME_DB =
@@ -21,8 +22,9 @@ they can be found from the game. Maybe add a get_players : (string * string)
             function to Game *)
     type tttc
     type tttxo
+    type three_men_morris
 
-    type ngame = (tttc, tttxo) named_game
+    type ngame = (tttc, tttxo, three_men_morris) named_game
 
     val put_game : id -> string -> string -> ngame -> unit
     val get_game : id -> ngame option
@@ -40,8 +42,9 @@ module type GAMES =
   sig
     type tttc
     type tttxo
+    type three_men_morris
 
-    type ngame = (tttc, tttxo) named_game
+    type ngame = (tttc, tttxo, three_men_morris) named_game
 
     val new_challenge : ?opponent:string -> string -> game_name option
                         -> challenge_result
@@ -58,8 +61,9 @@ module type GAME_ARCHIVE_DB =
   sig
     type tttc
     type tttxo
+    type three_men_morris
 
-    type ngame = (tttc, tttxo) named_game
+    type ngame = (tttc, tttxo, three_men_morris) named_game
 
     val put_game : id -> ngame -> unit
     val get_game : id -> ngame option

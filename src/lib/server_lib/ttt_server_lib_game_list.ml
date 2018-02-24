@@ -30,7 +30,7 @@ module Make(Dao : DAO) =
 
     module TTTCI = Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)
     module TTTXOI = Ttt_game_lib_games.TicTacToeXOnly(TrivialReporter)
-    module ThreeMenMorris =
+    module ThreeMenMorrisInternal =
       Ttt_game_lib_games.ThreeMenMorris(TrivialReporter)
 
     module TicTacToeClassical =
@@ -38,4 +38,7 @@ module Make(Dao : DAO) =
 
     module TicTacToeXOnly  =
       Ttt_server_lib_game_api.Make(TTTXOI)
+
+    module ThreeMenMorris =
+      Ttt_server_lib_game_api.Make(ThreeMenMorrisInternal)
   end

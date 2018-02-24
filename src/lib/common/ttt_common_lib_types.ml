@@ -2,6 +2,7 @@ type game_name =
   [
   | `TicTacToeClassical
   | `TicTacToeXOnly
+  | `ThreeMenMorris
   ]
 
 type frontend_challenge = {

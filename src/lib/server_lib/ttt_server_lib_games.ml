@@ -14,13 +14,17 @@ module Make
          (Game_archive_db : GAME_ARCHIVE_DB)
          (Game_DB : GAME_DB
           with type tttc = Game_archive_db.tttc fb_game
-           and type tttxo = Game_archive_db.tttxo fb_game)
+           and type tttxo = Game_archive_db.tttxo fb_game
+           and type three_men_morris = Game_archive_db.three_men_morris fb_game
+         )
          (Tttc : GAME with type game = Game_DB.tttc)
          (Tttxo : GAME with type game = Game_DB.tttxo)
+         (ThreeMenMorris : GAME with type game = Game_DB.three_men_morris)
          (User_DB : sig val exists : string -> bool end)
        : GAMES with
          type tttc = Game_DB.tttc
        and type tttxo = Game_DB.tttxo
+       and type three_men_morris = Game_DB.three_men_morris
        and type ngame = Game_DB.ngame
   =
   struct
@@ -29,8 +33,9 @@ module Make
 
     type tttc = Game_DB.tttc
     type tttxo = Game_DB.tttxo
+    type three_men_morris = Game_DB.three_men_morris
 
-    type ngame = (tttc, tttxo) named_game
+    type ngame = (tttc, tttxo, three_men_morris) named_game
 
     let challenge_db = Challenges.load ()
 
@@ -68,10 +73,11 @@ module Make
       Game_DB.get_game
 
     let random_game () =
-      let random_int = Random.int 2 in
+      let random_int = Random.int 3 in
       match random_int with
         0 -> `TicTacToeClassical
       | 1 -> `TicTacToeXOnly
+      | 2 -> `ThreeMenMorris
       | _ ->
          begin
            Logs.warn (fun m -> m "Invalid random_int in random_game");
@@ -88,6 +94,8 @@ module Make
          `TicTacToeClassical (Tttc.new_game players)
       | `TicTacToeXOnly ->
          `TicTacToeXOnly (Tttxo.new_game players)
+      | `ThreeMenMorris ->
+         `ThreeMenMorris (ThreeMenMorris.new_game players)
 
     let new_game ?random_side:(random_side=true) game_name id user1 user2 =
       if user1 = user2 then
@@ -209,13 +217,15 @@ module Make
           Error(Printf.sprintf "\"%s\" is not a valid player." challenger)
         end
 
-    let game_api_to_game_db =
+    let game_api_to_game_db : ngame -> 'a =
       let open Ttt_server_lib_game_list in
       function
       | `TicTacToeClassical game ->
          `TicTacToeClassical game.game
       | `TicTacToeXOnly game ->
          `TicTacToeXOnly game.game
+      | `ThreeMenMorris game ->
+         `ThreeMenMorris game.game
 
     let archive_game id =
       match Game_DB.get_game id with

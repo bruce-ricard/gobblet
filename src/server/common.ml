@@ -31,16 +31,21 @@ module ThreeMenMorris =
 
 module ApiGameTypes =
   struct
-    type tttc = GameList.TicTacToeClassical.game
-    type tttxo = GameList.TicTacToeXOnly.game
-    type ngame = (tttc, tttxo) Ttt_server_lib_types.named_game
+    type tttc = TicTacToeClassical.game
+    type tttxo = TicTacToeXOnly.game
+    type three_men_morris = ThreeMenMorris.game
+
+    type ngame = (tttc, tttxo, three_men_morris)
+                   Ttt_server_lib_types.named_game
   end
 
 module DbGameTypes =
   struct
     type tttc = GameList.TTTCI.t
     type tttxo = GameList.TTTXOI.t
-    type ngame = (tttc, tttxo) Ttt_server_lib_types.named_game
+    type three_men_morris = GameList.ThreeMenMorrisInternal.t
+
+    type ngame = (tttc, tttxo, three_men_morris) Ttt_server_lib_types.named_game
   end
 
 module Challenge_DB : Ttt_server_lib_types.CHALLENGES =
@@ -348,6 +353,7 @@ module Games : Ttt_server_lib_types.GAMES
     (GamesByIdAndUser)
     (TicTacToeClassical)
     (TicTacToeXOnly)
+    (ThreeMenMorris)
     (Users)
 
 let current_user =
