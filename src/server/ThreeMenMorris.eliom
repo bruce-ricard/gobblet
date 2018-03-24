@@ -146,8 +146,8 @@ let%client load_image src =
   >>= fun () -> Lwt.return img
 
 let%client clear_piece ~row ~column ctx =
-  let x = float_of_int (column * 200 + 50)
-  and y = float_of_int (row * 200 + 50)
+  let x = float_of_int (row * 200 + 50)
+  and y = float_of_int (column * 200 + 50)
   and width = 100.
   and height = 100.
   in
