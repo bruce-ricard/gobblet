@@ -61,7 +61,22 @@ module Make (Board : BOARD) : GAME_INTERNAL
           (fun () -> Board.place game.board square (piece_of player))
 
     let move game move player =
-      act game player (fun () -> Board.move game.board move)
+      let row = move.origin.row
+      and column = move.origin.column in
+      let piece_to_move = Board.piece_at game.board ~row ~column
+      and player_piece = piece_of player in
+      let can_move =
+        match piece_to_move, player_piece with
+            | Some p, p' -> p = p'
+            | _ -> false
+      in
+      act game player
+          (fun () ->
+            if can_move then
+              Board.move game.board move
+            else
+              `Invalid `InvalidMove
+          )
 
     let piece_at game = Board.piece_at game.board
 
