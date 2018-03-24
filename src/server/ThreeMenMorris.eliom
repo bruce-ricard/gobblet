@@ -91,11 +91,11 @@ let click_square (game_id, row, column) =
        match Games.get_game (new id game_id) with
        | None -> (*Lwt.return (`Invalid `NoSuchId)*) assert false
        | Some (`ThreeMenMorris game) ->
-          Logs.err (fun m -> m "Wrong game, should be 3 Morris!!!");
           let new_square =
             Ttt_game_lib_types.{row; column;} in
           move new_square game user
-       | _ -> assert false
+       | _ -> Logs.err (fun m -> m "Wrong game, should be 3 Morris!!!");
+              assert false
      end
 
 let%client click_rpc =
@@ -235,14 +235,16 @@ let%client piece_to_color = function
     `X -> `White | `O -> `Black
 
 let%client update_pieces ctx piece_events =
-  let update ~row ~column = function
+  let update ~row ~column piece =
+    match piece with
     | None ->
-       clear_piece ~row ~column
+       clear_piece ~row ~column ctx
     | Some piece ->
        draw_piece
          ~row
          ~column
          (piece_to_color piece)
+         ctx
   in
   for row = 0 to 2 do
     for column = 0 to 2 do
@@ -368,7 +370,8 @@ let game_page game_id =
                  user
                  `ThreeMenMorris
          with
-         | None -> (Logs.err (fun m -> m "No rating for user %s" user); "-")
+         | None -> (Logs.err (fun m -> m "No rating for user %s" user);
+                    "-")
          | Some s -> s
        in
        let phrase () =
