@@ -161,8 +161,8 @@ let%client draw_piece color ~row ~column ctx =
 
     and sourceWidth = 64.
     and sourceHeight = 64.
-    and destX = float_of_int (column * 200 + 50)
-    and destY = float_of_int (row * 200 + 50)
+    and destX = float_of_int (row * 200 + 50)
+    and destY = float_of_int (column * 200 + 50)
     and destWidth = 100.
     and destHeight = 100.
     in
