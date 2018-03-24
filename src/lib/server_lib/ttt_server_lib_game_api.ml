@@ -21,7 +21,9 @@ module Make (Game : GAME_IN_PROGRESS) =
       result
 
     let move game move user =
-      assert false (* TODO *)
+      let result = Game.move game.game move user in
+      game.update game.game;
+      result
 
     let username_and_piece game player =
       Game.username_and_piece game.game player

@@ -1,28 +1,42 @@
 open Ttt_game_lib_types
 
-module Make (W : WINNER_WINS) (Piece : PIECE)
+type semi_move_number = int
+
+module type MOVE_DECIDER =
+  sig
+    val is_move_allowed: semi_move_number -> bool
+    val is_place_allowed: semi_move_number -> bool
+  end
+
+module Make
+         (W : WINNER_WINS)
+         (Piece : PIECE)
+         (MoveDecider : MOVE_DECIDER)
        : BOARD with type piece = Piece.t
   =
   struct
     type piece = Piece.t
 
-    type t = Piece.t option array array
+    type t = Piece.t option array array * semi_move_number ref
     let pieces = Piece.pieces
-    let empty_board () : t = Array.make_matrix 3 3 None
+    let empty_board () : t = Array.make_matrix 3 3 None, (ref 0)
 
-    let piece_at board ~row ~column =
+    let piece_at_internal board ~row ~column =
       board.(row).(column)
 
+    let piece_at (board, _) = piece_at_internal board
+
     let square_is_occupied board {row; column} =
-      match piece_at board ~row ~column with
+      match piece_at_internal board ~row ~column with
       | Some _ -> true
       | None -> false
 
     let square_is_free board square =
       not @@ square_is_occupied board square
 
-    let valid_placement board ~row ~column =
-      square_is_free board {row; column}
+    let valid_placement (board, semi_move) ~row ~column =
+      square_is_free board {row; column} &&
+        MoveDecider.is_place_allowed !semi_move
 
     let squares_are_linked
           ({row = x1; column = y1} as s1)
@@ -41,11 +55,12 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
            )
       )
 
-      let valid_move
-          board
+    let valid_move
+          (board, semi_move)
           {origin; destination}
       =
-      (square_is_occupied board origin)
+      MoveDecider.is_move_allowed !semi_move
+      && (square_is_occupied board origin)
       && (square_is_free board destination)
       && (squares_are_linked origin destination)
 
@@ -74,7 +89,7 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
       | Some(x), Some(y), Some(z) when x = y && y = z -> Some(x)
                                                    | _ -> None
 
-    let check_board (board : t) : Piece.t option =
+    let check_board board : Piece.t option =
       List.fold_left
         (fun result element ->
           match result, element with
@@ -103,7 +118,7 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
       result.(2) <- Array.copy b.(2);
       result
 
-    let board_status board =
+    let board_status (board, _) =
       match check_board board with
       | None ->
          if board_is_full board then
@@ -112,16 +127,17 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
            `KeepPlaying
       | Some piece ->  if W.wins then `Won else `Lost
 
-    let actually_place board ~row ~column piece  =
-      if valid_placement board ~row ~column then
+    let actually_place (board, semi_move) ~row ~column piece  =
+      if valid_placement (board, semi_move) ~row ~column then
         begin
           board.(row).(column) <- Some piece;
-          `Ok (board_status board)
+          incr semi_move;
+          `Ok (board_status (board, semi_move))
         end
       else
         `Invalid `InvalidMove
 
-    let place board {row; column} piece =
+    let place (board : t) {row; column} piece : board_move_result =
       match board_status board with
       | `KeepPlaying -> actually_place board ~row ~column piece
       | _ -> `Invalid `GameWasOver
@@ -129,11 +145,14 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
     let actually_move board move =
       if valid_move board move then
         begin
+          let board = fst board
+          and semi_move = snd board in
           let {origin; destination} = move in
           let piece = board.(origin.row).(origin.column) in
           board.(origin.row).(origin.column) <- None;
           board.(destination.row).(destination.column) <- piece;
-          `Ok (board_status board)
+          incr semi_move;
+          `Ok (board_status (board, semi_move))
         end
       else
         `Invalid `InvalidMove
@@ -143,7 +162,7 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
       | `KeepPlaying -> actually_move board move
       | _ -> `Invalid `GameWasOver
 
-    let serialize board =
+    let serialize (board, _) =
       let result = Bytes.make 9 '-' in
       for i = 0 to 2 do
         for j = 0 to 2 do
@@ -157,7 +176,7 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
     exception Deserialize_error
 
     let deserialize s =
-      let board = empty_board () in
+      let board,_ = empty_board () in
       try
         for i = 0 to 2 do
           for j = 0 to 2 do
@@ -171,7 +190,7 @@ module Make (W : WINNER_WINS) (Piece : PIECE)
                end
           done
         done;
-        Some board
+        Some (board, ref 0)
       with
       | Deserialize_error -> None
   end

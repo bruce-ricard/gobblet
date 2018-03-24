@@ -56,7 +56,6 @@ module Make (Board : BOARD) : GAME_INTERNAL
            `Invalid `NotYourTurn
       | GameOver _ -> `Invalid `GameWasOver
 
-
     let place game square player : move_result =
       act game player
           (fun () -> Board.place game.board square (piece_of player))
