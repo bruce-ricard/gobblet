@@ -37,6 +37,7 @@ let parse_game_id = function
   | 0 -> None
   | 1 -> Some(`TicTacToeClassical)
   | 2 -> Some(`TicTacToeXOnly)
+  | 3 -> Some(`ThreeMenMorris)
   | n -> Logs.warn (fun m -> m "Illegal game_id %d" n); None
 
 let create_challenge_by_id (game_id, opp) =
@@ -120,6 +121,8 @@ let challenge_form () =
                (pcdata "Tic tac toe -- classical");
         option ~a:[a_value "2"]
                (pcdata "Tic tac toe -- X only");
+        option ~a:[a_value "3"]
+               (pcdata "Three men Morris");
       ]
   in
   let form =
