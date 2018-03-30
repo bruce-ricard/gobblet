@@ -1,4 +1,4 @@
 S .
 B ../../_build/lib/game_lib/
 
-PKG logs
+PKG logs ttt.lib.common
