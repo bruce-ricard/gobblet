@@ -1,3 +1,4 @@
+open Ttt_common_lib_types
 open Ttt_game_lib_types
 
 module TicTacToeClassical : functor
@@ -5,7 +6,7 @@ module TicTacToeClassical : functor
 sig
   type t
   type piece = [`X | `O]
-  val new_game : (player -> string) -> t
+  val new_game : (player -> string) -> id -> t
   val place : t -> square -> string -> move_result
   val piece_at : t -> row:int -> column:int -> piece option
   val move : t -> move -> string -> move_result
@@ -20,7 +21,7 @@ module TicTacToeXOnly : functor
 sig
   type t
   type piece = [`X]
-  val new_game : (player -> string) -> t
+  val new_game : (player -> string) -> id -> t
   val place : t -> square -> string -> move_result
   val move : t -> move -> string -> move_result
   val piece_at : t -> row:int -> column:int -> piece option
@@ -35,7 +36,7 @@ module ThreeMenMorris : functor
 sig
   type t
   type piece = [`X | `O]
-  val new_game : (player -> string) -> t
+  val new_game : (player -> string) -> id -> t
   val place : t -> square -> string -> move_result
   val move : t -> move -> string -> move_result
   val piece_at : t -> row:int -> column:int -> piece option

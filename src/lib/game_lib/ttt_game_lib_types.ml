@@ -109,7 +109,7 @@ module type REPORTER =
     type t
     val get : unit -> t
     val report_game_end :
-      t -> report_result -> unit
+      t -> report_result -> Ttt_common_lib_types.id -> unit
   end
 
 module type GAME_INTERNAL =
@@ -129,7 +129,7 @@ module type GAME_IN_PROGRESS =
   sig
     type t
     type piece
-    val new_game : (player -> string) -> t
+    val new_game : (player -> string) -> Ttt_common_lib_types.id -> t
     val place : t -> square -> string -> move_result
     val move : t -> move -> string -> move_result
     val piece_at : t -> row:int -> column:int -> piece option

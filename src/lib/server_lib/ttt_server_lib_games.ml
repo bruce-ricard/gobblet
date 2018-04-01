@@ -5,7 +5,7 @@ open Ttt_common_lib_types
 module type GAME =
   sig
     type game
-    val new_game : (player -> string) -> game
+    val new_game : (player -> string) -> id -> game
   end
 
 module Make
@@ -21,11 +21,11 @@ module Make
          (Tttxo : GAME with type game = Game_DB.tttxo)
          (ThreeMenMorris : GAME with type game = Game_DB.three_men_morris)
          (User_DB : sig val exists : string -> bool end)
-       : GAMES with
+(*       : Ttt_server_lib_types.GAMES with
          type tttc = Game_DB.tttc
        and type tttxo = Game_DB.tttxo
        and type three_men_morris = Game_DB.three_men_morris
-       and type ngame = Game_DB.ngame
+       and type ngame = Game_DB.ngame*)
   =
   struct
     module Games = Ttt_server_lib_game_list
@@ -84,20 +84,25 @@ module Make
            `TicTacToeClassical
          end
 
-    let new_game_creator game_name players =
+    let new_game_creator game_name players id =
       let game_name = match game_name with
         | None -> random_game ()
         | Some g -> g in
       let open Ttt_server_lib_game_list in
       match game_name with
       | `TicTacToeClassical ->
-         `TicTacToeClassical (Tttc.new_game players)
+         `TicTacToeClassical (Tttc.new_game players id)
       | `TicTacToeXOnly ->
-         `TicTacToeXOnly (Tttxo.new_game players)
+         `TicTacToeXOnly (Tttxo.new_game players id)
       | `ThreeMenMorris ->
-         `ThreeMenMorris (ThreeMenMorris.new_game players)
+         `ThreeMenMorris (ThreeMenMorris.new_game players id)
 
-    let new_game ?random_side:(random_side=true) game_name id user1 user2 =
+    let new_game
+          ?random_side:(random_side=true)
+          game_name
+          id
+          user1
+          user2 =
       if user1 = user2 then
         false
       else
@@ -114,7 +119,7 @@ module Make
              user1, user2)
         in
         let players = users_to_player_function user1 user2 in
-        let game = new_game_creator game_name players in
+        let game = new_game_creator game_name players id in
         Game_DB.put_game id user1 user2 game;
         true
 

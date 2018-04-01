@@ -7,10 +7,10 @@ module Make (Game : GAME_IN_PROGRESS) =
     type piece = Game.piece
     type game = Game.t fb_game
 
-    let new_game players =
+    let new_game players id =
       let event, update = React.E.create () in
       {
-        game = Game.new_game players;
+        game = Game.new_game players id;
         event;
         update
       }

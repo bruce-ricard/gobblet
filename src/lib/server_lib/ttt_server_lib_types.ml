@@ -33,6 +33,11 @@ they can be found from the game. Maybe add a get_players : (string * string)
     val get_games_for_user : string -> (id * string) list
   end
 
+module type ARCHIVE =
+  sig
+    val archive : id -> unit
+  end
+
 type challenge_result =
   | Challenge_created of id * (unit React.event)
   | Challenge_accepted of id

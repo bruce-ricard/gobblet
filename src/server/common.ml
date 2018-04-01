@@ -18,10 +18,20 @@ let () = init_logs (); Logs.info (fun m -> m "logs initialized")
 
 module Dao = UsersPostgresDao.Make(Config_parser.PostgresConfig)
 
-module GameList = Ttt_server_lib_game_list.Make(Dao)
+module MockArchive =
+  struct
+    let archive id =
+      Logs.warn (fun m -> m "Mock archiving game %d" id#get_id)
+  end
+
+module GameList = Ttt_server_lib_game_list.Make(Dao)(MockArchive)
 
 module TicTacToeClassical =
   GameList.TicTacToeClassical
+
+let _ = let open TicTacToeClassical in
+        (new_game :
+           (Ttt_game_lib_types.player -> string) -> id -> game)
 
 module TicTacToeXOnly =
   GameList.TicTacToeXOnly

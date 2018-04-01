@@ -1,3 +1,4 @@
+open Ttt_common_lib_types
 open Ttt_game_lib_types
 
 module Make (Game : GAME_INTERNAL)
@@ -5,17 +6,17 @@ module Make (Game : GAME_INTERNAL)
        : GAME_IN_PROGRESS with type piece = Game.piece =
 
   struct
-
     type t =
       {
         game : Game.t;
         players : player -> string;
+        id : id;
       }
     type piece = Game.piece
 
-    let new_game players =
+    let new_game players id =
       let game = Game.new_game () in
-      {game ; players}
+      {game ; players; id}
 
     let player_to_user game = game.players
 
@@ -53,12 +54,14 @@ module Make (Game : GAME_INTERNAL)
          Reporter.report_game_end
            (Reporter.get ())
            (Decisive {winner; loser})
+           game.id
       | GameOver(`Drawn) ->
          let player1 = game.players P1
          and player2 = game.players P2 in
          Reporter.report_game_end
            (Reporter.get ())
            (Draw {player1; player2})
+           game.id
       | _ -> ()
 
     let act game user action =

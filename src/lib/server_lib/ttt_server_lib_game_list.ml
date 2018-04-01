@@ -2,8 +2,8 @@ module TrivialReporter =
   struct
     type t = unit
     let get () = ()
-    let report_game_end () _ =
-      Logs.info (fun m -> m "Reporting end of game !!");
+    let report_game_end () _ _ =
+      Logs.err (fun m -> m "Trivial reporting end of game !!");
       ()
   end
 
@@ -20,13 +20,15 @@ module type DAO =
       game_name -> string -> Ttt_common_lib_types.rating -> bool
   end
 
-module Make(Dao : DAO) =
+module Make
+         (Dao : DAO)
+         (Archive : Ttt_server_lib_types.ARCHIVE) =
   struct
     module TTTClassicaRatings =
       Ratings.Make(Dao)
         (struct let game () = `TicTacToeClassical end)
 
-    module TTTCReporter = Reporter.Make(TTTClassicaRatings)
+    module TTTCReporter = Reporter.Make(TTTClassicaRatings)(Archive)
 
     module TTTCI =
       Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)

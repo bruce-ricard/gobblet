@@ -1,4 +1,5 @@
 open Ttt_common_lib_types
+open Ttt_game_lib_types
 
 type user = string
 
@@ -8,7 +9,9 @@ module type RATINGS =
     val set_rating : user -> rating -> bool
   end
 
-module Make(Ratings : RATINGS) =
+module Make
+         (Ratings : RATINGS)
+         (Archive : Ttt_server_lib_types.ARCHIVE) =
   struct
     type t = unit
     let get () = ()
@@ -90,8 +93,9 @@ module Make(Ratings : RATINGS) =
         player2 = game_result.player2;
       }
 
-    let report_game_end () result =
+    let report_game_end () result id =
       Logs.debug (fun m -> m "Game end reported");
+      Archive.archive id;
       let rate_result = compute_rate_result result in
       Logs.debug (fun m -> m "rate result computed");
       match rate_result.result with
