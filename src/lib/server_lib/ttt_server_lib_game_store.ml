@@ -1,3 +1,5 @@
+type named_game = Ttt_server_lib_types.GameTypes.named_game
+
 module HashMapSetInternal
          (KeyType : sig type t end)
          (ValueType : Set.OrderedType)
@@ -45,20 +47,8 @@ end
       Hashtbl.replace table key (ValueSet.remove value set)
   end
 
-module type API_GAME_TYPES =
-  sig
-    type tttc
-    type tttxo
-    type three_men_morris
-  end
-
-module GamesByIdAndUser(ApiGameTypes : API_GAME_TYPES) =
+module GamesByIdAndUser =
   struct
-    include ApiGameTypes
-
-    type ngame = (tttc, tttxo, three_men_morris)
-                   Ttt_server_lib_types.named_game
-
     module Users =
       struct
         type t = string
@@ -75,7 +65,12 @@ module GamesByIdAndUser(ApiGameTypes : API_GAME_TYPES) =
     module ValueSet = (UsersToIdSet.ValueSet)
 
     type t = {
-        index1 :  (int, (ngame * Users.t * Users.t)) Hashtbl.t;
+        index1 :
+          (int,
+           (named_game
+            * Users.t
+            * Users.t))
+            Hashtbl.t;
         index2 : UsersToIdSet.t;
       }
 
@@ -85,7 +80,7 @@ module GamesByIdAndUser(ApiGameTypes : API_GAME_TYPES) =
       }
 
     let (put_game : Ttt_common_lib_types.id ->
-                    string -> string -> ngame -> unit) =
+                    string -> string -> named_game -> unit) =
       fun id user1 user2 game ->
 
       Hashtbl.add table.index1 id#get_id (game, user1, user2);

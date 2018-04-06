@@ -8,26 +8,30 @@ module type GAME_ID_GENERATOR =
 
 include Internal_types
 
-type ('a,'b,'c) named_game =
-  [
-  | `TicTacToeClassical of 'a
-  | `TicTacToeXOnly of 'b
-  | `ThreeMenMorris of 'c
-  ]
+module GameTypes =
+  struct
+    open Ttt_game_lib_games
+    type tttc = GameInProgressTypes.tic_tac_toe_classical fb_game
+    type tttxo = GameInProgressTypes.tic_tac_toe_x_only fb_game
+    type three_men_morris = GameInProgressTypes.three_men_morris fb_game
+
+    type named_game =
+      [
+      | `TicTacToeClassical of tttc
+      | `TicTacToeXOnly of tttxo
+      | `ThreeMenMorris of three_men_morris
+      ]
+  end
 
 module type GAME_DB =
   sig
     (* TODO : remove the users from this function
 they can be found from the game. Maybe add a get_players : (string * string)
             function to Game *)
-    type tttc
-    type tttxo
-    type three_men_morris
+    open GameTypes
 
-    type ngame = (tttc, tttxo, three_men_morris) named_game
-
-    val put_game : id -> string -> string -> ngame -> unit
-    val get_game : id -> ngame option
+    val put_game : id -> string -> string -> named_game -> unit
+    val get_game : id -> named_game option
     val delete_game : id -> unit
 
     val get_games_for_user : string -> (id * string) list
@@ -45,12 +49,6 @@ type challenge_result =
 
 module type GAMES =
   sig
-    type tttc
-    type tttxo
-    type three_men_morris
-
-    type ngame = (tttc, tttxo, three_men_morris) named_game
-
     val new_challenge : ?opponent:string -> string -> game_name option
                         -> challenge_result
     val accept_challenge : id -> string -> bool
@@ -59,18 +57,12 @@ module type GAMES =
     val get_private_challenges : string -> frontend_challenge list React.event
     val get_public_challenges : string -> frontend_challenge list React.event
 
-    val get_game : id -> ngame option
+    val get_game : id -> GameTypes.named_game option
   end
 
 module type GAME_ARCHIVE_DB =
   sig
-    type tttc
-    type tttxo
-    type three_men_morris
-
-    type ngame = (tttc, tttxo, three_men_morris) named_game
-
-    val put_game : id -> ngame -> unit
-    val get_game : id -> ngame option
+    val put_game : id -> GameTypes.named_game -> unit
+    val get_game : id -> GameTypes.named_game option
     val get_games_for_user : string -> (id * string) list
   end

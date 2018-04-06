@@ -39,25 +39,6 @@ module TicTacToeXOnly =
 module ThreeMenMorris =
   GameList.ThreeMenMorris
 
-module ApiGameTypes =
-  struct
-    type tttc = TicTacToeClassical.game
-    type tttxo = TicTacToeXOnly.game
-    type three_men_morris = ThreeMenMorris.game
-
-    type ngame = (tttc, tttxo, three_men_morris)
-                   Ttt_server_lib_types.named_game
-  end
-
-module DbGameTypes =
-  struct
-    type tttc = GameList.TTTCI.t
-    type tttxo = GameList.TTTXOI.t
-    type three_men_morris = GameList.ThreeMenMorrisInternal.t
-
-    type ngame = (tttc, tttxo, three_men_morris) Ttt_server_lib_types.named_game
-  end
-
 module Users = Ttt_user_lib_users.Make(Dao)
 
 module TTT =
@@ -74,8 +55,6 @@ module TTTXonly =
 
 module MockGameArchiveDB =
   struct
-    include DbGameTypes
-
     let put_game id game =
       Logs.info (fun m -> m "Mock archiving game %d" id#get_id)
 
@@ -95,12 +74,9 @@ module IdGenerator =
   end
 
 module GamesByIdAndUser =
-  Ttt_server_lib_game_store.GamesByIdAndUser(ApiGameTypes)
+  Ttt_server_lib_game_store.GamesByIdAndUser
 
-module Games : Ttt_server_lib_types.GAMES
-       with type tttc = GamesByIdAndUser.tttc
-        and type tttxo = GamesByIdAndUser.tttxo
-        and type three_men_morris = GamesByIdAndUser.three_men_morris =
+module Games : Ttt_server_lib_types.GAMES =
   Ttt_server_lib_games.Make
     (Ttt_server_lib_challenge_store)
     (IdGenerator)

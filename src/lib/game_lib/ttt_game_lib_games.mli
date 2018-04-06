@@ -1,10 +1,17 @@
 open Ttt_common_lib_types
 open Ttt_game_lib_types
 
+module GameInProgressTypes :
+  sig
+    type tic_tac_toe_classical
+    type tic_tac_toe_x_only
+    type three_men_morris
+  end
+
 module TicTacToeClassical : functor
   (Reporter : REPORTER) ->
 sig
-  type t
+  type t = GameInProgressTypes.tic_tac_toe_classical
   type piece = [`X | `O]
   val new_game : (player -> string) -> id -> t
   val place : t -> square -> string -> move_result
@@ -19,7 +26,7 @@ end
 module TicTacToeXOnly : functor
   (Reporter : REPORTER) ->
 sig
-  type t
+  type t = GameInProgressTypes.tic_tac_toe_x_only
   type piece = [`X]
   val new_game : (player -> string) -> id -> t
   val place : t -> square -> string -> move_result
@@ -34,7 +41,7 @@ end
 module ThreeMenMorris : functor
   (Reporter : REPORTER) ->
 sig
-  type t
+  type t = GameInProgressTypes.three_men_morris
   type piece = [`X | `O]
   val new_game : (player -> string) -> id -> t
   val place : t -> square -> string -> move_result

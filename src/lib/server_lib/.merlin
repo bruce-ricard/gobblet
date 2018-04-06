@@ -1,5 +1,5 @@
 S .
-B _build
+B ../../_build/lib/server_lib
 
 PKG ttt.lib.common
 PKG ttt.lib.game

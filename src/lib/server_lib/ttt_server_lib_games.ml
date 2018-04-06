@@ -12,30 +12,16 @@ module Make
          (Challenges : Ttt_server_lib_types.CHALLENGES)
          (Id_generator : GAME_ID_GENERATOR)
          (Game_archive_db : GAME_ARCHIVE_DB)
-         (Game_DB : GAME_DB
-          with type tttc = Game_archive_db.tttc fb_game
-           and type tttxo = Game_archive_db.tttxo fb_game
-           and type three_men_morris = Game_archive_db.three_men_morris fb_game
-         )
-         (Tttc : GAME with type game = Game_DB.tttc)
-         (Tttxo : GAME with type game = Game_DB.tttxo)
-         (ThreeMenMorris : GAME with type game = Game_DB.three_men_morris)
+         (Game_DB : GAME_DB)
+         (Tttc : GAME with type game = GameTypes.tttc)
+         (Tttxo : GAME with type game = GameTypes.tttxo)
+         (ThreeMenMorris : GAME with type game = GameTypes.three_men_morris)
          (User_DB : sig val exists : string -> bool end)
-(*       : Ttt_server_lib_types.GAMES with
-         type tttc = Game_DB.tttc
-       and type tttxo = Game_DB.tttxo
-       and type three_men_morris = Game_DB.three_men_morris
-       and type ngame = Game_DB.ngame*)
+       : Ttt_server_lib_types.GAMES
   =
   struct
     module Games = Ttt_server_lib_game_list
     module Challenge = Ttt_server_lib_challenge
-
-    type tttc = Game_DB.tttc
-    type tttxo = Game_DB.tttxo
-    type three_men_morris = Game_DB.three_men_morris
-
-    type ngame = (tttc, tttxo, three_men_morris) named_game
 
     let challenge_db = Challenges.load ()
 
@@ -222,7 +208,7 @@ module Make
           Error(Printf.sprintf "\"%s\" is not a valid player." challenger)
         end
 
-    let game_api_to_game_db : ngame -> 'a =
+    let game_api_to_game_db : GameTypes.named_game -> 'a =
       let open Ttt_server_lib_game_list in
       function
       | `TicTacToeClassical game ->
@@ -237,7 +223,7 @@ module Make
       | Some game_api ->
          begin
            Game_DB.delete_game id;
-           Game_archive_db.put_game id (game_api_to_game_db game_api);
+           Game_archive_db.put_game id game_api;
            Logs.debug (fun m -> m "archived game %d" id#get_id)
          end
       | None ->
