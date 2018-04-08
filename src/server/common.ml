@@ -18,13 +18,6 @@ let () = init_logs (); Logs.info (fun m -> m "logs initialized")
 
 module Dao = UsersPostgresDao.Make(Config_parser.PostgresConfig)
 
-(*module MockArchive =
-  struct
-    let archive id =
-      Logs.err (fun m -> m "Mock archiving game %d" id#get_id)
-  end
- *)
-
 module Users = Ttt_user_lib_users.Make(Dao)
 
 module MockGameArchiveDB =
