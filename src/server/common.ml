@@ -29,10 +29,6 @@ module GameList = Ttt_server_lib_game_list.Make(Dao)(MockArchive)
 module TicTacToeClassical =
   GameList.TicTacToeClassical
 
-let _ = let open TicTacToeClassical in
-        (new_game :
-           (Ttt_game_lib_types.player -> string) -> id -> game)
-
 module TicTacToeXOnly =
   GameList.TicTacToeXOnly
 
