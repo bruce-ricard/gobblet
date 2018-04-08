@@ -66,7 +66,7 @@ module Make
       | 2 -> `ThreeMenMorris
       | _ ->
          begin
-           Logs.warn (fun m -> m "Invalid random_int in random_game");
+           Logs.err (fun m -> m "Invalid random_int in random_game");
            `TicTacToeClassical
          end
 
@@ -158,7 +158,7 @@ module Make
            let challenger = Challenge.challenger challenge
            and id = Challenge.id challenge in
            if challenger = user then
-             (Logs.warn (fun m ->
+             (Logs.err (fun m ->
                   m "%s %s %s"
                     "Attempting to accept a challenge from the same player."
                     "challenge_db.public_challenges_for_user shouldn't"
@@ -227,7 +227,7 @@ module Make
            Logs.debug (fun m -> m "archived game %d" id#get_id)
          end
       | None ->
-         Logs.warn (fun m ->
+         Logs.err (fun m ->
              m "Attempted to archive game %d, which doesn't exist" id#get_id
            )
 

@@ -21,7 +21,7 @@ module Dao = UsersPostgresDao.Make(Config_parser.PostgresConfig)
 module MockArchive =
   struct
     let archive id =
-      Logs.warn (fun m -> m "Mock archiving game %d" id#get_id)
+      Logs.err (fun m -> m "Mock archiving game %d" id#get_id)
   end
 
 module GameList = Ttt_server_lib_game_list.Make(Dao)(MockArchive)
@@ -56,12 +56,16 @@ module TTTXonly =
 module MockGameArchiveDB =
   struct
     let put_game id game =
-      Logs.info (fun m -> m "Mock archiving game %d" id#get_id)
+      Logs.err (fun m -> m "Mock storing game %d into archive DB" id#get_id);
+      ()
 
     let get_game id =
+      Logs.err (fun m -> m "Mock getting game %d from archive DB" id#get_id);
       None
 
-    let get_games_for_user user = []
+    let get_games_for_user user =
+      Logs.err (fun m -> m "Mock getting games for user %s" user);
+      []
   end
 
 module IdGenerator =
