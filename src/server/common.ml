@@ -18,36 +18,14 @@ let () = init_logs (); Logs.info (fun m -> m "logs initialized")
 
 module Dao = UsersPostgresDao.Make(Config_parser.PostgresConfig)
 
-module MockArchive =
+(*module MockArchive =
   struct
     let archive id =
       Logs.err (fun m -> m "Mock archiving game %d" id#get_id)
   end
-
-module GameList = Ttt_server_lib_game_list.Make(Dao)(MockArchive)
-
-module TicTacToeClassical =
-  GameList.TicTacToeClassical
-
-module TicTacToeXOnly =
-  GameList.TicTacToeXOnly
-
-module ThreeMenMorris =
-  GameList.ThreeMenMorris
+ *)
 
 module Users = Ttt_user_lib_users.Make(Dao)
-
-module TTT =
-  struct
-    type t = GameList.TicTacToeClassical.game
-    let compare = Pervasives.compare
-  end
-
-module TTTXonly =
-  struct
-    include GameList.TTTXOI
-    let compare = Pervasives.compare
-  end
 
 module MockGameArchiveDB =
   struct
@@ -73,19 +51,48 @@ module IdGenerator =
       new id (!current)
   end
 
+module XX(Archive : Ttt_server_lib_types.ARCHIVE) =
+  struct
+    module GameList = Ttt_server_lib_game_list.Make(Dao)(Archive)
+
+    module TicTacToeClassical =
+      GameList.TicTacToeClassical
+
+    module TicTacToeXOnly =
+      GameList.TicTacToeXOnly
+
+    module ThreeMenMorris =
+      GameList.ThreeMenMorris
+  end
+
 module GamesByIdAndUser =
   Ttt_server_lib_game_store.GamesByIdAndUser
 
-module Games : Ttt_server_lib_types.GAMES =
+module rec Games :
+             sig
+               include Ttt_server_lib_types.GAMES
+               include Ttt_server_lib_types.ARCHIVE
+             end =
   Ttt_server_lib_games.Make
     (Ttt_server_lib_challenge_store)
     (IdGenerator)
     (MockGameArchiveDB)
     (GamesByIdAndUser)
-    (TicTacToeClassical)
-    (TicTacToeXOnly)
-    (ThreeMenMorris)
+    (GameList.TicTacToeClassical)
+    (GameList.TicTacToeXOnly)
+    (GameList.ThreeMenMorris)
     (Users)
+   and GameList : Ttt_server_lib_game_list.GAME_LIST =
+     Ttt_server_lib_game_list.Make(Dao)(Games)
+
+module TicTacToeClassical =
+  GameList.TicTacToeClassical
+
+module TicTacToeXOnly =
+  GameList.TicTacToeXOnly
+
+module ThreeMenMorris =
+  GameList.ThreeMenMorris
 
 let current_user =
   Eliom_reference.eref

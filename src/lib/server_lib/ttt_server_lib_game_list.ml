@@ -31,9 +31,29 @@ module MockDao =
       true
   end
 
+module type GAME_LIST =
+  sig
+    open Ttt_server_lib_types.GameTypes
+    module TicTacToeClassical
+           : Ttt_server_lib_types.GAME_API
+           with type game = tttc
+           with type piece = Ttt_game_lib_pieces.XOPiece.t
+
+    module TicTacToeXOnly
+           : Ttt_server_lib_types.GAME_API
+           with type game = tttxo
+           with type piece = Ttt_game_lib_pieces.XPiece.t
+
+    module ThreeMenMorris
+           : Ttt_server_lib_types.GAME_API
+           with type game = three_men_morris
+           with type piece = Ttt_game_lib_pieces.XOPiece.t
+  end
+
 module Make
          (Dao : DAO)
-         (Archive : Ttt_server_lib_types.ARCHIVE) =
+         (Archive : Ttt_server_lib_types.ARCHIVE)
+       : GAME_LIST =
   struct
     module TTTClassicaRatings =
       Ratings.Make(Dao)
@@ -64,7 +84,7 @@ module Make
     module TicTacToeClassical =
       Ttt_server_lib_game_api.Make(TTTCI)
 
-    module TicTacToeXOnly  =
+    module TicTacToeXOnly =
       Ttt_server_lib_game_api.Make(TTTXOI)
 
     module ThreeMenMorris =

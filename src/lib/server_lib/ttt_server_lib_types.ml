@@ -39,7 +39,7 @@ they can be found from the game. Maybe add a get_players : (string * string)
 
 module type ARCHIVE =
   sig
-    val archive : id -> unit
+    val archive_game : id -> unit
   end
 
 type challenge_result =
@@ -65,4 +65,29 @@ module type GAME_ARCHIVE_DB =
     val put_game : id -> GameTypes.named_game -> unit
     val get_game : id -> GameTypes.named_game option
     val get_games_for_user : string -> (id * string) list
+  end
+
+module type GAME_API =
+  sig
+    type piece
+    type game
+    val new_game :
+      (Ttt_game_lib_types.player -> string) ->
+      Ttt_common_lib_types.id -> game
+    val place :
+      game ->
+      row:int -> column:int -> string -> Ttt_game_lib_types.move_result
+    val move :
+      game ->
+      Ttt_game_lib_types.move -> string -> Ttt_game_lib_types.move_result
+    val username_and_piece :
+      game ->
+      Ttt_game_lib_types.player -> string * piece
+    val piece_at :
+      game ->
+      row:int -> column:int -> piece option React.event
+    val game_status :
+      game ->
+      Ttt_game_lib_types.game_in_progress_status React.event
+    val refresh_game : game -> unit
   end

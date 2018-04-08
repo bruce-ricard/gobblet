@@ -95,6 +95,7 @@ module GamesByIdAndUser =
       | Not_found -> None
 
     let delete_game id =
+      Logs.debug (fun m -> m "Deleting game %d from game store" id#get_id);
       let game,user1,user2 = Hashtbl.find table.index1 id#get_id in
       UsersToIdSet.remove table.index2 user1 id#get_id;
       UsersToIdSet.remove table.index2 user2 id#get_id;

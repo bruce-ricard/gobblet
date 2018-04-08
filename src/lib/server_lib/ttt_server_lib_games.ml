@@ -8,6 +8,12 @@ module type GAME =
     val new_game : (player -> string) -> id -> game
   end
 
+module type GAMES_AND_ARCHIVING =
+  sig
+    include Ttt_server_lib_types.GAMES
+    include Ttt_server_lib_types.ARCHIVE
+  end
+
 module Make
          (Challenges : Ttt_server_lib_types.CHALLENGES)
          (Id_generator : GAME_ID_GENERATOR)
@@ -17,7 +23,7 @@ module Make
          (Tttxo : GAME with type game = GameTypes.tttxo)
          (ThreeMenMorris : GAME with type game = GameTypes.three_men_morris)
          (User_DB : sig val exists : string -> bool end)
-       : Ttt_server_lib_types.GAMES
+       : GAMES_AND_ARCHIVING
   =
   struct
     module Games = Ttt_server_lib_game_list

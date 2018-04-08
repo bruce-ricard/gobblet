@@ -95,7 +95,7 @@ module Make
 
     let report_game_end () result id =
       Logs.debug (fun m -> m "Game end reported");
-      Archive.archive id;
+      Archive.archive_game id;
       let rate_result = compute_rate_result result in
       Logs.debug (fun m -> m "rate result computed");
       match rate_result.result with
