@@ -1,20 +1,7 @@
-module TrivialReporter =
-  struct
-    type t = unit
-    let get () = ()
-    let report_game_end () _ _ =
-      Logs.err (fun m -> m "Trivial reporting end of game !!");
-      ()
-  end
-
 module type DAO =
   sig
     open Ttt_common_lib_types
 
-(*    val get : string -> Sha256.t -> bool
-    val exists :
-      [< `TicTacToeClassical | `TicTacToeXOnly ] ->
-      'a -> Ttt_common_lib_types.rating option*)
     val get_rating : game_name -> string -> rating option
     val set_rating :
       game_name -> string -> Ttt_common_lib_types.rating -> bool
