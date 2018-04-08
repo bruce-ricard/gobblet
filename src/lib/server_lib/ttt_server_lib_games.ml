@@ -1,6 +1,9 @@
-open Ttt_server_lib_types
 open Ttt_game_lib_types
 open Ttt_common_lib_types
+
+open Ttt_server_lib_types.FrontendBackendGame
+
+module GameTypes = Ttt_server_lib_types.GameTypes
 
 module type GAME =
   sig
@@ -16,9 +19,9 @@ module type GAMES_AND_ARCHIVING =
 
 module Make
          (Challenges : Ttt_server_lib_types.CHALLENGES)
-         (Id_generator : GAME_ID_GENERATOR)
-         (Game_archive_db : GAME_ARCHIVE_DB)
-         (Game_DB : GAME_DB)
+         (Id_generator : Ttt_server_lib_types.GAME_ID_GENERATOR)
+         (Game_archive_db : Ttt_server_lib_types.GAME_ARCHIVE_DB)
+         (Game_DB : Ttt_server_lib_types.GAME_DB)
          (Tttc : GAME with type game = GameTypes.tttc)
          (Tttxo : GAME with type game = GameTypes.tttxo)
          (ThreeMenMorris : GAME with type game = GameTypes.three_men_morris)
@@ -127,7 +130,7 @@ module Make
 
     let accept_challenge_internal ?game_name id user =
       match Challenges.remove challenge_db id with
-      | Deleted(challenge) ->
+      | Ttt_server_lib_types.Deleted(challenge) ->
          begin
            let challenger = Challenge.challenger challenge in
            let game_name = final_game_name challenge game_name in
@@ -144,7 +147,7 @@ module Make
                false
              end
          end
-      | Id_not_present ->
+      | Ttt_server_lib_types.Id_not_present ->
               Logs.debug
                 (fun m -> m "challenge with id %d not present" id#get_id);
               false
@@ -188,30 +191,33 @@ module Make
         | None ->
            begin
              match attempt_accept_challenge challenger game_name with
-             | Some id -> Challenge_accepted id
+             | Some id -> Ttt_server_lib_types.Challenge_accepted id
              | None ->
                 let challenge = create_challenge challenger game_name in
-                Challenge_created(
+                Ttt_server_lib_types.Challenge_created(
                     Challenge.id challenge, Challenge.event challenge
                   )
            end
         | Some opponent ->
            if opponent = challenger then
-             Error("You can't challenge yourself!")
+             Ttt_server_lib_types.Error("You can't challenge yourself!")
            else
              if User_DB.exists opponent then
                let challenge = create_challenge ~opponent challenger game_name
                in
-                Challenge_created(
-                    Challenge.id challenge, Challenge.event challenge
-                  )
+               Ttt_server_lib_types.Challenge_created(
+                   Challenge.id challenge, Challenge.event challenge
+                 )
              else
-               Error(Printf.sprintf "\"%s\" is not a valid player." opponent)
+               Ttt_server_lib_types.Error(
+                   Printf.sprintf "\"%s\" is not a valid player." opponent
+                 )
       else
         begin
           Logs.err (fun m ->
               m "Impossible case, the current player has to exist");
-          Error(Printf.sprintf "\"%s\" is not a valid player." challenger)
+          Ttt_server_lib_types.Error(
+              Printf.sprintf "\"%s\" is not a valid player." challenger)
         end
 
     let game_api_to_game_db : GameTypes.named_game -> 'a =
