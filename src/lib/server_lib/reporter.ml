@@ -93,9 +93,7 @@ module Make
         player2 = game_result.player2;
       }
 
-    let report_game_end () result id =
-      Logs.debug (fun m -> m "Game end reported");
-      Archive.archive_game id;
+    let update_ratings_from_result result id =
       let rate_result = compute_rate_result result in
       Logs.debug (fun m -> m "rate result computed");
       match rate_result.result with
@@ -116,10 +114,17 @@ module Make
           ()
         end
       | Glicko2.InvalidVolatility ->
-         Logs.err (fun m -> m "Invalid Volatility while trying to rate")
+         Logs.err (fun m ->
+             m "Invalid Volatility while trying to rate game %d"
+               id#get_id)
       | Glicko2.InternalError ->
          Logs.err (fun m ->
-             m "Glicko2 internal error while trying to rate"
+             m "Glicko2 internal error while trying to rate game %d"
+               id#get_id
            )
 
+    let report_game_end () result id =
+      Logs.debug (fun m -> m "Game end reported");
+      update_ratings_from_result result id;
+      Archive.archive_game id
   end
