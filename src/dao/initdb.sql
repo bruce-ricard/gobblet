@@ -37,3 +37,11 @@ rd numeric(5,2) not null,
 sigma numeric(10) not null,
 number_games integer not null
 );
+
+create table ratings.three_men_morris
+(
+username varchar(30) not null primary key REFERENCES users (id),
+rating numeric(6,2) not null,
+rd numeric(5,2) not null,
+sigma numeric(10,10) not null
+)
