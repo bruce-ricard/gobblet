@@ -25,8 +25,7 @@ create table ratings.tictactoeclassical
 username varchar(30) not null primary key REFERENCES users (id),
 rating numeric(6,2) not null,
 rd numeric(5,2) not null,
-sigma numeric(10) not null,
-number_games integer not null
+sigma numeric(10,10) not null
 );
 
 create table ratings.tictactoexonly
@@ -34,8 +33,7 @@ create table ratings.tictactoexonly
 username varchar(30) not null primary key REFERENCES users (id),
 rating numeric(6,2) not null,
 rd numeric(5,2) not null,
-sigma numeric(10) not null,
-number_games integer not null
+sigma numeric(10,10) not null,
 );
 
 create table ratings.three_men_morris
