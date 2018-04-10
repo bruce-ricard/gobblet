@@ -4,10 +4,11 @@ module Make(Config : CONFIG) =
   struct
 
     let log_config () =
-      let ots f = function
+      let option_to_string f = function
           None -> "None"
         | Some s -> f s
       in
+      let ots = option_to_string in
       let sts = ots (fun x -> x)
       and its = ots string_of_int in
       let open Config in
@@ -37,36 +38,59 @@ module Make(Config : CONFIG) =
     type rating = Ttt_common_lib_types.rating
 
     let put_hash username password_hash =
-      PGSQL(dbh) "insert into users values ($username, $password_hash)";
-      true
+      try
+        PGSQL(dbh) "insert into users values ($username, $password_hash)";
+        true
+      with
+        e -> Logs.err (fun m ->
+                 m "Exception while inserting new user in postgres.\n %s"
+                   (Printexc.to_string e)
+               ); false
+
 
     let (put : string -> Sha256.t -> bool) username password_hash  =
       put_hash username (Sha256.to_hex password_hash)
 
     let get username (password_hash: Sha256.t) =
       let password_hash = Sha256.to_hex password_hash in
-      match
-        PGSQL(dbh) "
-                    select password_hash
-                    from users
-                    where id=$username
-                    "
+      try
+        match
+          PGSQL(dbh) "
+                      select password_hash
+                      from users
+                      where id=$username
+                      "
+        with
+          [] -> false
+        | [pwh] -> pwh = password_hash
+        | _ -> failwith (Printf.sprintf
+                           "Multiple users for user \"%s\""
+                           username)
       with
-        [] -> false
-      | [pwh] -> pwh = password_hash
-      | _ -> failwith (Printf.sprintf
-                         "Multiple users for user \"%s\""
-                         username)
+        e -> Logs.err (fun m ->
+                 m "Exception while getting user from postgres.\n %s"
+                   (Printexc.to_string e)
+               ); false
+
 
     let exists username =
-      let users = PGSQL(dbh) "
-                              select 1 from users
-                              where id=$username
-                              " in
-      match users with
-      | [] -> false
-      | [_] -> true
-      | _ -> assert false
+      try
+        let users =
+          PGSQL(dbh)
+               "
+                select 1 from users
+                where id=$username
+                "
+        in
+        match users with
+        | [] -> false
+        | [_] -> true
+        | _ -> assert false
+      with
+        e -> Logs.err (fun m ->
+                 m "Exception while checking if user exists in postgres.\n %s"
+                   (Printexc.to_string e)
+               ); false
 
     let data_to_rating (rating, rating_deviation, sigma) =
       let open Ttt_common_lib_types in
@@ -82,36 +106,56 @@ module Make(Config : CONFIG) =
     let get_tictactoeclassical_rating username =
       Logs.debug (fun m -> m "Getting rating for user %s" username);
       request_result_to_rating (
-          PGSQL(dbh)
-            "
-             SELECT rating, rd, sigma
-             FROM ratings.tictactoeclassical
-             WHERE username=$username
-             "
+          try
+            PGSQL(dbh)
+                 "
+                  SELECT rating, rd, sigma
+                  FROM ratings.tictactoeclassical
+                  WHERE username=$username
+                  "
+          with
+            e -> Logs.err (fun m ->
+                 m "Exception while getting tttc rating from postgres.\n %s"
+                   (Printexc.to_string e)
+               ); []
         )
 
     let get_tictactoexonly_rating username =
       Logs.debug (fun m -> m "Getting rating for user %s" username);
       request_result_to_rating (
-          PGSQL(dbh)
-            "
-             SELECT rating, rd, sigma
-             FROM ratings.tictactoexonly
-             WHERE username=$username
-             "
+          try
+            PGSQL(dbh)
+                 "
+                  SELECT rating, rd, sigma
+                  FROM ratings.tictactoexonly
+                  WHERE username=$username
+                  "
+          with
+            e -> Logs.err (fun m ->
+                 m "Exception while getting tttxo rating from postgres.\n %s"
+                   (Printexc.to_string e)
+               ); []
+
         )
 
     let get_3menmorris_rating username =
       Logs.debug (fun m -> m "Getting rating for user %s" username);
       request_result_to_rating (
-          PGSQL(dbh)
-            "
-             SELECT rating, rd, sigma
-             FROM ratings.three_men_morris
-             WHERE username=$username
-             "
+          try
+            PGSQL(dbh)
+                 "
+                  SELECT rating, rd, sigma
+                  FROM ratings.three_men_morris
+                  WHERE username=$username
+                  "
+          with
+            e -> Logs.err (fun m ->
+                     m "%s %s\n %s"
+                       "Exception while getting "
+                       "three mm rating from postgres."
+                       (Printexc.to_string e)
+                   ); []
         )
-
 
     let get_rating = function
       | `TicTacToeClassical -> get_tictactoeclassical_rating
@@ -120,30 +164,44 @@ module Make(Config : CONFIG) =
 
 
     let upsert_ttt_classical username rating rating_deviation sigma =
-      ignore (PGSQL(dbh)
-                "
-                 INSERT INTO ratings.tictactoeclassical
-                 VALUES ($username, $rating, $rating_deviation, $sigma)
-                 ON CONFLICT (username) DO UPDATE
-                 SET rating = $rating,
-                 rd = $rating_deviation,
-                 sigma = $sigma
-                 "
-        );
-      true
+      try
+        ignore (PGSQL(dbh)
+                     "
+                      INSERT INTO ratings.tictactoeclassical
+                      VALUES ($username, $rating, $rating_deviation, $sigma)
+                      ON CONFLICT (username) DO UPDATE
+                      SET rating = $rating,
+                      rd = $rating_deviation,
+                      sigma = $sigma
+                      "
+               );
+        true
+      with
+        e -> Logs.err (fun m ->
+                 m "Exception while updating tttc rating from postgres.\n %s"
+                   (Printexc.to_string e)
+               ); false
+
 
     let upsert_ttt_xonly username rating rating_deviation sigma =
-      ignore (PGSQL(dbh)
-                "
-                 INSERT INTO ratings.tictactoexonly
-                 VALUES ($username, $rating, $rating_deviation, $sigma)
-                 ON CONFLICT (username) DO UPDATE
-                 SET rating = $rating,
-                 rd = $rating_deviation,
-                 sigma = $sigma
-                 "
-        );
-      true
+      try
+        ignore (PGSQL(dbh)
+                     "
+                      INSERT INTO ratings.tictactoexonly
+                      VALUES ($username, $rating, $rating_deviation, $sigma)
+                      ON CONFLICT (username) DO UPDATE
+                      SET rating = $rating,
+                      rd = $rating_deviation,
+                      sigma = $sigma
+                      "
+               );
+        true
+      with
+        e -> Logs.err (fun m ->
+                 m "Exception while updating tttxo rating from postgres.\n %s"
+                   (Printexc.to_string e)
+               ); false
+
 
     let upsert_3_men_morris username rating rating_deviation sigma =
       try
