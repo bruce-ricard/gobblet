@@ -33,7 +33,7 @@ Library "ttt.lib.game"
 Library "ttt.lib.server"
   Path: lib/server_lib
   BuildDepends: lwt.syntax, ttt.lib.game, ttt.lib.user, ttt.lib.common, ttt.daos, lwt.react, lwt.ppx, logs, core, threads, glicko2
-  InternalModules: Reporter, Ratings
+  InternalModules: Reporter, Ratings, Rating_updater
   Modules: Ttt_server_lib_games, Ttt_server_lib_types, Ttt_server_lib_challenge, Ttt_server_lib_game_api, Ttt_server_lib_game_list, Internal_types, Ttt_server_lib_game_store, Ttt_server_lib_challenge_store
 
 Library "ttt.config-file"

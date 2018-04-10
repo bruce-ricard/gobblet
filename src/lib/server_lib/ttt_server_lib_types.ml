@@ -83,6 +83,13 @@ module type ARCHIVE =
     val archive_game : id -> unit
   end
 
+module type RATING_UPDATER =
+  sig
+    open Ttt_game_lib_types
+    open Ttt_common_lib_types
+    val update_ratings_from_result: report_result -> id -> unit
+  end
+
 type challenge_result =
   | Challenge_created of id * (unit React.event)
   | Challenge_accepted of id

@@ -42,24 +42,32 @@ module Make
          (Archive : Ttt_server_lib_types.ARCHIVE)
        : GAME_LIST =
   struct
-    module TTTClassicaRatings =
-      Ratings.Make(Dao)
-        (struct let game () = `TicTacToeClassical end)
+    module TttcRatingUpdater =
+      Rating_updater.Make(
+          Ratings.Make
+            (Dao)
+            (struct let game () = `TicTacToeClassical end)
+        )
+    module TttXoRatingUpdater =
+      Rating_updater.Make(
+          Ratings.Make
+            (MockDao)
+            (struct let game () = `TicTacToeXOnly end)
+        )
 
-    module TTTXoRatings =
-      Ratings.Make(MockDao)
-        (struct let game () = `TicTacToeXOnly end)
-
-    module ThreeMenMorrisRatings =
-      Ratings.Make(MockDao)
-        (struct let game () = `ThreeMenMorris end)
+    module ThreeMenMorrisRatingUpdater =
+      Rating_updater.Make(
+          Ratings.Make
+            (MockDao)
+            (struct let game () = `ThreeMenMorris end)
+        )
 
     module TTTCReporter =
-      Reporter.Make(TTTClassicaRatings)(Archive)
+      Reporter.Make(TttcRatingUpdater)(Archive)
     module TTTXoReporter =
-      Reporter.Make(TTTXoRatings)(Archive)
+      Reporter.Make(TttXoRatingUpdater)(Archive)
     module ThreeMenMorrisReporter =
-      Reporter.Make(ThreeMenMorrisRatings)(Archive)
+      Reporter.Make(ThreeMenMorrisRatingUpdater)(Archive)
 
     module TTTCI =
       Ttt_game_lib_games.TicTacToeClassical(TTTCReporter)
