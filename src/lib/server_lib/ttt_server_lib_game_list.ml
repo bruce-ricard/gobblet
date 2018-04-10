@@ -58,7 +58,7 @@ module Make
     module ThreeMenMorrisRatingUpdater =
       Rating_updater.Make(
           Ratings.Make
-            (MockDao)
+            (Dao)
             (struct let game () = `ThreeMenMorris end)
         )
 

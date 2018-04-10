@@ -102,9 +102,16 @@ module Make(Config : CONFIG) =
         )
 
     let get_3menmorris_rating username =
-      Logs.err (fun m -> m "Not getting 3 men morris rating, not implemented yet");
-      (*Some(data_to_rating (100.,1.,0.01))*)
-      None
+      Logs.debug (fun m -> m "Getting rating for user %s" username);
+      request_result_to_rating (
+          PGSQL(dbh)
+            "
+             SELECT rating, rd, sigma
+             FROM ratings.three_men_morris
+             WHERE username=$username
+             "
+        )
+
 
     let get_rating = function
       | `TicTacToeClassical -> get_tictactoeclassical_rating
@@ -139,8 +146,23 @@ module Make(Config : CONFIG) =
       true
 
     let upsert_3_men_morris username rating rating_deviation sigma =
-      Logs.err (fun m -> m "Not setting 3 men morris rating, not implemented yet");
-      true
+      try
+        ignore (PGSQL(dbh)
+                  "
+                   INSERT INTO ratings.three_men_morris
+                   VALUES ($username, $rating, $rating_deviation, $sigma)
+                   ON CONFLICT (username) DO UPDATE
+                   SET rating = $rating,
+                   rd = $rating_deviation,
+                   sigma = $sigma
+                   "
+          );
+        true
+      with
+        e -> Logs.err (fun m ->
+                 m "Exception while inserting in postgres.\n %s"
+                   (Printexc.to_string e)
+               ); false
 
     let set_rating
           game
