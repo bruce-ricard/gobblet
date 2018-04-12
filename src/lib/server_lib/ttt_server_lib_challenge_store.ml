@@ -3,10 +3,9 @@ type challenge = Ttt_server_lib_challenge.t
 type t = {
     event_listener: unit React.event;
     trigger_event: unit -> unit;
-    mutex: Lwt_mutex.t
+    mutex: Lwt_mutex.t;
+    mutable challenges: challenge list;
   }
-
-let challenges : challenge list ref = ref []
 
 let list_to_string elt_to_string l =
   let rec aux = function
@@ -20,27 +19,35 @@ let list_to_string elt_to_string l =
      | _ -> aux l)
     ^ " ]"
 
-let challenges_to_string () =
+let challenges_to_string challenges =
   list_to_string (fun i -> string_of_int (i#get_id))
-  @@ List.map Ttt_server_lib_challenge.id !challenges
+  @@ List.map Ttt_server_lib_challenge.id challenges
 
-let log_debug_challenges () =
-  Logs.debug (fun m -> m "challenges: %s" (challenges_to_string ()))
+let log_debug_challenges challenges =
+  Logs.debug (fun m ->
+      m "challenges: %s"
+        (challenges_to_string challenges)
+    )
 
 let load () =
   let event_listener, trigger_event = React.E.create ()
-  and mutex = Lwt_mutex.create () in
-  { event_listener; trigger_event; mutex}
+  in
+  {
+    event_listener;
+    trigger_event;
+    mutex = Lwt_mutex.create ();
+    challenges = [];
+  }
 
 let event_listener t = t.event_listener
 
 let create db challenger ?opponent game_name id =
   let challenge =
     Ttt_server_lib_challenge.create ?game_name challenger ?opponent id in
-  log_debug_challenges ();
-  challenges :=
-    !challenges @ [challenge];
-  log_debug_challenges ();
+  log_debug_challenges db.challenges;
+  db.challenges <-
+    db.challenges @ [challenge];
+  log_debug_challenges db.challenges;
   (*db.trigger_event ();*)
   challenge
 
@@ -54,7 +61,7 @@ let public_challenges_for_user db user =
   in
 
   let publics = List.filter filter_function
-                            !challenges
+                            db.challenges
   in
   publics
 
@@ -65,10 +72,9 @@ let private_challenges_for_user db user =
     | _ -> false
   in
   let privates = List.filter filter_function
-                             !challenges
+                             db.challenges
   in
   privates
-
 
 let rec remove_id id =
   let open Ttt_server_lib_types in
@@ -84,15 +90,14 @@ let rec remove_id id =
 
 let remove db id =
   (* TODO: there will be race conditions here, fix *)
-  log_debug_challenges ();
+  log_debug_challenges db.challenges;
   let open Ttt_server_lib_types in
-  let list,result = remove_id id !challenges in
+  let list,result = remove_id id db.challenges in
   match result with
   | Deleted(user) as d ->
      begin
-       challenges := list;
-       log_debug_challenges ();
-       (*db.trigger_event ();*)
+       db.challenges <- list;
+       log_debug_challenges db.challenges;
        d
      end
   |  Id_not_present -> Id_not_present
