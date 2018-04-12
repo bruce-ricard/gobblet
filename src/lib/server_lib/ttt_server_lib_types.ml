@@ -32,6 +32,7 @@ module type CHALLENGES =
     val public_challenges_for_user : t -> string -> challenge list
     val private_challenges_for_user : t -> string -> challenge list
     val remove : t -> id -> remove_challenge
+    val purge_user_challenges : t -> string -> unit
     val lock : t -> < unlock : unit > Lwt.t
     val event_listener : t -> unit React.event
     val send_updates : t -> unit

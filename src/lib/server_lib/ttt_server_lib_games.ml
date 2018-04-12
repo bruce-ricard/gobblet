@@ -137,10 +137,16 @@ module Make
            Logs.debug (fun m ->
                m "successfully deleted challenge %d" id#get_id);
            if new_game game_name id challenger user then
-             (Challenge.accept challenge;
-              Logs.debug
-                (fun m -> m "successfully created game %d" id#get_id);
-              true)
+             begin
+               Challenge.accept challenge;
+               Challenges.purge_user_challenges challenge_db challenger;
+               Challenges.purge_user_challenges challenge_db user;
+               Logs.debug
+                 (fun m ->
+                   m "successfully created game %d" id#get_id
+                 );
+               true
+             end
            else
              begin
                Logs.err (fun m -> m "Error creating new game");

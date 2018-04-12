@@ -102,6 +102,25 @@ let remove db id =
      end
   |  Id_not_present -> Id_not_present
 
+let purge_user_challenges db user =
+  let open Ttt_server_lib_challenge in
+  let rec aux = function
+    | [] -> []
+    | c :: cs ->
+       if challenger c = user then
+         begin
+           Logs.debug (fun m ->
+               m "Deleted challenge %d for user %s"
+                 (id c)#get_id
+                 user
+             );
+           aux cs
+         end
+       else
+         c :: aux cs
+  in
+  db.challenges <- aux db.challenges
+
 let lock db : <unlock : unit > Lwt.t =
   let open Lwt in
   Lwt_mutex.lock db.mutex >>=
