@@ -26,11 +26,11 @@ a.out
 # oasis generated files
 setup.data
 setup.log
-lib/META
-lib/_tags
-lib/myocamlbuild.ml
-lib/*.mldylib
-lib/*.mllib
+META
+_tags
+myocamlbuild.ml
+*.mldylib
+*.mllib
 
 # config files
 

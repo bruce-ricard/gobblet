@@ -27,7 +27,7 @@ Library "ttt.lib.user"
 Library "ttt.lib.game"
   Path: lib/game_lib
   BuildDepends: logs, ttt.lib.common
-  InternalModules: Game_in_progress, Game_internal, Tictactoe_board
+  InternalModules: Game_in_progress, Game_internal, Tictactoe_board, Boards
   Modules: Ttt_game_lib_types, Ttt_game_lib_pieces, Ttt_game_lib_games
 
 Library "ttt.lib.server"
@@ -42,8 +42,22 @@ Library "ttt.config-file"
   BuildDepends: config-file
   Modules:    Config_reader
 
-Executable create_config
+Executable "create_config"
   Path: config_file
   BuildTools: ocamlbuild
   BuildDepends: ttt.config-file
   MainIs:     create_config.ml
+
+Executable "game_lib_tests"
+  Path: lib/game_lib
+  MainIs: test.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: ttt.lib.game, oUnit
+
+Test "game_lib_tests"
+  Run$: flag(tests)
+  TestTools: game_lib_tests
+  Command: $game_lib_tests
+  WorkingDirectory: lib/game_lib
