@@ -45,14 +45,18 @@ module XX(Archive : Ttt_server_lib_types.ARCHIVE) =
 module GamesByIdAndUser =
   Ttt_server_lib_game_store.GamesByIdAndUser
 
+module Challenges =
+  Ttt_server_lib_challenge_api.Make
+    (Ttt_server_lib_challengeCriticalSection.Make(List_challenge_store))
+    (IdGenerator)
+
 module rec Games :
              sig
                include Ttt_server_lib_types.GAMES
                include Ttt_server_lib_types.ARCHIVE
              end =
   Ttt_server_lib_games.Make
-    (Ttt_server_lib_challenge_store)
-    (IdGenerator)
+    (Challenges)
     (MockGameArchiveDB)
     (GamesByIdAndUser)
     (GameList.TicTacToeClassical)

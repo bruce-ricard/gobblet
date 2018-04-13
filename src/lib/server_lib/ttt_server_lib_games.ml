@@ -18,8 +18,7 @@ module type GAMES_AND_ARCHIVING =
   end
 
 module Make
-         (Challenges : Ttt_server_lib_types.CHALLENGES)
-         (Id_generator : Ttt_server_lib_types.GAME_ID_GENERATOR)
+         (Challenges : Ttt_server_lib_types.CHALLENGE_API)
          (Game_archive_db : Ttt_server_lib_types.GAME_ARCHIVE_DB)
          (Game_DB : Ttt_server_lib_types.GAME_DB)
          (Tttc : GAME with type game = GameTypes.tttc)
@@ -30,39 +29,16 @@ module Make
   =
   struct
     module Games = Ttt_server_lib_game_list
-    module Challenge = Ttt_server_lib_challenge
 
     let challenge_db = Challenges.load ()
 
     let () = Random.self_init ()
-    let () = Challenges.send_updates challenge_db
 
     let users_to_player_function user1 user2 = function
         P1 -> user1
       | P2 -> user2
 
     let get_current_games = Game_DB.get_games_for_user
-
-    let challenge_event = Challenges.event_listener challenge_db
-
-    let challenge_to_frontend challenge =
-      {
-        id = (Challenge.id challenge)#get_id;
-        challenger = Challenge.challenger challenge;
-        game_type = Challenge.game_name challenge;
-      }
-
-    let get_public_challenges user =
-      let get_challenges () =
-        List.map challenge_to_frontend @@
-          Challenges.public_challenges_for_user challenge_db user in
-      React.E.map get_challenges challenge_event
-
-    let get_private_challenges user =
-      let get_challenges () =
-        List.map challenge_to_frontend @@
-          Challenges.private_challenges_for_user challenge_db user in
-      React.E.map get_challenges challenge_event
 
     let get_game =
       Game_DB.get_game
@@ -101,130 +77,90 @@ module Make
       if user1 = user2 then
         false
       else
-        let user1,user2 =
-          if random_side then
-            if Random.int 2 == 0 then
-              (Logs.debug (fun m -> m "Users randomly NOT swapped");
-               user1,user2)
-            else
-              (Logs.debug (fun m -> m "Users randomly swapped");
-              user2,user1)
-          else
-            (Logs.debug (fun m -> m "Users kept in order");
-             user1, user2)
-        in
-        let players = users_to_player_function user1 user2 in
-        let game = new_game_creator game_name players id in
-        Game_DB.put_game id user1 user2 game;
-        true
-
-    let final_game_name challenge game_name =
-      match (Challenge.game_name challenge), game_name with
-        None, None -> None
-      | None, Some(g) | Some(g), None-> Some(g)
-      | Some(g), Some(_) ->
-         begin
-           Logs.err (fun m -> m "Incompatible games in final_game_name");
-           Some(g)
-         end
-
-    let accept_challenge_internal ?game_name id user =
-      match Challenges.remove challenge_db id with
-      | Ttt_server_lib_types.Deleted(challenge) ->
-         begin
-           let challenger = Challenge.challenger challenge in
-           let game_name = final_game_name challenge game_name in
-           Logs.debug (fun m ->
-               m "successfully deleted challenge %d" id#get_id);
-           if new_game game_name id challenger user then
-             begin
-               Challenge.accept challenge;
-               Challenges.purge_user_challenges challenge_db challenger;
-               Challenges.purge_user_challenges challenge_db user;
-               Logs.debug
-                 (fun m ->
-                   m "successfully created game %d" id#get_id
-                 );
-               true
-             end
-           else
-             begin
-               Logs.err (fun m -> m "Error creating new game");
-               false
-             end
-         end
-      | Ttt_server_lib_types.Id_not_present ->
-              Logs.debug
-                (fun m -> m "challenge with id %d not present" id#get_id);
-              false
-
-    let accept_challenge = accept_challenge_internal ?game_name:None
-
-    let challenge_matches challenge game_name =
-      match Challenge.game_name challenge, game_name with
-      | Some g1, Some g2 -> g1 = g2
-      | _ -> true
-
-    let attempt_accept_challenge user game_name =
-      let rec aux () =
-        match Challenges.public_challenges_for_user challenge_db user with
-          [] -> None
-        | challenge :: _ ->
-           let challenger = Challenge.challenger challenge
-           and id = Challenge.id challenge in
-           if challenger = user then
-             (Logs.err (fun m ->
-                  m "%s %s %s"
-                    "Attempting to accept a challenge from the same player."
-                    "challenge_db.public_challenges_for_user shouldn't"
-                    "return challenges from that user");
-              None)
-           else if challenge_matches challenge game_name
-                   && accept_challenge_internal id user then
-             Some id
-           else
-             aux ()
-      in
-      aux ()
-
-    let create_challenge ?opponent:opponent user2 game_name =
-      let id = Id_generator.next () in
-      Challenges.create challenge_db ?opponent user2 game_name id
-
-    let new_challenge ?opponent:opponent challenger game_name =
-      if User_DB.exists challenger then
-        match opponent with
-        | None ->
-           begin
-             match attempt_accept_challenge challenger game_name with
-             | Some id -> Ttt_server_lib_types.Challenge_accepted id
-             | None ->
-                let challenge = create_challenge challenger game_name in
-                Ttt_server_lib_types.Challenge_created(
-                    Challenge.id challenge, Challenge.event challenge
-                  )
-           end
-        | Some opponent ->
-           if opponent = challenger then
-             Ttt_server_lib_types.Error("You can't challenge yourself!")
-           else
-             if User_DB.exists opponent then
-               let challenge = create_challenge ~opponent challenger game_name
-               in
-               Ttt_server_lib_types.Challenge_created(
-                   Challenge.id challenge, Challenge.event challenge
-                 )
-             else
-               Ttt_server_lib_types.Error(
-                   Printf.sprintf "\"%s\" is not a valid player." opponent
-                 )
-      else
         begin
-          Logs.err (fun m ->
-              m "Impossible case, the current player has to exist");
-          Ttt_server_lib_types.Error(
-              Printf.sprintf "\"%s\" is not a valid player." challenger)
+          Logs.debug (fun m -> m "Creating new game");
+          let user1,user2 =
+            if random_side then
+              if Random.int 2 == 0 then
+                user1,user2
+              else
+                user2,user1
+            else
+              user1, user2
+          in
+          let players = users_to_player_function user1 user2 in
+          let game = new_game_creator game_name players id in
+          Game_DB.put_game id user1 user2 game;
+          true
         end
+
+    let new_challenge ?opponent user game_name =
+      Logs.debug (fun m -> m "games new challenge");
+      let report_error user =
+        Logs.err (fun m ->
+            m "%s %s %s"
+              "Attempting to create challenge with user "
+              "who doesn't exist: "
+              user
+          );
+        Lwt.return (Ttt_server_lib_types.Error(
+            "This challenge contains illegal users"))
+      in
+      let unknown_opponent =
+        match opponent with
+        | Some o -> if User_DB.exists o then None else Some o
+        | None -> None
+      in
+
+      if User_DB.exists user then
+        match unknown_opponent with
+        | None ->
+           let open Lwt in
+           Challenges.new_challenge
+             challenge_db
+             user
+             ?opponent
+             game_name >|=
+             let open Ttt_server_lib_types in
+             (function
+              | Challenge_accepted accepted ->
+                 (new_game
+                    accepted.game_name
+                    accepted.id
+                    accepted.challenger
+                    accepted.chalengee;
+                  Challenge_accepted accepted)
+              | x -> x)
+
+        | Some unknown ->
+           report_error unknown
+      else
+        report_error user
+
+    let accept_challenge id user =
+      let open Ttt_server_lib_types in
+      let open Lwt in
+      Logs.debug (fun m -> m "games accept challenge");
+      Challenges.accept challenge_db id user >|=
+        function
+      | Accept accepted ->
+         Logs.debug
+           (fun m ->
+             m "successfully created game %d" id#get_id
+           );
+
+         new_game
+           accepted.game_name
+           accepted.id
+           accepted.challenger
+           accepted.chalengee
+      | Declined -> false
+
+    let get_public_challenges =
+      Challenges.public_challenges_for_user challenge_db
+
+    let get_private_challenges =
+      Challenges.private_challenges_for_user challenge_db
 
     let game_api_to_game_db : GameTypes.named_game -> 'a =
       let open Ttt_server_lib_game_list in
@@ -254,22 +190,22 @@ module Make
           Lwt.bind
             (Lwt_unix.sleep 5.)
             (fun () ->
-              let id = Id_generator.next() in
+              let id = new id 1000 in
               ignore (new_game
                  ~random_side:false
                  (Some `TicTacToeClassical)
                  id "bruce" "bruce2");
-              let id = Id_generator.next() in
+              let id = new id 1001 in
               ignore (new_game
                  ~random_side:false
                  (Some `TicTacToeClassical)
                  id "bruce" "bruce2");
-              let id = Id_generator.next() in
+              let id = new id 1002 in
               ignore (new_game
                         ~random_side:false
                         (Some `TicTacToeClassical)
                         id "bruce" "bruce2");
-              let id = Id_generator.next() in
+              let id = new id 1003 in
               ignore (new_game
                         ~random_side:false
                         (Some `ThreeMenMorris)

@@ -1,16 +1,12 @@
 open Ttt_common_lib_types
 open Ttt_game_lib_types
 
+include Base_types
+
 module type GAME_ID_GENERATOR =
   sig
     val next : unit -> id
   end
-
-type challenge = Ttt_server_lib_challenge.t
-
-type remove_challenge =
-  | Id_not_present
-  | Deleted of challenge
 
 module FrontendBackendGame =
   struct
@@ -23,19 +19,34 @@ module FrontendBackendGame =
 
 open FrontendBackendGame
 
-module type CHALLENGES =
+type challenge_accepted =
+  {
+    id: id;
+    game_name: game_name option;
+    challenger: string;
+    chalengee: string;
+  }
+
+type attempt_accepting_challenge =
+  | Accept of challenge_accepted
+  | Declined
+
+type create_challenge_result =
+  | Challenge_created of id * (unit React.event)
+  | Challenge_accepted of challenge_accepted
+  | Error of string
+
+module type CHALLENGE_API =
   sig
     type t
     val load : unit -> t
-    val create : t -> string -> ?opponent:string -> game_name option -> id
-                 -> challenge
-    val public_challenges_for_user : t -> string -> challenge list
-    val private_challenges_for_user : t -> string -> challenge list
-    val remove : t -> id -> remove_challenge
-    val purge_user_challenges : t -> string -> unit
-    val lock : t -> < unlock : unit > Lwt.t
-    val event_listener : t -> unit React.event
-    val send_updates : t -> unit
+    val new_challenge : t -> string -> ?opponent:string -> game_name option
+                 -> create_challenge_result Lwt.t
+    val accept : t -> id -> string -> attempt_accepting_challenge Lwt.t
+    val public_challenges_for_user :
+      t -> string -> frontend_challenge list React.event
+    val private_challenges_for_user :
+      t -> string -> frontend_challenge list React.event
   end
 
 module type GAME =
@@ -91,16 +102,11 @@ module type RATING_UPDATER =
     val update_ratings_from_result: report_result -> id -> unit
   end
 
-type challenge_result =
-  | Challenge_created of id * (unit React.event)
-  | Challenge_accepted of id
-  | Error of string
-
 module type GAMES =
   sig
     val new_challenge : ?opponent:string -> string -> game_name option
-                        -> challenge_result
-    val accept_challenge : id -> string -> bool
+                        -> create_challenge_result Lwt.t
+    val accept_challenge : id -> string -> bool Lwt.t
 
     val get_current_games : string -> (id * string) list
     val get_private_challenges : string -> frontend_challenge list React.event

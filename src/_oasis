@@ -33,8 +33,8 @@ Library "ttt.lib.game"
 Library "ttt.lib.server"
   Path: lib/server_lib
   BuildDepends: lwt.syntax, ttt.lib.game, ttt.lib.user, ttt.lib.common, ttt.daos, lwt.react, lwt.ppx, logs, core, threads, glicko2
-  InternalModules: Reporter, Ratings, Rating_updater
-  Modules: Ttt_server_lib_games, Ttt_server_lib_types, Ttt_server_lib_challenge, Ttt_server_lib_game_api, Ttt_server_lib_game_list, Internal_types, Ttt_server_lib_game_store, Ttt_server_lib_challenge_store
+  InternalModules: Base_types, Reporter, Ratings, Rating_updater
+  Modules: Internal_types, Ttt_server_lib_games, Ttt_server_lib_types, Ttt_server_lib_challenge, Ttt_server_lib_game_api, Ttt_server_lib_game_list, Ttt_server_lib_game_store, Ttt_server_lib_challenge_api, Ttt_server_lib_challengeCriticalSection, List_challenge_store
 
 Library "ttt.config-file"
   Path: config_file
@@ -61,3 +61,17 @@ Test "game_lib_tests"
   TestTools: game_lib_tests
   Command: $game_lib_tests
   WorkingDirectory: lib/game_lib
+
+Executable "server_lib_tests"
+  Path: lib/server_lib
+  MainIs: challenge_test.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: ttt.lib.server, oUnit
+
+Test "server_lib_tests"
+  Run$: flag(tests)
+  TestTools: server_lib_tests
+  Command: $server_lib_tests
+  WorkingDirectory: lib/server_lib

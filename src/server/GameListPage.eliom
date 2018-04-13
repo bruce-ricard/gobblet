@@ -22,14 +22,16 @@ let create_challenge game opponent =
            Games.new_challenge user ~opponent game
        in
        let open Ttt_server_lib_types in
-       match challenge with
+       challenge >>=
+         function
        | Challenge_created(id,event) ->
           Lwt.async (fun () ->
               Base.send_instant_message "Challenge created");
           Lwt.return (`ChallengeCreated
                        (id#get_id,Eliom_react.Down.of_react event)
                      )
-       | Challenge_accepted id -> Lwt.return (`ChallengeAccepted id#get_id)
+       | Challenge_accepted accepted ->
+          Lwt.return (`ChallengeAccepted accepted.id#get_id)
        | Error e -> Lwt.return (`Error e)
      end
 
@@ -38,7 +40,7 @@ let parse_game_id = function
   | 1 -> Some(`TicTacToeClassical)
   | 2 -> Some(`TicTacToeXOnly)
   | 3 -> Some(`ThreeMenMorris)
-  | n -> Logs.warn (fun m -> m "Illegal game_id %d" n); None
+  | n -> Logs.err (fun m -> m "Illegal game_id %d" n); None
 
 let create_challenge_by_id (game_id, opp) =
   let int_id =
@@ -55,13 +57,16 @@ let create_challenge_by_id (game_id, opp) =
 
 let accept_challenge id_int =
   let%lwt user = Eliom_reference.get current_user in
-  Lwt.return (match user with
-              | None -> `NotLoggedIn
-              | Some (user, _) ->
-                 if Games.accept_challenge (new id id_int) user then
-                   `Success
-                 else
-                   `Fail)
+  match user with
+  | None -> Lwt.return `NotLoggedIn
+  | Some (user, _) ->
+     Games.accept_challenge (new id id_int) user
+     >|=
+       (fun accept ->
+         if accept then
+           `Success
+         else
+           `Fail)
 
 let%client create_challenge_rpc =
   ~%(server_function [%derive.json: string * string]
@@ -154,15 +159,18 @@ let%client accept_challenge_handler accept_button id =
           match response with
           | `NotLoggedIn ->
              begin
-               print_endline "Not logged player tried to accept challenge";
+               Logs.err (fun m ->
+                   m "Not logged player tried to accept challenge");
                Eliom_lib.alert "Log in to play!";
                Lwt.return ()
              end
           | `Fail ->
-             print_endline "failed to accept challenge, too late";
+             Logs.debug (fun m ->
+                 m "failed to accept challenge, too late");
              Lwt.return ()
           | `Success ->
-             print_endline "challenge accepted, forwarding to game page";
+             Logs.debug (fun m ->
+                 m "challenge accepted, forwarding to game page");
              Eliom_client.change_page
                ~%Services.game_dispatch_service
                id

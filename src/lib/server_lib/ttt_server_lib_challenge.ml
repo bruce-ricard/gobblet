@@ -24,7 +24,12 @@ let id challenge =
   challenge.id
 
 let accept challenge =
-  challenge.update_function ()
+  Logs.debug (fun m ->
+      m "Sending challenge %d accept event"
+        challenge.id#get_id);
+  challenge.update_function ();
+  Logs.debug (fun m ->
+      m "event sent")
 
 let event challenge =
   challenge.event
