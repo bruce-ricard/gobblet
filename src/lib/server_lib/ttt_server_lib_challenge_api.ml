@@ -139,13 +139,10 @@ module Make
     let attempt_find_matching_challenge challenges user game_name =
       Logs.debug (fun m ->
           m "challenge api attempt find matching challenge");
-      let rec aux () =
-        match ChallengesCriticalSection.public_challenges_for_user
-                challenges.challenges
-                user
-        with
+
+      let rec aux = function
         | [] -> Lwt.return Declined
-        | challenge :: _ ->
+        | challenge :: challenge_tail ->
            let challenger = Challenge.challenger challenge
            and id = Challenge.id challenge in
            if challenger = user then
@@ -163,15 +160,18 @@ module Make
                  function
              | Declined ->
                 Logs.debug (fun m -> m "couldn't combine, too late");
-                aux ()
+                aux challenge_tail
              | accept ->
                 Logs.debug (fun m -> m "challenges combined");
                 Lwt.return accept
              end
            else
-             aux () (*TODO this is where the mutual public challenges explode*)
+             aux challenge_tail
       in
-      aux ()
+      aux (ChallengesCriticalSection.public_challenges_for_user
+                challenges.challenges
+                user)
+
 
     let create_challenge challenges ?opponent:opponent user2 game_name =
       let id = Id_generator.next () in
