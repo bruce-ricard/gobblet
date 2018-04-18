@@ -97,17 +97,23 @@ module Make
              let game_name = final_game_name challenge game_name in
              Logs.debug (fun m ->
                  m "successfully deleted challenge %d" id#get_id);
-             ChallengesCriticalSection.purge_user_challenges
-                   challenges.challenges
-                   challenger
-             >>=
-               (fun () ->
-                 ChallengesCriticalSection.purge_user_challenges
-                   challenges.challenges
-                   user
-               )
+
+             let purge_challenger =
+               ChallengesCriticalSection.purge_user_challenges
+                 challenges.challenges
+                 challenger
+             and purge_challengee =
+               ChallengesCriticalSection.purge_user_challenges
+                 challenges.challenges
+                 user
+             in
+             purge_challenger >>= (fun () -> purge_challengee)
              >|=
                (fun () ->
+                 (* We shouldn't accept the challenge before the
+                  game has been created. Maybe add a game creation module
+                  as a parameter to this module, and call that function
+                  before accepting the challenge *)
                  Challenge.accept challenge
                )
              >|=
