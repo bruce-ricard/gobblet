@@ -51,7 +51,7 @@ Executable "create_config"
 
 Executable "game_lib_tests"
   Path: lib/game_lib
-  MainIs: test.ml
+  MainIs: game_lib_test.ml
   Build$: flag(tests)
   CompiledObject: best
   Install: false
