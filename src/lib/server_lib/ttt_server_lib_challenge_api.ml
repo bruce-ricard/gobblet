@@ -107,7 +107,7 @@ module Make
                  challenges.challenges
                  user
              in
-             purge_challenger >>= (fun () -> purge_challengee)
+             (purge_challenger <&> purge_challengee)
              >|=
                (fun () ->
                  (* We shouldn't accept the challenge before the
@@ -118,7 +118,7 @@ module Make
                )
              >|=
                (fun () ->
-                 Internal_types.Accept {
+                 Internal_types.Accept Internal_types.{
                      game_name;
                      id;
                      challenger;
