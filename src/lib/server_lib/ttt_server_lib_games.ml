@@ -1,7 +1,6 @@
 open Ttt_game_lib_types
 open Ttt_common_lib_types
-
-open Ttt_server_lib_types.FrontendBackendGame
+open Internal_types
 
 module GameTypes = Ttt_server_lib_types.GameTypes
 
@@ -14,13 +13,13 @@ module type GAME =
 module type GAMES_AND_ARCHIVING =
   sig
     include Ttt_server_lib_types.GAMES
-    include Ttt_server_lib_types.ARCHIVE
+    include Internal_types.ARCHIVE
   end
 
 module Make
-         (Challenges : Ttt_server_lib_types.CHALLENGE_API)
-         (Game_archive_db : Ttt_server_lib_types.GAME_ARCHIVE_DB)
-         (Game_DB : Ttt_server_lib_types.GAME_DB)
+         (Challenges : Internal_types.CHALLENGE_API)
+         (Game_archive_db : Internal_types.GAME_ARCHIVE_DB)
+         (Game_DB : Internal_types.GAME_DB)
          (Tttc : GAME with type game = GameTypes.tttc)
          (Tttxo : GAME with type game = GameTypes.tttxo)
          (ThreeMenMorris : GAME with type game = GameTypes.three_men_morris)
@@ -120,17 +119,20 @@ module Make
              challenge_db
              user
              ?opponent
-             game_name >|=
+             game_name >>=
              let open Ttt_server_lib_types in
              (function
               | Challenge_accepted accepted ->
-                 (new_game
+                 if (new_game
                     accepted.game_name
                     accepted.id
                     accepted.challenger
-                    accepted.chalengee;
-                  Challenge_accepted accepted)
-              | x -> x)
+                    accepted.chalengee) then
+                   Lwt.return (Challenge_accepted accepted.id)
+                 else
+                   report_error "failed to create game"
+              | Challenge_created(x,y) -> Lwt.return (Challenge_created(x,y))
+              | Error e -> Lwt.return (Error e))
 
         | Some unknown ->
            report_error unknown

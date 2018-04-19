@@ -1,6 +1,8 @@
+open Internal_types
+
 module Make
-         (RatingUpdater : Ttt_server_lib_types.RATING_UPDATER)
-         (Archive : Ttt_server_lib_types.ARCHIVE)
+         (RatingUpdater : RATING_UPDATER)
+         (Archive : ARCHIVE)
   =
   struct
     type t = unit

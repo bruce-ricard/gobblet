@@ -30,8 +30,8 @@ let create_challenge game opponent =
           Lwt.return (`ChallengeCreated
                        (id#get_id,Eliom_react.Down.of_react event)
                      )
-       | Challenge_accepted accepted ->
-          Lwt.return (`ChallengeAccepted accepted.id#get_id)
+       | Challenge_accepted id ->
+          Lwt.return (`ChallengeAccepted id#get_id)
        | Error e -> Lwt.return (`Error e)
      end
 

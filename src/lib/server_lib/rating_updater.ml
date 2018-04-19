@@ -1,5 +1,6 @@
 open Ttt_game_lib_types
 open Ttt_common_lib_types
+open Internal_types
 
 type user = string
 
@@ -10,7 +11,7 @@ module type RATINGS =
   end
 
 module Make (Ratings : RATINGS)
-       : Ttt_server_lib_types.RATING_UPDATER =
+       : RATING_UPDATER =
   struct
     let to_glicko_player =
       let open Ttt_game_lib_types in

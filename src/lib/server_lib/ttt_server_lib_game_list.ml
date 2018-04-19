@@ -39,7 +39,7 @@ module type GAME_LIST =
 
 module Make
          (Dao : DAO)
-         (Archive : Ttt_server_lib_types.ARCHIVE)
+         (Archive : Internal_types.ARCHIVE)
        : GAME_LIST =
   struct
     module TttcRatingUpdater =

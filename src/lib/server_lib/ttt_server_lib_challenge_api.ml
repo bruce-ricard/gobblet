@@ -5,7 +5,7 @@ module Challenge = Ttt_server_lib_challenge
 module Make
          (ChallengesCriticalSection : Internal_types.CHALLENGE_CRITICAL_SECTION)
          (Id_generator : Ttt_server_lib_types.GAME_ID_GENERATOR)
-         : CHALLENGE_API
+       : Internal_types.CHALLENGE_API
   =
   struct
 
@@ -118,7 +118,7 @@ module Make
                )
              >|=
                (fun () ->
-                 Accept {
+                 Internal_types.Accept {
                      game_name;
                      id;
                      challenger;
@@ -131,7 +131,7 @@ module Make
              Logs.debug
                (fun m ->
                  m "challenge with id %d not present" id#get_id);
-             Lwt.return Declined
+             Lwt.return Internal_types.Declined
            end
 
     let accept challenges id user =
@@ -147,7 +147,7 @@ module Make
           m "challenge api attempt find matching challenge");
 
       let rec aux = function
-        | [] -> Lwt.return Declined
+        | [] -> Lwt.return Internal_types.Declined
         | challenge :: challenge_tail ->
            let challenger = Challenge.challenger challenge
            and id = Challenge.id challenge in
@@ -157,14 +157,14 @@ module Make
                     "Attempting to accept a challenge from the same player."
                     "challenge_db.public_challenges_for_user shouldn't"
                     "return challenges from that user");
-              Lwt.return Declined)
+              Lwt.return Internal_types.Declined)
            else if challenge_matches challenge game_name then
              begin
                Logs.debug (fun m -> m "Found matching challenge");
                let open Lwt in
                accept' challenges ?game_name id user >>=
                  function
-             | Declined ->
+             | Internal_types.Declined ->
                 Logs.debug (fun m -> m "couldn't combine, too late");
                 aux challenge_tail
              | accept ->
@@ -197,8 +197,9 @@ module Make
              game_name
            >|=
              function
-             | Accept a -> Challenge_accepted a
-             | Declined ->
+             | Internal_types.Accept a ->
+                Challenge_accepted a
+             | Internal_types.Declined ->
                 let challenge =
                   create_challenge
                     challenges

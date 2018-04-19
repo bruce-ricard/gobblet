@@ -1,7 +1,7 @@
 open Ttt_game_lib_types
 open Ttt_common_lib_types
 
-open Ttt_server_lib_types.FrontendBackendGame
+open Internal_types
 
 module Make (Game : GAME_IN_PROGRESS) =
   struct
