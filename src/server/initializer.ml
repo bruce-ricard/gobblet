@@ -10,7 +10,7 @@ let reporter ppf =
 
 let init_logs () =
   Logs.set_reporter (reporter (Format.std_formatter));
-  Logs.set_level (Some Logs.Debug);
+  Logs.set_level (Some (Parsed_config.ServerConfig.log_level));
   Logs.info (fun m -> m "logs initialized")
 
 let init () =
