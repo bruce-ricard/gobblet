@@ -31,12 +31,23 @@ module Make
       | Some _ -> true
       | None -> false
 
+    let square_is_in_board {row; column} =
+      if row >= 0 && row <= 2
+         && column >= 0 && column <= 2 then
+        true
+      else
+        begin
+          Logs.err (fun m -> m "Square is not on the board!");
+          false
+        end
+
     let square_is_free board square =
       not @@ square_is_occupied board square
 
     let valid_placement (board, semi_move) ~row ~column =
-      square_is_free board {row; column} &&
-        MoveDecider.is_place_allowed !semi_move
+      square_is_in_board {row; column}
+      && square_is_free board {row; column}
+      && MoveDecider.is_place_allowed !semi_move
 
     let squares_are_linked
           ({row = x1; column = y1} as s1)
@@ -59,7 +70,9 @@ module Make
           (board, semi_move)
           {origin; destination}
       =
-      MoveDecider.is_move_allowed !semi_move
+      square_is_in_board origin
+      && square_is_in_board destination
+      && MoveDecider.is_move_allowed !semi_move
       && (square_is_occupied board origin)
       && (square_is_free board destination)
       && (squares_are_linked origin destination)

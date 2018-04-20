@@ -55,7 +55,7 @@ Executable "game_lib_tests"
   Build$: flag(tests)
   CompiledObject: best
   Install: false
-  BuildDepends: ttt.lib.game, oUnit
+  BuildDepends: ttt.lib.game, alcotest
 
 Test "game_lib_tests"
   Run$: flag(tests)
@@ -69,7 +69,7 @@ Executable "server_lib_tests"
   Build$: flag(tests)
   CompiledObject: best
   Install: false
-  BuildDepends: ttt.lib.server, oUnit
+  BuildDepends: ttt.lib.server, alcotest, alcotest-lwt
 
 Test "server_lib_tests"
   Run$: flag(tests)
