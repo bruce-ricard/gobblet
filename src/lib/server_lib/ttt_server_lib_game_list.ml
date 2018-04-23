@@ -17,30 +17,10 @@ module MockDao =
       Logs.err (fun m -> m "Mock setting rating");
       true
   end
-
-module type GAME_LIST =
-  sig
-    open Ttt_server_lib_types.GameTypes
-    module TicTacToeClassical
-           : Ttt_server_lib_types.GAME_API
-           with type game = tttc
-           with type piece = Ttt_game_lib_pieces.XOPiece.t
-
-    module TicTacToeXOnly
-           : Ttt_server_lib_types.GAME_API
-           with type game = tttxo
-           with type piece = Ttt_game_lib_pieces.XPiece.t
-
-    module ThreeMenMorris
-           : Ttt_server_lib_types.GAME_API
-           with type game = three_men_morris
-           with type piece = Ttt_game_lib_pieces.XOPiece.t
-  end
-
 module Make
          (Dao : DAO)
          (Archive : Internal_types.ARCHIVE)
-       : GAME_LIST =
+       : Ttt_server_lib_types.GAME_LIST =
   struct
     module TttcRatingUpdater =
       Rating_updater.Make(

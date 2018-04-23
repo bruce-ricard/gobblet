@@ -45,3 +45,22 @@ module type GAME_API =
       Ttt_game_lib_types.game_in_progress_status React.event
     val refresh_game : game -> unit
   end
+
+module type GAME_LIST =
+  sig
+    open GameTypes
+    module TicTacToeClassical
+           : GAME_API
+           with type game = tttc
+           with type piece = Ttt_game_lib_pieces.XOPiece.t
+
+    module TicTacToeXOnly
+           : GAME_API
+           with type game = tttxo
+           with type piece = Ttt_game_lib_pieces.XPiece.t
+
+    module ThreeMenMorris
+           : GAME_API
+           with type game = three_men_morris
+           with type piece = Ttt_game_lib_pieces.XOPiece.t
+  end

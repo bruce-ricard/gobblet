@@ -64,6 +64,6 @@ module Make(PostgresConfig : PostgresConfiguration.CONFIG) =
         (GameList.TicTacToeXOnly)
         (GameList.ThreeMenMorris)
         (Users)
-       and GameList : Ttt_server_lib_game_list.GAME_LIST =
+       and GameList : Ttt_server_lib_types.GAME_LIST =
          Ttt_server_lib_game_list.Make(Dao)(Games)
 end
