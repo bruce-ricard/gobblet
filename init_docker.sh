@@ -1,8 +1,8 @@
 #!/bin/sh
 
-sudo apt-get update
-sudo apt-get install git -y
-sudo apt-get install sudo -y
+apt-get update
+apt-get install sudo
+apt-get install git -y
 
 cd
 git clone https://github.com/bruce-ricard/gobblet.git
