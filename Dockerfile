@@ -10,4 +10,6 @@ RUN cd ~ && git clone https://github.com/bruce-ricard/o-glicko2.git
 RUN chmod -R 777 /usr/local/bin
 RUN cd ~/o-glicko2 && eval `opam config env` && make && make install
 
-CMD ~/gobblet/run_tests.sh
+RUN apt-get install emacs -y
+
+ADD ttt-pg_hba.conf /etc/postgresql/9.5/main/pg_hba.conf
