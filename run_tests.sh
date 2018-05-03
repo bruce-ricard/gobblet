@@ -11,7 +11,10 @@ eval `opam config env`
 . ~/gobblet/src/dao/before_build.sh
 export PGUSER='postgres'
 make
-make test
 make install
-cd server
-make all
+(
+    cd server
+    make all
+    make distclean
+)
+make test
