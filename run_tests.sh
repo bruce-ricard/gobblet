@@ -1,15 +1,15 @@
-#//bin/sh
+#!/bin/sh
 
 set -ex
 
 service postgresql start
 sudo -u postgres createdb gobblet
-sudo -u postgres createuser 'gobblet_server_user'
 
-cd ~/gobblet/src && psql gobblet -U gobblet_server_user < dao/initdb.sql
+cd ~/gobblet/src && psql gobblet -U postgres < dao/initdb.sql
 
 eval `opam config env`
 source dao/before_build.sh
+export PGUSER='postgres'
 make
 make test
 make install
