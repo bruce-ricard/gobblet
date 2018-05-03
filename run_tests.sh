@@ -8,7 +8,7 @@ sudo -u postgres createdb gobblet
 cd ~/gobblet/src && psql gobblet -U postgres < dao/initdb.sql
 
 eval `opam config env`
-source dao/before_build.sh
+source ~/gobblet/src/dao/before_build.sh
 export PGUSER='postgres'
 make
 make test
