@@ -91,10 +91,9 @@ let test_win () =
 
     Alcotest.check
     board_move_result
-    "should be a legal move"
+    "should win the game"
     (`Ok `Won)
     (place {row=0;column=2} `X)
-
 
 let board_suite = [
     "place a piece", `Quick, test_place_a_piece;

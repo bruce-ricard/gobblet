@@ -1,6 +1,21 @@
-#!/bin/sh
+#!/bin/bash
 
 set -ex
+
+if [ $INSERTED_GIT_REPO = 'true' ]; then
+    echo 'Using inserted git repo'
+else
+    echo 'Pulling latest master...'
+    cd ~/gobblet && git pull
+fi
+
+HASH=$(cd ~/gobblet && git show | head -1)
+echo "Running tests on $HASH"
+
+cd ~/gobblet/src
+eval `opam config env`
+rm -f setup.data
+./configure --enable-tests
 
 service postgresql start
 sudo -u postgres createdb gobblet
