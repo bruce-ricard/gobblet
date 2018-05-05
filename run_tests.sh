@@ -2,7 +2,7 @@
 
 set -ex
 
-if [ $INSERTED_GIT_REPO = 'true' ]; then
+if [ "${INSERTED_GIT_REPO}" = 'true' ]; then
     echo 'Using inserted git repo'
 else
     echo 'Pulling latest master...'

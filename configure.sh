@@ -25,3 +25,5 @@ opam install pgocaml -y
 opam install config-file -y
 opam install alcotest -y
 opam install alcotest-lwt -y
+
+opam pin add glicko2 https://github.com/bruce-ricard/o-glicko2.git -y
