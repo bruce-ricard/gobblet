@@ -4,6 +4,8 @@ open Internal_types
 
 type user = string
 
+module Glicko2 = Glicko2.Default.SingleGame
+
 module type RATINGS =
   sig
     val get_rating : user -> rating option
@@ -16,8 +18,7 @@ module Make (Ratings : RATINGS)
     let to_glicko_player =
       let open Ttt_game_lib_types in
       function {rating; rating_deviation; sigma} ->
-        let open Glicko2 in
-        {rating; rating_deviation; volatility = sigma}
+        Glicko2.{rating; rating_deviation; volatility = sigma}
 
     let from_glicko_player : 'a -> Ttt_common_lib_types.rating =
       let open Glicko2 in
@@ -46,7 +47,7 @@ module Make (Ratings : RATINGS)
       let result = {
           player1 = to_glicko_player p1rating;
           player2 = to_glicko_player p2rating;
-          game_outcome = Draw;
+          game_outcome = `Draw;
         }
       in
       {
@@ -62,7 +63,7 @@ module Make (Ratings : RATINGS)
       let result = {
           player1 = to_glicko_player p1rating;
           player2 = to_glicko_player p2rating;
-          game_outcome = Player1Win;
+          game_outcome = `Player1Win;
         }
       in
       {
@@ -94,7 +95,7 @@ module Make (Ratings : RATINGS)
       let rate_result = compute_rate_result result in
       Logs.debug (fun m -> m "rate result computed");
       match rate_result.result with
-        Glicko2.NewRatings(new_ratings) ->
+        `Ok(new_ratings) ->
          begin
            let newP1rating =
              from_glicko_player
@@ -110,13 +111,18 @@ module Make (Ratings : RATINGS)
            Logs.debug (fun m -> m "p2 rating sent");
            ()
          end
-      | Glicko2.InvalidVolatility ->
+      | `Error(`InvalidVolatility) ->
          Logs.err (fun m ->
              m "Invalid Volatility while trying to rate game %d"
                id#get_id)
-      | Glicko2.InternalError ->
+      | `Error(`ExceededIterations) ->
          Logs.err (fun m ->
-             m "Glicko2 internal error while trying to rate game %d"
+             m "Exceeded iterations while trying to rate game %d"
+               id#get_id)
+      | `Error(`UnknownError e) ->
+         Logs.err (fun m ->
+             m "Glicko2 internal error while trying to rate game %d: %s"
                id#get_id
+               e
            )
   end
