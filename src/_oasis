@@ -20,7 +20,7 @@ Library "ttt.lib.common"
 
 Library "ttt.lib.user"
   Path: lib/user_lib
-  BuildDepends: sha, ttt.lib.common
+  BuildDepends: sha, ttt.lib.common, glicko2, threads
   InternalModules:
   Modules: Ttt_user_lib_types, Ttt_user_lib_user, Ttt_user_lib_users
 

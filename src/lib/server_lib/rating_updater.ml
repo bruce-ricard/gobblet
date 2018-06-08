@@ -26,8 +26,9 @@ module Make (Ratings : RATINGS)
         {rating; rating_deviation; sigma = volatility}
 
     let initial_rating () =
-      let open Ttt_game_lib_types in
-      {rating = 1500.; rating_deviation = 350.; sigma = 0.06}
+      match Glicko2.default_player () with
+      | `Ok p -> from_glicko_player p
+      | `Error e -> failwith "error while getting default player"
 
     let get_rating user =
       match Ratings.get_rating user with

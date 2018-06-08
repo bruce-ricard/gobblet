@@ -57,24 +57,19 @@ module Make(User_db : USER_DB) : USERS =
       else
         None
 
-(*    let get_user user =
-      User_db.get user ""*)
-
     let exists = User_db.exists
 
     let initial_rating () =
-      let open Ttt_common_lib_types in
-      {
-        rating = 1500.;
-        rating_deviation = 350.;
-        sigma = 0.06;
-      }
+      let open Glicko2.Default.SingleGame in
+      match default_player () with
+      | `Ok p -> p.rating
+      | `Error e -> failwith "error while getting default player"
 
     let formatted_rating user g =
       let open Ttt_common_lib_types in
       let rating =
         match User_db.get_rating g user with
-          None -> 1500.
+          None -> initial_rating ()
         | Some {rating;} -> rating
       in
       Some (string_of_int (truncate (rating +. 0.5)))

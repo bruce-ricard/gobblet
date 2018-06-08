@@ -1,5 +1,5 @@
 S .
-B _build
+B ../../_build/lib/user_lib
 
-PKG ttt-common-lib
-PKG sha
+PKG ttt.lib.common
+PKG sha glicko2
