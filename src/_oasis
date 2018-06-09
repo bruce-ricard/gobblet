@@ -22,7 +22,7 @@ Library "ttt.lib.user"
   Path: lib/user_lib
   BuildDepends: sha, ttt.lib.common, glicko2, threads
   InternalModules:
-  Modules: Ttt_user_lib_types, Ttt_user_lib_user, Ttt_user_lib_users
+  Modules: Ttt_user_lib_types, Ttt_user_lib_user, Ttt_user_lib_users, Ttt_user_lib_ratings
 
 Library "ttt.lib.game"
   Path: lib/game_lib

@@ -1,7 +1,5 @@
 S .
 B ../../_build/lib/server_lib
 
-PKG ttt.lib.common
-PKG ttt.lib.game
-PKG ttt.daos
-PKG glicko2 logs lwt.react alcotest alcotest-lwt config-file
+PKG logs lwt.react alcotest alcotest-lwt config-file
+PKG ttt.lib.common ttt.lib.game ttt.lib.user ttt.daos

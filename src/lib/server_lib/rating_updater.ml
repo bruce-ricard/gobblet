@@ -4,7 +4,7 @@ open Internal_types
 
 type user = string
 
-module Glicko2 = Glicko2.Default.SingleGame
+module Glicko2 = Ttt_user_lib_ratings
 
 module type RATINGS =
   sig
@@ -15,19 +15,9 @@ module type RATINGS =
 module Make (Ratings : RATINGS)
        : RATING_UPDATER =
   struct
-    let to_glicko_player =
-      let open Ttt_game_lib_types in
-      function {rating; rating_deviation; sigma} ->
-        Glicko2.{rating; rating_deviation; volatility = sigma}
-
-    let from_glicko_player : 'a -> Ttt_common_lib_types.rating =
-      let open Glicko2 in
-      function {rating; rating_deviation; volatility} ->
-        {rating; rating_deviation; sigma = volatility}
-
     let initial_rating () =
-      match Glicko2.default_player () with
-      | `Ok p -> from_glicko_player p
+      match Glicko2.new_player () with
+      | `Ok p -> p
       | `Error e -> failwith "error while getting default player"
 
     let get_rating user =
@@ -46,8 +36,8 @@ module Make (Ratings : RATINGS)
       and p2rating = get_rating player2 in
       let open Glicko2 in
       let result = {
-          player1 = to_glicko_player p1rating;
-          player2 = to_glicko_player p2rating;
+          player1 = p1rating;
+          player2 = p2rating;
           game_outcome = `Draw;
         }
       in
@@ -62,8 +52,8 @@ module Make (Ratings : RATINGS)
       and p2rating = get_rating loser in
       let open Glicko2 in
       let result = {
-          player1 = to_glicko_player p1rating;
-          player2 = to_glicko_player p2rating;
+          player1 = p1rating;
+          player2 = p2rating;
           game_outcome = `Player1Win;
         }
       in
@@ -99,11 +89,9 @@ module Make (Ratings : RATINGS)
         `Ok(new_ratings) ->
          begin
            let newP1rating =
-             from_glicko_player
-               new_ratings.Glicko2.new_player1
+             new_ratings.Glicko2.new_player1
            and newP2rating =
-             from_glicko_player
-               new_ratings.Glicko2.new_player2
+             new_ratings.Glicko2.new_player2
            in
            Logs.debug (fun m -> m "new ratings computed");
            let _ = Ratings.set_rating rate_result.player1 newP1rating in
