@@ -1,7 +1,7 @@
 language: c
 sudo: required
 install: docker pull brucericard/ttt:0.4
-script: docker run -v ${TRAVIS_BUILD_DIR}:/root/gobblet -e INSERTED_GIT_REPO=true -it brucericard/ttt:0.4
+script: docker run -v ${TRAVIS_BUILD_DIR}:/root/gobblet -e INSERTED_GIT_REPO=true -it brucericard/ttt:0.6
 env:
   - INSERTED_GIT_REPO=true
 os:
