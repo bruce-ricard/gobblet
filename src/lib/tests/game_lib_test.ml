@@ -101,10 +101,3 @@ let board_suite = [
     "test place piece again", `Quick, test_invalid_move_twice;
     "win test", `Quick, test_win;
   ]
-
-let () =
-  Alcotest.run
-    "game lib"
-    [
-      "board suite", board_suite
-    ]

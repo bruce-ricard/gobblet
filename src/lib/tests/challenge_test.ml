@@ -83,19 +83,3 @@ let challenge_suite = [
     "remove challenge by ID", `Quick, remove_challenge;
     "not remove other challenge", `Quick, not_remove_challenge;
   ]
-
-let () =
-  Alcotest.run
-    "server lib"
-    [
-      "challenge critical section suite",
-      List.map
-        (
-          fun (name, speed, test) ->
-          Alcotest_lwt.test_case
-            name
-            speed
-            (fun _ _ -> test())
-        )
-        challenge_suite;
-    ]

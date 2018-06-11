@@ -49,30 +49,15 @@ Executable "create_config"
   BuildDepends: ttt.config-file
   MainIs: create_config.ml
 
-Executable "game_lib_tests"
-  Path: lib/game_lib
-  MainIs: game_lib_test.ml
-  Build$: flag(tests)
+Executable "lib_tests"
+  Path: lib/tests/
+  MainIs: tests.ml
   CompiledObject: best
   Install: false
-  BuildDepends: ttt.lib.game, alcotest
+  BuildDepends: ttt.lib.server, ttt.lib.game, alcotest, alcotest-lwt
 
-Test "game_lib_tests"
+Test "lib_tests"
   Run$: flag(tests)
-  TestTools: game_lib_tests
-  Command: $game_lib_tests
-  WorkingDirectory: lib/game_lib
-
-Executable "server_lib_tests"
-  Path: lib/server_lib
-  MainIs: challenge_test.ml
-  Build$: flag(tests)
-  CompiledObject: best
-  Install: false
-  BuildDepends: ttt.lib.server, alcotest, alcotest-lwt
-
-Test "server_lib_tests"
-  Run$: flag(tests)
-  TestTools: server_lib_tests
-  Command: $server_lib_tests
-  WorkingDirectory: lib/server_lib
+  TestTools: lib_tests
+  Command: $lib_tests
+  WorkingDirectory: lib/tests
