@@ -26,9 +26,9 @@ Library "ttt.lib.user"
 
 Library "ttt.lib.game"
   Path: lib/game_lib
-  BuildDepends: logs, ttt.lib.common
+  BuildDepends: logs, ttt.lib.common, alcotest
   InternalModules: Game_in_progress, Game_internal, Tictactoe_board, Boards
-  Modules: Ttt_game_lib_types, Ttt_game_lib_pieces, Ttt_game_lib_games
+  Modules: Ttt_game_lib_types, Ttt_game_lib_pieces, Ttt_game_lib_games, Engine, Engine_test
 
 Library "ttt.config-file"
   Path: config_file

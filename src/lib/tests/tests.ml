@@ -3,6 +3,7 @@ let () =
   @@ Alcotest_lwt.run
        "game lib"
        [
+         "engine unit tests", Engine_test.engine_unit_suite;
          "board suite",
          (List.map
             (fun (name, speed, test) ->
