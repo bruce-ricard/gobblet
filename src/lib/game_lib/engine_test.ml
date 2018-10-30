@@ -22,7 +22,7 @@ module Game =
       | _ -> `Invalid
 
     let takeback g = ()
-    let evaluate g _ p =
+    let evaluate g p =
       match g with
       | (true, _) -> Win(0)
       | (false, (true, true)) -> Draw(0)
@@ -34,14 +34,6 @@ module DumbEngine = Engine.Make(Game)
 let board_tester =
   let open Alcotest in
   pair bool (pair bool bool)
-
-let test_play_all_moves game number_moves () =
-  let all_moves = DumbEngine.play_all_moves game P1 in
-  Alcotest.check
-    Alcotest.int
-    "all moves"
-    number_moves
-    (List.length all_moves)
 
 let all_move_result_tester =
   let open Alcotest in
@@ -80,8 +72,9 @@ let test_play_all_moves3 () =
   in
   test_play_all_moves_builder game expected_result
 
-
-let test_evaluate_position () =
+let test_evaluate_drawn_position () =
+  let game = (false, (true, true)) in
+  let evaluation = Game.evaluate game in
   Alcotest.check
     Alcotest.int
     "test"
@@ -89,9 +82,6 @@ let test_evaluate_position () =
     0
 
 let engine_unit_suite = [
-    "all moves 1", `Quick, test_play_all_moves (false, (false, false)) 3;
-    "all moves 2", `Quick, test_play_all_moves (true, (false, false)) 2;
-    "all moves 3", `Quick, test_play_all_moves (true, (true, true)) 0;
     "all moves 1", `Quick, test_play_all_moves1;
     "all moves 2", `Quick, test_play_all_moves2;
     "all moves 3", `Quick, test_play_all_moves3;

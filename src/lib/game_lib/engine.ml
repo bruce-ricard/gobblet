@@ -8,8 +8,16 @@ type square = {
   }
                           *)
 type player = P1 | P2
-type evaluation =
-  Win of int | Lose of int | Draw of int | Unclear of float
+
+type 't game_over_evaluation =
+  [ `Win of 't | `Lose of 't | `Draw of 't ]
+
+type 't evaluation =
+  [ 't game_over_evaluation | `Unclear of float ]
+
+type 'm move_tree =
+  | GameOver of 'm move_tree game_over_evaluation
+  | Unclear of float * 'm move_tree list
 
 module type GAME =
   sig
@@ -28,7 +36,7 @@ module type GAME =
     val all_moves : t -> move list
     val move: t -> move -> player -> move_result
     val takeback: t -> unit
-    val evaluate: t -> (board -> evaluation) -> player -> evaluation
+    val evaluate: t -> player -> evaluation
   end
 
 module Make(Game : GAME) =
@@ -64,7 +72,7 @@ module Make(Game : GAME) =
         []
         evals
 
-    let evaluate_position game =
+    let evaluate_position game p =
       let result = Game.result game in
       let eval =
         match result with
@@ -73,14 +81,15 @@ module Make(Game : GAME) =
         | Drawn -> Draw(0)
         | NotOver -> Unclear(0.)
       in
-      Game.evaluate game (fun _ -> eval)
+      Game.evaluate game p
 
     let evaluate_move game player move =
       match Game.move game move player with
       | `Invalid  -> `Invalid
       | `Ok game -> `Eval (evaluate_position game)
 
-    let evaluate game player moves =
+    let evaluate game player =
+      let moves = Game.all_moves game in
       let mvs = List.map (evaluate_move game player) moves
       in
 
