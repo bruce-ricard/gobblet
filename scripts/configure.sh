@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -euxo pipefail
 
 sudo apt-get update --yes
 sudo apt-get install opam --yes
