@@ -10,7 +10,7 @@ eval `opam config env`
 eval `opam config env`
 opam install depext -y
 opam depext conf-gmp.1 -y && opam depext conf-m4.1 -y && opam depext conf-pkg-config.1.0 -y
-opam depext conf-libpcre.1 -y && opam depext conf-openssl.1 -y && opam depext conf-zlib.1 -y && opam depext dbm.1.1 -y
+opam depext conf-libpcre.1 -y && opam depext conf-openssl.1 -y && opam depext conf-zlib.1 -y && opam depext dbm.1.2 -y
 opam depext sqlite3.4.1.3 -y
 opam install dbm -y
 opam install eliom.5.0.0 -y
