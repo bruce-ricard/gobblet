@@ -26,7 +26,7 @@ psql gobblet -U postgres < dao/set_users_permissions.sql
 
 eval `opam config env`
 . ~/gobblet/src/dao/before_build.sh
-export PGUSER='postgres'
+
 make
 make install
 (
