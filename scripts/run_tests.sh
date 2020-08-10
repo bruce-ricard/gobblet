@@ -18,9 +18,11 @@ rm -f setup.data
 ./configure --enable-tests
 
 service postgresql start
-sudo -u postgres createdb gobblet
 
-cd ~/gobblet/src && psql gobblet -U postgres < dao/initdb.sql
+cd ~/gobblet/src
+psql -U postgres < dao/init_db.sql
+psql gobblet -U postgres < dao/init_gobblet_db.sql
+psql gobblet -U postgres < dao/set_users_permissions.sql
 
 eval `opam config env`
 . ~/gobblet/src/dao/before_build.sh
