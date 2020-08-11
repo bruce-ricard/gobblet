@@ -2,6 +2,7 @@
 
 set -euxo pipefail
 
+opam update
 opam init -y
 eval `opam config env`
 eval `opam config env`
@@ -23,5 +24,4 @@ opam install pgocaml -y
 opam install config-file -y
 opam install alcotest -y
 opam install alcotest-lwt -y
-
 opam install glicko2 -y
