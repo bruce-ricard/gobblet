@@ -2,8 +2,8 @@
 
 set -euxo pipefail
 
-opam update
 opam init -y
+opam update
 eval `opam config env`
 eval `opam config env`
 opam switch 4.02.3
