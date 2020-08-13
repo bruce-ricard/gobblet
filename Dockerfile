@@ -16,4 +16,4 @@ RUN cd ~/gobblet/src && eval `opam config env` && ./configure --enable-tests
 
 ADD conf/ttt-pg_hba.conf /etc/postgresql/9.5/main/pg_hba.conf
 
-CMD cd ~/gobblet && ./run_tests.sh
+CMD cd ~/gobblet && ./scripts/run_tests.sh
