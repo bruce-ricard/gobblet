@@ -9,9 +9,10 @@ let reporter ppf =
   { Logs.report = report }
 
 let init_logs () =
+  let log_level = Some Parsed_config.ServerConfig.log_level in
   Logs.set_reporter (reporter (Format.std_formatter));
-  Logs.set_level (Some (Parsed_config.ServerConfig.log_level));
-  Logs.info (fun m -> m "logs initialized")
+  Logs.set_level log_level;
+  Logs.info (fun m -> m "logs initialized with level \"%s\"" (Logs.level_to_string log_level))
 
 let init () =
   init_logs ();
