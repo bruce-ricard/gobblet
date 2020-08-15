@@ -1,1 +1,3 @@
 GRANT USAGE ON SCHEMA ratings TO gobblet_server_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gobblet_server_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA ratings TO gobblet_server_user;
