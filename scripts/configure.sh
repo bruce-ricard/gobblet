@@ -2,15 +2,15 @@
 
 set -euxo pipefail
 
-opam init -y
+opam init --yes
 opam update
 eval `opam config env`
 eval `opam config env`
 opam switch 4.02.3
 eval `opam config env`
 eval `opam config env`
-opam install depext -y
-opam depext \
+opam install depext --yes
+opam depext --yes \
 	 conf-gmp.1 \
 	 conf-m4.1 \
 	 conf-pkg-config.1.0 \
@@ -18,9 +18,9 @@ opam depext \
 	 conf-openssl.1 \
 	 conf-zlib.1 \
 	 dbm.1.2 \
-	 sqlite3.4.1.3 -y
+	 sqlite3.4.1.3
 
-opam install -y \
+opam install --yes \
 	 dbm \
 	 eliom.5.0.0 \
 	 extlib \
