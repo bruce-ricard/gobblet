@@ -2,12 +2,10 @@
 
 set -euxo pipefail
 
-opam init --yes
+opam init --yes --disable-sandboxing
 opam update
-eval `opam config env`
-eval `opam config env`
-opam switch 4.02.3
-eval `opam config env`
+eval `opam env`
+opam switch create 4.02.3
 eval `opam config env`
 opam install depext --yes
 opam depext --yes \
