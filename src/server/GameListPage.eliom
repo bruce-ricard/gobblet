@@ -69,12 +69,12 @@ let accept_challenge id_int =
            `Fail)
 
 let%client create_challenge_rpc =
-  ~%(server_function [%derive.json: string * string]
+  ~%(server_function Json.t<string * string>
                      (create_challenge_by_id)
     )
 
 let%client accept_challenge_rpc =
-  ~%(server_function [%derive.json: int] accept_challenge)
+  ~%(server_function Json.t<int> accept_challenge)
 
 let%client challenge_form_handler
            input_text_field game_name_field submit_button =
