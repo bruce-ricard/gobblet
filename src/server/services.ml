@@ -5,62 +5,87 @@ let main_service =
     (*~https:true*)
     ()
 
+module App =
+  Eliom_registration.App (
+      struct
+        let application_name = "ttt"
+        let global_data_path = None
+      end
+    )
+
 let show_my_games_service =
-  Eliom_service.App.service
-    ~path:["games"; "list"]
-    ~get_params:Eliom_parameter.unit
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["games"; "list"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.unit))
     ()
 
 let game_dispatch_service =
-  Eliom_service.App.service
-    ~path:["games"; "play"]
-    ~get_params:(Eliom_parameter.int "game_id")
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["games"; "play"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.int "game_id"))
     ()
 
 let ttt_classical_service =
-  Eliom_service.App.service
-    ~path:["games"; "tictactoe"; "classical"; "play"]
-    ~get_params:Eliom_parameter.(int "game_id")
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["games"; "tictactoe"; "classical"; "play"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.int "game_id"))
     ()
 
 let ttt_xonly_service =
-  Eliom_service.App.service
-    ~path:["games"; "tictactoe"; "xonly"; "play"]
-    ~get_params:Eliom_parameter.(int "game_id")
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["games"; "tictactoe"; "xonly"; "play"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.int "game_id"))
     ()
 
 let ttt_3morris_service =
-  Eliom_service.App.service
-    ~path:["games"; "3morris"; "play"]
-    ~get_params:Eliom_parameter.(int "game_id")
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["games"; "3morris"; "play"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.int "game_id"))
     ()
 
 let image_piece_service =
-  Eliom_service.App.service
-    ~path:["games"; "pieces.png"]
-    ~get_params:Eliom_parameter.unit
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["games"; "pieces.png"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.unit))
     ()
 
 let input_user_registration_service =
-  Eliom_service.Http.service
-    ~path:["register"]
-    ~get_params:Eliom_parameter.unit
+  Eliom_service.create
+    ~path:(Eliom_service.Path ["register"])
+    ~meth:(Eliom_service.Get (Eliom_parameter.unit))
     ()
 
 let user_registration_service =
-  Eliom_service.Http.post_service
-    ~fallback:input_user_registration_service
-    ~post_params:Eliom_parameter.
-      (string "user_name" **
-         (string "password1" ** string "password2"))
+  Eliom_service.create
+    (*    ~fallback:input_user_registration_service*)
+    ~path:Eliom_service.No_path
+    ~meth:(Eliom_service.Post
+             (Eliom_parameter.unit,
+              Eliom_parameter.
+              (string "user_name" **
+                 (string "password1" ** string "password2"))
+             )
+    )
     ()
 
 let connection_service =
-  Eliom_service.Http.post_coservice'
-    ~post_params:Eliom_parameter.(string "name" ** string "password")
+  (*  Eliom_service.Http.post_coservice'*)
+  Eliom_service.create
+    ~path:Eliom_service.No_path
+    ~meth:(Eliom_service.Post (
+               Eliom_parameter.unit,
+               Eliom_parameter.(string "name" ** string "password")
+             )
+    )
+
     ()
 
 let disconnection_service =
-  Eliom_service.Http.post_coservice'
-    ~post_params:Eliom_parameter.unit
+  Eliom_service.create
+    ~path:Eliom_service.No_path
+    ~meth:(Eliom_service.Post (
+               Eliom_parameter.unit,
+               Eliom_parameter.unit
+             )
+    )
     ()
