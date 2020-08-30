@@ -2,7 +2,6 @@ open PostgresConfiguration
 
 module Make(Config : CONFIG) =
   struct
-
     let log_config () =
       let option_to_string f = function
           None -> "None"
@@ -39,7 +38,7 @@ module Make(Config : CONFIG) =
 
     let put_hash username password_hash =
       try
-        PGSQL(dbh) "insert into users values ($username, $password_hash)";
+        [%pgsql dbh "insert into users values ($username, $password_hash)"];
         true
       with
         e -> Logs.err (fun m ->
@@ -48,18 +47,19 @@ module Make(Config : CONFIG) =
                ); false
 
 
-    let (put : string -> Sha256.t -> bool) username password_hash  =
+    let (put : string -> Sha256.t -> bool) = fun username password_hash ->
       put_hash username (Sha256.to_hex password_hash)
 
     let get username (password_hash: Sha256.t) =
       let password_hash = Sha256.to_hex password_hash in
       try
         match
-          PGSQL(dbh) "
+          [%pgsql dbh "
                       select password_hash
                       from users
                       where id=$username
-                      "
+                       "
+          ]
         with
           [] -> false
         | [pwh] -> pwh = password_hash
@@ -76,11 +76,12 @@ module Make(Config : CONFIG) =
     let exists username =
       try
         let users =
-          PGSQL(dbh)
+          [%pgsql dbh
                "
                 select 1 from users
                 where id=$username
                 "
+          ]
         in
         match users with
         | [] -> false
@@ -107,12 +108,13 @@ module Make(Config : CONFIG) =
       Logs.debug (fun m -> m "Getting rating for user %s" username);
       request_result_to_rating (
           try
-            PGSQL(dbh)
+            [%pgsql dbh
                  "
                   SELECT rating, rd, sigma
                   FROM ratings.tictactoeclassical
                   WHERE username=$username
                   "
+            ]
           with
             e -> Logs.err (fun m ->
                  m "Exception while getting tttc rating from postgres.\n %s"
@@ -124,12 +126,13 @@ module Make(Config : CONFIG) =
       Logs.debug (fun m -> m "Getting rating for user %s" username);
       request_result_to_rating (
           try
-            PGSQL(dbh)
+            [%pgsql dbh
                  "
                   SELECT rating, rd, sigma
                   FROM ratings.tictactoexonly
                   WHERE username=$username
                   "
+            ]
           with
             e -> Logs.err (fun m ->
                  m "Exception while getting tttxo rating from postgres.\n %s"
@@ -142,12 +145,13 @@ module Make(Config : CONFIG) =
       Logs.debug (fun m -> m "Getting rating for user %s" username);
       request_result_to_rating (
           try
-            PGSQL(dbh)
+            [%pgsql dbh
                  "
                   SELECT rating, rd, sigma
                   FROM ratings.three_men_morris
                   WHERE username=$username
                   "
+            ]
           with
             e -> Logs.err (fun m ->
                      m "%s %s\n %s"
@@ -165,7 +169,7 @@ module Make(Config : CONFIG) =
 
     let upsert_ttt_classical username rating rating_deviation sigma =
       try
-        ignore (PGSQL(dbh)
+        ignore ([%pgsql dbh
                      "
                       INSERT INTO ratings.tictactoeclassical
                       VALUES ($username, $rating, $rating_deviation, $sigma)
@@ -174,6 +178,7 @@ module Make(Config : CONFIG) =
                       rd = $rating_deviation,
                       sigma = $sigma
                       "
+                ]
                );
         true
       with
@@ -185,7 +190,7 @@ module Make(Config : CONFIG) =
 
     let upsert_ttt_xonly username rating rating_deviation sigma =
       try
-        ignore (PGSQL(dbh)
+        ignore ([%pgsql dbh
                      "
                       INSERT INTO ratings.tictactoexonly
                       VALUES ($username, $rating, $rating_deviation, $sigma)
@@ -194,6 +199,7 @@ module Make(Config : CONFIG) =
                       rd = $rating_deviation,
                       sigma = $sigma
                       "
+                ]
                );
         true
       with
@@ -205,7 +211,7 @@ module Make(Config : CONFIG) =
 
     let upsert_3_men_morris username rating rating_deviation sigma =
       try
-        ignore (PGSQL(dbh)
+        ignore ([%pgsql dbh
                   "
                    INSERT INTO ratings.three_men_morris
                    VALUES ($username, $rating, $rating_deviation, $sigma)
@@ -214,6 +220,7 @@ module Make(Config : CONFIG) =
                    rd = $rating_deviation,
                    sigma = $sigma
                    "
+                ]
           );
         true
       with

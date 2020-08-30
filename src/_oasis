@@ -11,7 +11,7 @@ Library "ttt.daos"
   Path: dao
   BuildTools: ocamlbuild
   Modules: PostgresConfiguration, UsersPostgresDao
-  BuildDepends: pgocaml, pgocaml.syntax, sha, logs, ttt.lib.common
+  BuildDepends: pgocaml, pgocaml_ppx, sha, logs, ttt.lib.common
 
 Library "ttt.lib.common"
   Path: lib/common
@@ -38,7 +38,7 @@ Library "ttt.config-file"
 
 Library "ttt.lib.server"
   Path: lib/server_lib
-  BuildDepends: lwt.syntax, ttt.lib.game, ttt.lib.user, ttt.lib.common, ttt.daos, lwt.react, lwt.ppx, logs, core, threads, glicko2, ttt.config-file
+  BuildDepends: ttt.lib.game, ttt.lib.user, ttt.lib.common, ttt.daos, lwt.unix, lwt_react, lwt_ppx, logs, core, threads, glicko2, ttt.config-file
   InternalModules: Reporter, Ratings, Rating_updater, Internal_types, Ttt_server_lib_games, Ttt_server_lib_game_api, Ttt_server_lib_game_list, Ttt_server_lib_game_store, Ttt_server_lib_challenge_api, Ttt_server_lib_challengeCriticalSection, List_challenge_store
 
   Modules: Base_types, Ttt_server_lib_types, Ttt_server_lib_challenge, Ttt_server_lib
