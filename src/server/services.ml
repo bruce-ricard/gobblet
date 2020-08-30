@@ -1,7 +1,7 @@
 let main_service =
-  Eliom_service.Http.service
-    ~path:[]
-    ~get_params:Eliom_parameter.unit
+  Eliom_service.create
+    ~path:(Eliom_service.Path [])
+    ~meth:(Eliom_service.Get (Eliom_parameter.unit))
     (*~https:true*)
     ()
 
