@@ -7,7 +7,7 @@ let dispatch game id =
        Logs.warn (fun m -> m "Game dispatch: non existant game");
        Common.set_message_next_page
          "This game doesn't exist, please chose another one";
-       Services.show_my_games_service
+       Eliom_service.preapply Services.show_my_games_service ()
      end
   | Some game ->
      begin
