@@ -22,10 +22,12 @@ let dispatch game id =
 
 let register () =
   Eliom_registration.Redirection.register
-    ~service:Services.game_dispatch_service
-    (fun id () ->
-      let game = Common.Games.get_game (new id id) in
-      Lwt.return (dispatch game id)
-    )
+   ~service:Services.game_dispatch_service
+   (fun id () ->
+     let game = Common.Games.get_game (new id id) in
+     Lwt.return (Eliom_registration.Redirection
+                   (dispatch game id)
+       )
+   )
 
 let () = register ()
