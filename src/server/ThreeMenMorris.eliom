@@ -129,7 +129,7 @@ let%client draw_dot ctx x y =
   ()
 
 [%%client
- module Html = Dom_html
+ module Html = Js_of_ocaml.Dom_html
 ]
 
 let%client lwt_wrap f =
@@ -182,7 +182,7 @@ let%client draw_piece color ~row ~column ctx =
   in
 
   let piece_sprite =
-    load_image (Js.string "/games/pieces.png") in
+    load_image (Js_of_ocaml.Js.string "/games/pieces.png") in
 
   Lwt.async (
       fun () ->
@@ -272,10 +272,10 @@ let board_canvas_elt game_id =
       ]
   in
   let _ = [%client
-              ((let canvas = Html.To_dom.of_canvas ~%elt in
+              ((let canvas = Eliom_content.Html.To_dom.of_canvas ~%elt in
                 let st = canvas##.style in
                 st##.zIndex := Js_of_ocaml.Js.string "2";
-                let ctx = canvas##(getContext (Dom_html._2d_)) in
+                let ctx = canvas##(getContext (Html._2d_)) in
                 ctx##.lineCap := Js_of_ocaml.Js.string "round";
                 draw_board ctx;
                 Lwt.async (fun () ->
@@ -283,7 +283,7 @@ let board_canvas_elt game_id =
                       canvas
                       (
                         fun ev _ ->
-                        let x0, y0 = Dom_html.elementClientPosition canvas in
+                        let x0, y0 = Html.elementClientPosition canvas in
                         let x,y = ((ev##.clientX - x0), (ev##.clientY - y0)) in
                         Printf.printf "you clicked on (%d,%d)" x y;
                         (match position_to_square x y with
@@ -338,11 +338,11 @@ let pieces_canvas_elt game =
   let events = piece_events game
   in
   let _ = [%client
-              (let canvas = Html.To_dom.of_canvas ~%elt in
+              (let canvas = Eliom_content.Html.To_dom.of_canvas ~%elt in
                let st = canvas##.style in
                st##.zIndex := Js_of_ocaml.Js.string "3";
                st##.pointerEvents := Js_of_ocaml.Js.string "none";
-               let ctx = canvas##(getContext (Dom_html._2d_)) in
+               let ctx = canvas##(getContext (Html._2d_)) in
                ctx##.lineCap := Js_of_ocaml.Js.string "round";
                update_pieces ctx ~%events : unit)
           ]
