@@ -14,7 +14,7 @@ let%client chat_form_handler input_text_field submit_button =
       Js_of_ocaml_lwt.Lwt_js_events.clicks
         dom_button
         (fun _ _ ->
-          let message = Js.to_string dom_text##.value in
+          let message = Js_of_ocaml.Js.to_string dom_text##.value in
           let new_chat_line =
             li [pcdata (Printf.sprintf "me: %s" message)] in
           Eliom_content.Html.Manip.appendChild ~%chat_logs_elt new_chat_line;
@@ -23,7 +23,7 @@ let%client chat_form_handler input_text_field submit_button =
                 ~service:~%Services.chat_service
                 () message
             );
-          dom_text##.value := Js.string "";
+          dom_text##.value := Js_of_ocaml.Js.string "";
           Lwt.return ()
         )
     )

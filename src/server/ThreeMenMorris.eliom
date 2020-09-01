@@ -140,7 +140,7 @@ let%client load_image src =
   let img = Html.createImg Html.document in
   lwt_wrap
     (fun c ->
-      img##.onload := Html.handler (fun _ -> c (); Js._false);
+      img##.onload := Html.handler (fun _ -> c (); Js_of_ocaml.Js._false);
       img##.src := src;
     )
   >>= fun () -> Lwt.return img
@@ -272,9 +272,9 @@ let board_canvas_elt game_id =
   let _ = [%client
               ((let canvas = Html.To_dom.of_canvas ~%elt in
                 let st = canvas##.style in
-                st##.zIndex := Js.string "2";
+                st##.zIndex := Js_of_ocaml.Js.string "2";
                 let ctx = canvas##(getContext (Dom_html._2d_)) in
-                ctx##.lineCap := Js.string "round";
+                ctx##.lineCap := Js_of_ocaml.Js.string "round";
                 draw_board ctx;
                 Lwt.async (fun () ->
                     Js_of_ocaml_lwt.Lwt_js_events.mousedowns
@@ -338,10 +338,10 @@ let pieces_canvas_elt game =
   let _ = [%client
               (let canvas = Html.To_dom.of_canvas ~%elt in
                let st = canvas##.style in
-               st##.zIndex := Js.string "3";
-               st##.pointerEvents := Js.string "none";
+               st##.zIndex := Js_of_ocaml.Js.string "3";
+               st##.pointerEvents := Js_of_ocaml.Js.string "none";
                let ctx = canvas##(getContext (Dom_html._2d_)) in
-               ctx##.lineCap := Js.string "round";
+               ctx##.lineCap := Js_of_ocaml.Js.string "round";
                update_pieces ctx ~%events : unit)
           ]
   in
@@ -357,7 +357,7 @@ type 'a game_page_result =
 let%client update_html_content elt content =
   let dom_html = Eliom_content.Html.To_dom.of_element elt in
   ignore (React.E.map
-            (fun c -> dom_html##.innerHTML := Js.string c)
+            (fun c -> dom_html##.innerHTML := Js_of_ocaml.Js.string c)
             content)
 
 let game_page game_id =

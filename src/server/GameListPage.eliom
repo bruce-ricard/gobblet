@@ -86,9 +86,9 @@ let%client challenge_form_handler
       Js_of_ocaml_lwt.Lwt_js_events.clicks
         dom_button
         (fun _ _ ->
-          let opponent = Js.to_string dom_text##.value in
+          let opponent = Js_of_ocaml.Js.to_string dom_text##.value in
           let game_name_int =
-            Js.to_string
+            Js_of_ocaml.Js.to_string
               dom_game_name##.value in
           print_endline game_name_int;
           let%lwt challenge = create_challenge_rpc (game_name_int, opponent) in

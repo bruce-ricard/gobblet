@@ -27,7 +27,7 @@ let%client remove_message_in_5 dom =
   let open Lwt in
   Lwt.async (fun () ->
       Lwt_js.sleep 5. >|=
-        (fun () -> dom##.innerHTML := Js.string "")
+        (fun () -> dom##.innerHTML := Js_of_ocaml.Js.string "")
     )
 
 let%client show_instant_message event message_element =
@@ -35,7 +35,7 @@ let%client show_instant_message event message_element =
     Eliom_content.Html.To_dom.of_element message_element in
   remove_message_in_5 message_dom;
   React.E.map
-    (fun msg -> message_dom##.innerHTML := Js.string msg;
+    (fun msg -> message_dom##.innerHTML := Js_of_ocaml.Js.string msg;
                 remove_message_in_5 message_dom;
     )
     event

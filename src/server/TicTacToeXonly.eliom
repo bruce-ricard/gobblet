@@ -70,7 +70,7 @@ let%client refresh = ~%(server_function Json.t<int> refresh)
 
 let%client update_cell_content cell content =
   let dom_cell = Eliom_content.Html.To_dom.of_element cell in
-  ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string c) content)
+  ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js_of_ocaml.Js.string c) content)
 
 let%client cell_on_click dom_cell game_id x y =
   (Lwt.async (fun () ->
