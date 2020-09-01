@@ -26,7 +26,7 @@ let header_login () =
 let%client remove_message_in_5 dom =
   let open Lwt in
   Lwt.async (fun () ->
-      Lwt_js.sleep 5. >|=
+      Js_of_ocaml_lwt.Lwt_js.sleep 5. >|=
         (fun () -> dom##.innerHTML := Js_of_ocaml.Js.string "")
     )
 
