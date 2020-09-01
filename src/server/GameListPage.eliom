@@ -26,7 +26,7 @@ let create_challenge game opponent =
          function
        | Challenge_created(id,event) ->
           Lwt.async (fun () ->
-              Base.send_instant_message "Challenge created");
+              Tttbase.send_instant_message "Challenge created");
           Lwt.return (`ChallengeCreated
                        (id#get_id,Eliom_react.Down.of_react event)
                      )
@@ -69,12 +69,12 @@ let accept_challenge id_int =
            `Fail)
 
 let%client create_challenge_rpc =
-  ~%(server_function Json.t<string * string>
-                     (create_challenge_by_id)
+  ~%(Eliom_client.server_function [%json: string * string]
+       (create_challenge_by_id)
     )
 
 let%client accept_challenge_rpc =
-  ~%(server_function Json.t<int> accept_challenge)
+  ~%(Eliom_client.server_function [%json:int] accept_challenge)
 
 let%client challenge_form_handler
            input_text_field game_name_field submit_button =
@@ -122,7 +122,7 @@ let challenge_form () =
   and game_name_select =
     Raw.select [
         option ~a:[a_value "0"] (pcdata "Any");
-        option ~a:[a_value "1"; a_selected `Selected]
+        option ~a:[a_value "1"; a_selected ()]
                (pcdata "Tic tac toe -- classical");
         option ~a:[a_value "2"]
                (pcdata "Tic tac toe -- X only");
@@ -262,7 +262,7 @@ let game_list_page () =
        div (games_display @ challenge_form () :: (challenge_elements user) ::
                               [])
   in
-  Base.skeleton
+  Tttbase.skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Game list"
     [game_list]
@@ -270,7 +270,7 @@ let game_list_page () =
 let eliom_register () =
   let open Services in
 
-  Base.TicTacToe_app.register
+  Tttbase.TicTacToe_app.register
     ~service:show_my_games_service
     (fun () () -> game_list_page ())
 

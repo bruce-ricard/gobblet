@@ -104,7 +104,7 @@ let%client click_rpc =
 let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
               ?title:(title="Three men Morris")
               content =
-  Base.skeleton
+  Tttbase.skeleton
     ~css ~title content
 
 let%client draw ctx ((x1, y1), (x2, y2)) =
@@ -449,7 +449,7 @@ let register () =
 
   let open Services in
 
-  Base.TicTacToe_app.register
+  Tttbase.TicTacToe_app.register
     ~service:ttt_3morris_service
     ~options
     (fun id_int () ->

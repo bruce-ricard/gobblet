@@ -128,7 +128,7 @@ let board_html game_id =
     ]
 
 let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
-  Base.skeleton
+  Tttbase.skeleton
     ~css ~title content
 
 let turn_sentence game user : string React.event =
@@ -215,7 +215,7 @@ let options = {
 let register () =
   let open Services in
 
-  Base.TicTacToe_app.register
+  Tttbase.TicTacToe_app.register
     ~service:ttt_xonly_service
     ~options
     (fun id_int () ->

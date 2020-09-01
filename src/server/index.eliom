@@ -5,7 +5,7 @@ let welcome_page () =
     [
       pcdata "Welcome! To start playing, click Play in the menu."
     ] in
-  Base.skeleton
+  Tttbase.skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Board games"
     content
