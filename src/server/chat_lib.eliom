@@ -11,7 +11,7 @@ let%client chat_form_handler input_text_field submit_button =
   let dom_text = Eliom_content.Html.To_dom.of_input input_text_field in
   let dom_button = Eliom_content.Html.To_dom.of_element submit_button in
   Lwt.async (fun () ->
-      Lwt_js_events.clicks
+      Js_of_ocaml_lwt.Lwt_js_events.clicks
         dom_button
         (fun _ _ ->
           let message = Js.to_string dom_text##.value in

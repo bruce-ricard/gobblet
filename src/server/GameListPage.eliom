@@ -83,7 +83,7 @@ let%client challenge_form_handler
   and dom_game_name = Eliom_content.Html.To_dom.of_select game_name_field
   in
   Lwt.async (fun () ->
-      Lwt_js_events.clicks
+      Js_of_ocaml_lwt.Lwt_js_events.clicks
         dom_button
         (fun _ _ ->
           let opponent = Js.to_string dom_text##.value in
@@ -150,7 +150,7 @@ let%client accept_challenge_handler accept_button id =
   let button_dom =
     Eliom_content.Html.To_dom.of_element accept_button in
   Lwt.async (fun () ->
-      Lwt_js_events.clicks
+      Js_of_ocaml_lwt.Lwt_js_events.clicks
         button_dom
         (fun _ _ ->
           print_endline "accept button was clicked";

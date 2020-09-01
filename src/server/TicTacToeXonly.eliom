@@ -74,7 +74,7 @@ let%client update_cell_content cell content =
 
 let%client cell_on_click dom_cell game_id x y =
   (Lwt.async (fun () ->
-       Lwt_js_events.clicks
+       Js_of_ocaml_lwt.Lwt_js_events.clicks
          dom_cell
          (fun _ _ ->
            let%lwt move_result = move_rpc (game_id, x, y) in

@@ -277,7 +277,7 @@ let board_canvas_elt game_id =
                 ctx##.lineCap := Js.string "round";
                 draw_board ctx;
                 Lwt.async (fun () ->
-                    Lwt_js_events.mousedowns
+                    Js_of_ocaml_lwt.Lwt_js_events.mousedowns
                       canvas
                       (
                         fun ev _ ->
