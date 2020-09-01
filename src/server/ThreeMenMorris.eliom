@@ -49,7 +49,7 @@ let refresh id_int =
     | Some game ->
        Game.refresh_game game)
 
-let refresh = server_function Json.t<int> refresh
+let refresh = server_function [%json: int] refresh
 
 let%client refresh = ~%refresh
 
@@ -99,7 +99,7 @@ let click_square (game_id, row, column) =
      end
 
 let%client click_rpc =
-  ~%(server_function Json.t<move_messages> click_square)
+  ~%(server_function [%json: move_messages] click_square)
 
 let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
               ?title:(title="Three men Morris")
