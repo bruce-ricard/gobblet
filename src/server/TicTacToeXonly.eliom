@@ -56,7 +56,7 @@ let move (game_id, row, column) =
           move row column game user
      end
 
-let%client move_rpc = ~%(server_function [%json: move_messages] move)
+let%client move_rpc = ~%(Eliom_client.server_function [%json: move_messages] move)
 
 let refresh id_int =
   let game = get_game (new id id_int) in
@@ -66,7 +66,7 @@ let refresh id_int =
     | Some game ->
        Game.refresh_game game)
 
-let%client refresh = ~%(server_function [%json: int] refresh)
+let%client refresh = ~%(Eliom_client.server_function [%json: int] refresh)
 
 let%client update_cell_content cell content =
   let dom_cell = Eliom_content.Html.To_dom.of_element cell in

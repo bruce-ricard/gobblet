@@ -49,7 +49,7 @@ let refresh id_int =
     | Some game ->
        Game.refresh_game game)
 
-let refresh = server_function [%json: int] refresh
+let refresh = Eliom_client.server_function [%json: int] refresh
 
 let%client refresh = ~%refresh
 
@@ -99,7 +99,7 @@ let click_square (game_id, row, column) =
      end
 
 let%client click_rpc =
-  ~%(server_function [%json: move_messages] click_square)
+  ~%(Eliom_client.server_function [%json: move_messages] click_square)
 
 let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
               ?title:(title="Three men Morris")
@@ -108,6 +108,7 @@ let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
     ~css ~title content
 
 let%client draw ctx ((x1, y1), (x2, y2)) =
+  let open Js_of_ocaml in
   let color = CSS.Color.string_of_t (CSS.Color.rgb 1 2 3) in
   ctx##.strokeStyle := (Js.string color);
   ctx##.lineWidth := float 10;
@@ -118,6 +119,7 @@ let%client draw ctx ((x1, y1), (x2, y2)) =
   ()
 
 let%client draw_dot ctx x y =
+  let open Js_of_ocaml in
   let color = CSS.Color.string_of_t (CSS.Color.rgb 1 2 3) in
   ctx##.strokeStyle := (Js.string color);
   ctx##.lineWidth := float 40;
