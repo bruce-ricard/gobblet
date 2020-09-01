@@ -1,6 +1,6 @@
-Eliom_registration.Html.register_service
-  ~path:["heartbeat"]
-  ~get_params:Eliom_parameter.unit
+Eliom_registration.Html.create
+  ~path:(Eliom_service.Path ["heartbeat"])
+  ~meth:(Eliom_service.Get (Eliom_parameter.unit))
   (fun _ _ ->
     let open Eliom_content.Html.D in
     Lwt.return (
