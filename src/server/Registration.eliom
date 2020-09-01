@@ -12,7 +12,7 @@ let non_matching_passwords_msg = "The passwords don't match, please try again."
 let register () =
   let open Register in
 
-  Eliom_registration.Html5.register
+  Eliom_registration.Html.register
     ~service:Services.input_user_registration_service
     (fun () () -> user_registration_page ());
 

@@ -11,7 +11,7 @@ let welcome_page () =
     content
 
 
-let () = Eliom_registration.Html5.register
+let () = Eliom_registration.Html.register
     ~service:Services.main_service
     (fun () () ->
       welcome_page ()

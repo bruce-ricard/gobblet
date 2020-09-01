@@ -270,7 +270,7 @@ let board_canvas_elt game_id =
       ]
   in
   let _ = [%client
-              ((let canvas = Html5.To_dom.of_canvas ~%elt in
+              ((let canvas = Html.To_dom.of_canvas ~%elt in
                 let st = canvas##.style in
                 st##.zIndex := Js.string "2";
                 let ctx = canvas##(getContext (Dom_html._2d_)) in
@@ -336,7 +336,7 @@ let pieces_canvas_elt game =
   let events = piece_events game
   in
   let _ = [%client
-              (let canvas = Html5.To_dom.of_canvas ~%elt in
+              (let canvas = Html.To_dom.of_canvas ~%elt in
                let st = canvas##.style in
                st##.zIndex := Js.string "3";
                st##.pointerEvents := Js.string "none";
@@ -355,7 +355,7 @@ type 'a game_page_result =
   | Content of 'a
 
 let%client update_html_content elt content =
-  let dom_html = Eliom_content.Html5.To_dom.of_element elt in
+  let dom_html = Eliom_content.Html.To_dom.of_element elt in
   ignore (React.E.map
             (fun c -> dom_html##.innerHTML := Js.string c)
             content)

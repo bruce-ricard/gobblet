@@ -32,7 +32,7 @@ let%client remove_message_in_5 dom =
 
 let%client show_instant_message event message_element =
   let message_dom =
-    Eliom_content.Html5.To_dom.of_element message_element in
+    Eliom_content.Html.To_dom.of_element message_element in
   remove_message_in_5 message_dom;
   React.E.map
     (fun msg -> message_dom##.innerHTML := Js.string msg;

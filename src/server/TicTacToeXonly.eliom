@@ -69,7 +69,7 @@ let refresh id_int =
 let%client refresh = ~%(server_function Json.t<int> refresh)
 
 let%client update_cell_content cell content =
-  let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
+  let dom_cell = Eliom_content.Html.To_dom.of_element cell in
   ignore (React.E.map (fun c -> dom_cell##.innerHTML := Js.string c) content)
 
 let%client cell_on_click dom_cell game_id x y =
@@ -100,7 +100,7 @@ let cell game_id x y
   let downcontent = Eliom_react.Down.of_react content in
   let game_id_int = game_id#get_id in
   let _ = [%client
-              (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
+              (let dom_cell = Eliom_content.Html.To_dom.of_element ~%cell in
                cell_on_click dom_cell ~%game_id_int ~%x ~%y;
                update_cell_content ~%cell (React.E.map piece_to_string ~%downcontent)
                : unit)]

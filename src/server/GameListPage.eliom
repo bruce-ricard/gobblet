@@ -78,9 +78,9 @@ let%client accept_challenge_rpc =
 
 let%client challenge_form_handler
            input_text_field game_name_field submit_button =
-  let dom_text = Eliom_content.Html5.To_dom.of_input input_text_field
-  and dom_button = Eliom_content.Html5.To_dom.of_element submit_button
-  and dom_game_name = Eliom_content.Html5.To_dom.of_select game_name_field
+  let dom_text = Eliom_content.Html.To_dom.of_input input_text_field
+  and dom_button = Eliom_content.Html.To_dom.of_element submit_button
+  and dom_game_name = Eliom_content.Html.To_dom.of_select game_name_field
   in
   Lwt.async (fun () ->
       Lwt_js_events.clicks
@@ -148,7 +148,7 @@ let challenge_form () =
 
 let%client accept_challenge_handler accept_button id =
   let button_dom =
-    Eliom_content.Html5.To_dom.of_element accept_button in
+    Eliom_content.Html.To_dom.of_element accept_button in
   Lwt.async (fun () ->
       Lwt_js_events.clicks
         button_dom
@@ -227,13 +227,13 @@ let challenge_elements user =
   in
   let _ = [%client
               (ignore @@ React.E.map (fun l ->
-                             Eliom_content.Html5.Manip.replaceChildren
+                             Eliom_content.Html.Manip.replaceChildren
                                ~%public_challenges_elt
                                [(challenges_to_html l)])
                                      ~%public_event;
 
                ignore @@ React.E.map (fun l ->
-                             Eliom_content.Html5.Manip.replaceChildren
+                             Eliom_content.Html.Manip.replaceChildren
                                ~%private_challenges_elt
                                [(challenges_to_html l)])
                                      ~%private_event;

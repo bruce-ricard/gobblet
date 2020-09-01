@@ -1,4 +1,4 @@
-Eliom_registration.Html5.register_service
+Eliom_registration.Html.register_service
   ~path:["heartbeat"]
   ~get_params:Eliom_parameter.unit
   (fun _ _ ->

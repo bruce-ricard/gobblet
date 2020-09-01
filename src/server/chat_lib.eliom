@@ -8,8 +8,8 @@ let chat_logs_elt =
 (*
 
 let%client chat_form_handler input_text_field submit_button =
-  let dom_text = Eliom_content.Html5.To_dom.of_input input_text_field in
-  let dom_button = Eliom_content.Html5.To_dom.of_element submit_button in
+  let dom_text = Eliom_content.Html.To_dom.of_input input_text_field in
+  let dom_button = Eliom_content.Html.To_dom.of_element submit_button in
   Lwt.async (fun () ->
       Lwt_js_events.clicks
         dom_button
@@ -17,7 +17,7 @@ let%client chat_form_handler input_text_field submit_button =
           let message = Js.to_string dom_text##.value in
           let new_chat_line =
             li [pcdata (Printf.sprintf "me: %s" message)] in
-          Eliom_content.Html5.Manip.appendChild ~%chat_logs_elt new_chat_line;
+          Eliom_content.Html.Manip.appendChild ~%chat_logs_elt new_chat_line;
           ignore (
               Eliom_client.call_service
                 ~service:~%Services.chat_service
