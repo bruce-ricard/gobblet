@@ -20,7 +20,8 @@ let register () =
     ~service:Services.user_registration_service
     (*    ~options:`TemporaryRedirect*)
     (fun ()  (user_name, (p1, p2)) ->
-      Lwt.return (
+      Lwt.return
+        (Eliom_registration.Redirection (
           Logs.debug (fun m -> m "Registration attempt");
           if p1 = p2 then
           let open Ttt_user_lib_types in
@@ -62,6 +63,7 @@ let register () =
             set_message non_matching_passwords_msg;
             Services.input_user_registration_service
           end
+        )
         )
     )
 
