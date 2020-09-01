@@ -5,14 +5,6 @@ let main_service =
     (*~https:true*)
     ()
 
-module App =
-  Eliom_registration.App (
-      struct
-        let application_name = "ttt"
-        let global_data_path = None
-      end
-    )
-
 let show_my_games_service =
   Eliom_service.create
     ~path:(Eliom_service.Path ["games"; "list"])

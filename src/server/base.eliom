@@ -1,4 +1,4 @@
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 
 let _ = let open Common in let open Connection_code in ()
 
@@ -6,6 +6,7 @@ module TicTacToe_app =
   Eliom_registration.App (
       struct
         let application_name = "TicTacToe"
+        let global_data_path = None
       end)
 
 let header_login () =

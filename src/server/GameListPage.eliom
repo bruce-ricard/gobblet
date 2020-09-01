@@ -1,7 +1,7 @@
 [%%shared
  open Ttt_common_lib_types
  open Eliom_lib
- open Eliom_content.Html5.D
+ open Eliom_content.Html.D
 ]
 
 module TTTBasic = Common.TicTacToeClassical

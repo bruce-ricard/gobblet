@@ -1,6 +1,6 @@
 [%%shared
  open Eliom_lib
- open Eliom_content.Html5.D
+ open Eliom_content.Html.D
  open Eliom_content
 
  open Ttt_common_lib_types
@@ -258,15 +258,15 @@ let%client update_pieces ctx piece_events =
 let board_canvas_elt game_id =
   let game_id = game_id#get_id in
   let elt =
-    Html5.D.canvas
+    Html.D.canvas
       ~a:[
         a_id "board_canvas";
-        Html5.D.a_width 600;
-        Html5.D.a_height 600;
+        Html.D.a_width 600;
+        Html.D.a_height 600;
       ]
       [
-        Html5.D.pcdata "your browser doesn't support canvas";
-        Html5.D.br ();
+        Html.D.pcdata "your browser doesn't support canvas";
+        Html.D.br ();
       ]
   in
   let _ = [%client
@@ -322,15 +322,15 @@ let piece_events game
 
 let pieces_canvas_elt game =
   let elt =
-    Html5.D.canvas
+    Html.D.canvas
       ~a:[
         a_id "pieces_canvas";
-        Html5.D.a_width 600;
-        Html5.D.a_height 600;
+        Html.D.a_width 600;
+        Html.D.a_height 600;
       ]
       [
-        Html5.D.pcdata "your browser doesn't support canvas";
-        Html5.D.br ();
+        Html.D.pcdata "your browser doesn't support canvas";
+        Html.D.br ();
       ]
   in
   let events = piece_events game
