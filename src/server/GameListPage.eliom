@@ -42,7 +42,12 @@ let parse_game_id = function
   | 3 -> Some(`ThreeMenMorris)
   | n -> Logs.err (fun m -> m "Illegal game_id %d" n); None
 
-let create_challenge_by_id (game_id, opp) =
+let create_challenge_by_id (game_id, opp) :
+      [  `ChallengeAccepted of int
+       | `ChallengeCreated of int * unit Eliom_react.Down.t
+       | `Error of string
+       | `NotLoggedIn ] Lwt.t
+  =
   let int_id =
     try
       Some (int_of_string game_id)
@@ -55,7 +60,7 @@ let create_challenge_by_id (game_id, opp) =
      create_challenge game (String.lowercase opp)
   | None -> Lwt.return (`Error "Invalid game ID")
 
-let accept_challenge id_int =
+let accept_challenge id_int : [ `Success | `Fail | `NotLoggedIn ] Lwt.t =
   let%lwt user = Eliom_reference.get current_user in
   match user with
   | None -> Lwt.return `NotLoggedIn
@@ -68,7 +73,13 @@ let accept_challenge id_int =
          else
            `Fail)
 
-let%client create_challenge_rpc =
+let%client (create_challenge_rpc : (Deriving_Json.Json_string.a * Deriving_Json.Json_string.a,
+          [  `ChallengeAccepted of int
+           | `ChallengeCreated of int * unit Eliom_react.Down.t
+           | `Error of string
+           | `NotLoggedIn ]
+          )
+         Eliom_client.server_function) =
   ~%(Eliom_client.server_function [%json: string * string]
        (create_challenge_by_id)
     )
