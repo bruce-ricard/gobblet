@@ -1,6 +1,6 @@
 [%%shared
  open Eliom_lib
- open Eliom_content.Html5.D
+ open Eliom_content.Html.D
  open Eliom_content
 
  open Ttt_common_lib_types
@@ -49,7 +49,7 @@ let refresh id_int =
     | Some game ->
        Game.refresh_game game)
 
-let refresh = server_function [%derive.json: int] refresh
+let refresh = Eliom_client.server_function [%json: int] refresh
 
 let%client refresh = ~%refresh
 
@@ -99,15 +99,16 @@ let click_square (game_id, row, column) =
      end
 
 let%client click_rpc =
-  ~%(server_function [%derive.json: move_messages] click_square)
+  ~%(Eliom_client.server_function [%json: move_messages] click_square)
 
 let skeleton  ?css:(css=[["css"; "ThreeMorris.css"]])
               ?title:(title="Three men Morris")
               content =
-  Base.skeleton
+  Tttbase.skeleton
     ~css ~title content
 
 let%client draw ctx ((x1, y1), (x2, y2)) =
+  let open Js_of_ocaml in
   let color = CSS.Color.string_of_t (CSS.Color.rgb 1 2 3) in
   ctx##.strokeStyle := (Js.string color);
   ctx##.lineWidth := float 10;
@@ -118,6 +119,7 @@ let%client draw ctx ((x1, y1), (x2, y2)) =
   ()
 
 let%client draw_dot ctx x y =
+  let open Js_of_ocaml in
   let color = CSS.Color.string_of_t (CSS.Color.rgb 1 2 3) in
   ctx##.strokeStyle := (Js.string color);
   ctx##.lineWidth := float 40;
@@ -127,7 +129,7 @@ let%client draw_dot ctx x y =
   ()
 
 [%%client
- module Html = Dom_html
+ module Html = Js_of_ocaml.Dom_html
 ]
 
 let%client lwt_wrap f =
@@ -140,7 +142,7 @@ let%client load_image src =
   let img = Html.createImg Html.document in
   lwt_wrap
     (fun c ->
-      img##.onload := Html.handler (fun _ -> c (); Js._false);
+      img##.onload := Html.handler (fun _ -> c (); Js_of_ocaml.Js._false);
       img##.src := src;
     )
   >>= fun () -> Lwt.return img
@@ -180,7 +182,7 @@ let%client draw_piece color ~row ~column ctx =
   in
 
   let piece_sprite =
-    load_image (Js.string "/games/pieces.png") in
+    load_image (Js_of_ocaml.Js.string "/games/pieces.png") in
 
   Lwt.async (
       fun () ->
@@ -258,30 +260,30 @@ let%client update_pieces ctx piece_events =
 let board_canvas_elt game_id =
   let game_id = game_id#get_id in
   let elt =
-    Html5.D.canvas
+    Html.D.canvas
       ~a:[
         a_id "board_canvas";
-        Html5.D.a_width 600;
-        Html5.D.a_height 600;
+        Html.D.a_width 600;
+        Html.D.a_height 600;
       ]
       [
-        Html5.D.pcdata "your browser doesn't support canvas";
-        Html5.D.br ();
+        Html.D.pcdata "your browser doesn't support canvas";
+        Html.D.br ();
       ]
   in
   let _ = [%client
-              ((let canvas = Html5.To_dom.of_canvas ~%elt in
+              ((let canvas = Eliom_content.Html.To_dom.of_canvas ~%elt in
                 let st = canvas##.style in
-                st##.zIndex := Js.string "2";
-                let ctx = canvas##(getContext (Dom_html._2d_)) in
-                ctx##.lineCap := Js.string "round";
+                st##.zIndex := Js_of_ocaml.Js.string "2";
+                let ctx = canvas##(getContext (Html._2d_)) in
+                ctx##.lineCap := Js_of_ocaml.Js.string "round";
                 draw_board ctx;
                 Lwt.async (fun () ->
-                    Lwt_js_events.mousedowns
+                    Js_of_ocaml_lwt.Lwt_js_events.mousedowns
                       canvas
                       (
                         fun ev _ ->
-                        let x0, y0 = Dom_html.elementClientPosition canvas in
+                        let x0, y0 = Html.elementClientPosition canvas in
                         let x,y = ((ev##.clientX - x0), (ev##.clientY - y0)) in
                         Printf.printf "you clicked on (%d,%d)" x y;
                         (match position_to_square x y with
@@ -322,26 +324,26 @@ let piece_events game
 
 let pieces_canvas_elt game =
   let elt =
-    Html5.D.canvas
+    Html.D.canvas
       ~a:[
         a_id "pieces_canvas";
-        Html5.D.a_width 600;
-        Html5.D.a_height 600;
+        Html.D.a_width 600;
+        Html.D.a_height 600;
       ]
       [
-        Html5.D.pcdata "your browser doesn't support canvas";
-        Html5.D.br ();
+        Html.D.pcdata "your browser doesn't support canvas";
+        Html.D.br ();
       ]
   in
   let events = piece_events game
   in
   let _ = [%client
-              (let canvas = Html5.To_dom.of_canvas ~%elt in
+              (let canvas = Eliom_content.Html.To_dom.of_canvas ~%elt in
                let st = canvas##.style in
-               st##.zIndex := Js.string "3";
-               st##.pointerEvents := Js.string "none";
-               let ctx = canvas##(getContext (Dom_html._2d_)) in
-               ctx##.lineCap := Js.string "round";
+               st##.zIndex := Js_of_ocaml.Js.string "3";
+               st##.pointerEvents := Js_of_ocaml.Js.string "none";
+               let ctx = canvas##(getContext (Html._2d_)) in
+               ctx##.lineCap := Js_of_ocaml.Js.string "round";
                update_pieces ctx ~%events : unit)
           ]
   in
@@ -355,9 +357,9 @@ type 'a game_page_result =
   | Content of 'a
 
 let%client update_html_content elt content =
-  let dom_html = Eliom_content.Html5.To_dom.of_element elt in
+  let dom_html = Eliom_content.Html.To_dom.of_element elt in
   ignore (React.E.map
-            (fun c -> dom_html##.innerHTML := Js.string c)
+            (fun c -> dom_html##.innerHTML := Js_of_ocaml.Js.string c)
             content)
 
 let game_page game_id =
@@ -449,7 +451,7 @@ let register () =
 
   let open Services in
 
-  Base.TicTacToe_app.register
+  Tttbase.TicTacToe_app.register
     ~service:ttt_3morris_service
     ~options
     (fun id_int () ->

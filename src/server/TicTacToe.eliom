@@ -1,6 +1,6 @@
 [%%shared
  open Eliom_lib
- open Eliom_content.Html5.D
+ open Eliom_content.Html.D
  open Lwt
  open Ttt_common_lib_types
 
@@ -64,7 +64,7 @@ let move (game_id, row, column) =
      end
 
 let%client move_rpc =
-  ~%(server_function [%derive.json: move_messages]
+  ~%(Eliom_client.server_function [%json: move_messages]
                      move
     )
 
@@ -77,17 +77,17 @@ let refresh id_int =
     | Some game ->
        Game.refresh_game game)
 
-let%client refresh = ~%(server_function [%derive.json: int] refresh)
+let%client refresh = ~%(Eliom_client.server_function [%json: int] refresh)
 
 let%client update_cell_content cell content =
-  let dom_cell = Eliom_content.Html5.To_dom.of_element cell in
+  let dom_cell = Eliom_content.Html.To_dom.of_element cell in
   ignore (React.E.map
-            (fun c -> dom_cell##.innerHTML := Js.string c)
+            (fun c -> dom_cell##.innerHTML := Js_of_ocaml.Js.string c)
             content)
 
 let%client cell_on_click dom_cell game_id x y =
   (Lwt.async (fun () ->
-       Lwt_js_events.clicks
+       Js_of_ocaml_lwt.Lwt_js_events.clicks
          dom_cell
          (fun _ _ ->
            let%lwt move_result = move_rpc (game_id, x, y) in
@@ -113,7 +113,7 @@ let cell game_id x y
   let downcontent = Eliom_react.Down.of_react content in
   let game_id_int = game_id#get_id in
   let _ = [%client
-              (let dom_cell = Eliom_content.Html5.To_dom.of_element ~%cell in
+              (let dom_cell = Eliom_content.Html.To_dom.of_element ~%cell in
                cell_on_click dom_cell ~%game_id_int ~%x ~%y;
                update_cell_content ~%cell (React.E.map piece_to_string ~%downcontent)
                : unit)
@@ -140,7 +140,7 @@ let board_html game_id =
     ]
 
 let skeleton  ?css:(css=[["css"; "TicTacToe.css"]]) ~title content =
-  Base.skeleton
+  Tttbase.skeleton
     ~css ~title content
 
 type 'a game_page_result =
@@ -226,7 +226,7 @@ let options = {
 let register () =
   let open Services in
 
-  Base.TicTacToe_app.register
+  Tttbase.TicTacToe_app.register
     ~service:ttt_classical_service
     ~options
     (fun id_int () ->

@@ -1,7 +1,7 @@
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 
 let html () =
-  Base.skeleton
+  Tttbase.skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"XOs"
     [

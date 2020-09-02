@@ -8,12 +8,12 @@ PROJECT_NAME := TicTacToe
 # Source files for the server
 SERVER_FILES := initializer.ml module_instanciation.ml common.ml connection_code.ml register.ml services.ml parsed_config.ml game_page_common.ml $(wildcard *.eliomi *.eliom)
 # Source files for the client
-CLIENT_FILES := services.ml game_page_frontend_common.ml $(wildcard *.eliomi *.eliom)
+CLIENT_FILES := game_page_frontend_common.ml $(wildcard *.eliomi *.eliom)
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := ttt.lib.server lwt.ppx js_of_ocaml.deriving.ppx logs logs.fmt core ttt.daos ttt.config-file config-file
+SERVER_PACKAGES := ttt.lib.server lwt_ppx js_of_ocaml-ppx_deriving_json logs logs.fmt core ttt.daos ttt.config-file config-file
 # OCamlfind packages for the client
-CLIENT_PACKAGES := ttt.lib.game ttt.lib.common lwt.ppx js_of_ocaml.deriving.ppx js_of_ocaml.ppx logs
+CLIENT_PACKAGES := ttt.lib.game ttt.lib.common lwt_ppx js_of_ocaml-ppx_deriving_json js_of_ocaml-ppx logs
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

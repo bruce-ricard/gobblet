@@ -1,5 +1,5 @@
 open Eliom_lib
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 open Services
 
 let register_form () =
@@ -27,4 +27,4 @@ let register_form () =
     ()
 
 let user_registration_page () =
-  Base.skeleton ~title:"Register!" [register_form ()]
+  Tttbase.skeleton ~title:"Register!" [register_form ()]
