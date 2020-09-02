@@ -1,6 +1,6 @@
 language: c
 sudo: required
-install: docker pull brucericard/ttt:0.7
+install: docker pull brucericard/ttt:0.8-rc3
 script: ${TRAVIS_BUILD_DIR}/scripts/run_tests_in_docker.sh "${TRAVIS_BUILD_DIR}"
 env:
   - INSERTED_GIT_REPO=true

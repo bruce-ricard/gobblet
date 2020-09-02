@@ -1,4 +1,4 @@
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 
 let _ = let open Common in ()
 

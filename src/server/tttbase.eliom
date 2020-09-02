@@ -1,4 +1,4 @@
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 
 let _ = let open Common in let open Connection_code in ()
 
@@ -6,6 +6,7 @@ module TicTacToe_app =
   Eliom_registration.App (
       struct
         let application_name = "TicTacToe"
+        let global_data_path = None
       end)
 
 let header_login () =
@@ -25,16 +26,16 @@ let header_login () =
 let%client remove_message_in_5 dom =
   let open Lwt in
   Lwt.async (fun () ->
-      Lwt_js.sleep 5. >|=
-        (fun () -> dom##.innerHTML := Js.string "")
+      Js_of_ocaml_lwt.Lwt_js.sleep 5. >|=
+        (fun () -> dom##.innerHTML := Js_of_ocaml.Js.string "")
     )
 
 let%client show_instant_message event message_element =
   let message_dom =
-    Eliom_content.Html5.To_dom.of_element message_element in
+    Eliom_content.Html.To_dom.of_element message_element in
   remove_message_in_5 message_dom;
   React.E.map
-    (fun msg -> message_dom##.innerHTML := Js.string msg;
+    (fun msg -> message_dom##.innerHTML := Js_of_ocaml.Js.string msg;
                 remove_message_in_5 message_dom;
     )
     event

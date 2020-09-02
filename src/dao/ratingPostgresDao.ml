@@ -7,11 +7,12 @@ let dbh = PGOCaml.connect
             ()
 
 let get_rating username =
-  match PGSQL(dbh) "
+  match [%pgsql dbh "
                     SELECT rating, rd, sigma
                     FROM ratings.tictactoeclassical
                     WHERE username=$username
-                    "
+                     "
+        ]
   with
     [] -> (1500., 350., 0.06)
   | [r,rd,s] ->

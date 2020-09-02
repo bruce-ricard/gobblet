@@ -1,7 +1,7 @@
 [%%shared
  open Ttt_common_lib_types
  open Eliom_lib
- open Eliom_content.Html5.D
+ open Eliom_content.Html.D
 ]
 
 module TTTBasic = Common.TicTacToeClassical
@@ -26,7 +26,7 @@ let create_challenge game opponent =
          function
        | Challenge_created(id,event) ->
           Lwt.async (fun () ->
-              Base.send_instant_message "Challenge created");
+              Tttbase.send_instant_message "Challenge created");
           Lwt.return (`ChallengeCreated
                        (id#get_id,Eliom_react.Down.of_react event)
                      )
@@ -42,7 +42,12 @@ let parse_game_id = function
   | 3 -> Some(`ThreeMenMorris)
   | n -> Logs.err (fun m -> m "Illegal game_id %d" n); None
 
-let create_challenge_by_id (game_id, opp) =
+let create_challenge_by_id (game_id, opp) :
+      [  `ChallengeAccepted of int
+       | `ChallengeCreated of int * unit Eliom_react.Down.t
+       | `Error of string
+       | `NotLoggedIn ] Lwt.t
+  =
   let int_id =
     try
       Some (int_of_string game_id)
@@ -55,7 +60,7 @@ let create_challenge_by_id (game_id, opp) =
      create_challenge game (String.lowercase opp)
   | None -> Lwt.return (`Error "Invalid game ID")
 
-let accept_challenge id_int =
+let accept_challenge id_int : [ `Success | `Fail | `NotLoggedIn ] Lwt.t =
   let%lwt user = Eliom_reference.get current_user in
   match user with
   | None -> Lwt.return `NotLoggedIn
@@ -68,27 +73,33 @@ let accept_challenge id_int =
          else
            `Fail)
 
-let%client create_challenge_rpc =
-  ~%(server_function [%derive.json: string * string]
-                     (create_challenge_by_id)
+let%client (create_challenge_rpc : (Deriving_Json.Json_string.a * Deriving_Json.Json_string.a,
+          [  `ChallengeAccepted of int
+           | `ChallengeCreated of int * unit Eliom_react.Down.t
+           | `Error of string
+           | `NotLoggedIn ]
+          )
+         Eliom_client.server_function) =
+  ~%(Eliom_client.server_function [%json: string * string]
+       (create_challenge_by_id)
     )
 
 let%client accept_challenge_rpc =
-  ~%(server_function [%derive.json: int] accept_challenge)
+  ~%(Eliom_client.server_function [%json:int] accept_challenge)
 
 let%client challenge_form_handler
            input_text_field game_name_field submit_button =
-  let dom_text = Eliom_content.Html5.To_dom.of_input input_text_field
-  and dom_button = Eliom_content.Html5.To_dom.of_element submit_button
-  and dom_game_name = Eliom_content.Html5.To_dom.of_select game_name_field
+  let dom_text = Eliom_content.Html.To_dom.of_input input_text_field
+  and dom_button = Eliom_content.Html.To_dom.of_element submit_button
+  and dom_game_name = Eliom_content.Html.To_dom.of_select game_name_field
   in
   Lwt.async (fun () ->
-      Lwt_js_events.clicks
+      Js_of_ocaml_lwt.Lwt_js_events.clicks
         dom_button
         (fun _ _ ->
-          let opponent = Js.to_string dom_text##.value in
+          let opponent = Js_of_ocaml.Js.to_string dom_text##.value in
           let game_name_int =
-            Js.to_string
+            Js_of_ocaml.Js.to_string
               dom_game_name##.value in
           print_endline game_name_int;
           let%lwt challenge = create_challenge_rpc (game_name_int, opponent) in
@@ -122,7 +133,7 @@ let challenge_form () =
   and game_name_select =
     Raw.select [
         option ~a:[a_value "0"] (pcdata "Any");
-        option ~a:[a_value "1"; a_selected `Selected]
+        option ~a:[a_value "1"; a_selected ()]
                (pcdata "Tic tac toe -- classical");
         option ~a:[a_value "2"]
                (pcdata "Tic tac toe -- X only");
@@ -148,9 +159,9 @@ let challenge_form () =
 
 let%client accept_challenge_handler accept_button id =
   let button_dom =
-    Eliom_content.Html5.To_dom.of_element accept_button in
+    Eliom_content.Html.To_dom.of_element accept_button in
   Lwt.async (fun () ->
-      Lwt_js_events.clicks
+      Js_of_ocaml_lwt.Lwt_js_events.clicks
         button_dom
         (fun _ _ ->
           print_endline "accept button was clicked";
@@ -227,13 +238,13 @@ let challenge_elements user =
   in
   let _ = [%client
               (ignore @@ React.E.map (fun l ->
-                             Eliom_content.Html5.Manip.replaceChildren
+                             Eliom_content.Html.Manip.replaceChildren
                                ~%public_challenges_elt
                                [(challenges_to_html l)])
                                      ~%public_event;
 
                ignore @@ React.E.map (fun l ->
-                             Eliom_content.Html5.Manip.replaceChildren
+                             Eliom_content.Html.Manip.replaceChildren
                                ~%private_challenges_elt
                                [(challenges_to_html l)])
                                      ~%private_event;
@@ -262,7 +273,7 @@ let game_list_page () =
        div (games_display @ challenge_form () :: (challenge_elements user) ::
                               [])
   in
-  Base.skeleton
+  Tttbase.skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Game list"
     [game_list]
@@ -270,7 +281,7 @@ let game_list_page () =
 let eliom_register () =
   let open Services in
 
-  Base.TicTacToe_app.register
+  Tttbase.TicTacToe_app.register
     ~service:show_my_games_service
     (fun () () -> game_list_page ())
 

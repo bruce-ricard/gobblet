@@ -1,17 +1,17 @@
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 
 let welcome_page () =
   let content =
     [
       pcdata "Welcome! To start playing, click Play in the menu."
     ] in
-  Base.skeleton
+  Tttbase.skeleton
     ~css:[["css"; "TicTacToe.css"]]
     ~title:"Board games"
     content
 
 
-let () = Eliom_registration.Html5.register
+let () = Eliom_registration.Html.register
     ~service:Services.main_service
     (fun () () ->
       welcome_page ()

@@ -7,7 +7,7 @@ let dispatch game id =
        Logs.warn (fun m -> m "Game dispatch: non existant game");
        Common.set_message_next_page
          "This game doesn't exist, please chose another one";
-       Services.show_my_games_service
+       Eliom_service.preapply Services.show_my_games_service ()
      end
   | Some game ->
      begin
@@ -22,10 +22,12 @@ let dispatch game id =
 
 let register () =
   Eliom_registration.Redirection.register
-    ~service:Services.game_dispatch_service
-    (fun id () ->
-      let game = Common.Games.get_game (new id id) in
-      Lwt.return (dispatch game id)
-    )
+   ~service:Services.game_dispatch_service
+   (fun id () ->
+     let game = Common.Games.get_game (new id id) in
+     Lwt.return (Eliom_registration.Redirection
+                   (dispatch game id)
+       )
+   )
 
 let () = register ()

@@ -2,13 +2,11 @@
 
 set -euxo pipefail
 
-opam init --yes
+opam init --disable-sandboxing --yes
 opam update
-eval `opam config env`
-eval `opam config env`
-opam switch 4.02.3
-eval `opam config env`
-eval `opam config env`
+eval `opam env`
+opam switch create 4.11.0
+eval `opam env`
 opam install depext --yes
 opam depext --yes \
 	 conf-gmp.1 \
@@ -22,7 +20,7 @@ opam depext --yes \
 
 opam install --yes \
 	 dbm \
-	 eliom.5.0.0 \
+	 eliom.6.12.1 \
 	 extlib \
 	 sha \
 	 fmt \
