@@ -52,13 +52,13 @@ module GamesByIdAndUser =
     module Users =
       struct
         type t = string
-        let compare = Pervasives.compare
+        let compare = Stdlib.compare
       end
 
     module Ids =
       struct
         type t = int
-        let compare = Pervasives.compare
+        let compare = Stdlib.compare
       end
 
     module UsersToIdSet = HashMapSetInternal(Users)(Ids)

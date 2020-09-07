@@ -26,7 +26,7 @@ module type USER_DB =
 
 module Make(User_db : USER_DB) : USERS =
   struct
-    let normalize_username = String.lowercase
+    let normalize_username = String.lowercase_ascii
     let hash_password username password =
       let random_string = "mqpKXje8Jzpjgh3#cNmAq2-Uihx" in
       let string_to_hash = random_string ^ username ^ password in
