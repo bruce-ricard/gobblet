@@ -49,15 +49,15 @@ Executable "create_config"
   BuildDepends: ttt.config-file
   MainIs: create_config.ml
 
-Executable "lib_tests"
+Executable "interface_tests"
   Path: lib/tests/
-  MainIs: tests.ml
+  MainIs: interface_tests.ml
   CompiledObject: best
   Install: false
-  BuildDepends: ttt.lib.server, ttt.lib.game, alcotest, alcotest-lwt
+  BuildDepends: alcotest, alcotest-lwt, threads
 
-Test "lib_tests"
-  Run$: flag(tests)
-  TestTools: lib_tests
-  Command: $lib_tests
-  WorkingDirectory: lib/tests
+# Test "interface_tests"
+#   Run$: flag(tests)
+#   TestTools: interface_tests
+#   Command: $interface_tests
+#   WorkingDirectory: lib/tests
