@@ -54,10 +54,10 @@ Executable "interface_tests"
   MainIs: interface_tests.ml
   CompiledObject: best
   Install: false
-  BuildDepends: alcotest, alcotest-lwt, threads
+  BuildDepends: alcotest, alcotest-lwt, threads, ttt.lib.common, ttt.lib.game
 
-# Test "interface_tests"
-#   Run$: flag(tests)
-#   TestTools: interface_tests
-#   Command: $interface_tests
-#   WorkingDirectory: lib/tests
+Test "interface_tests"
+  Run$: flag(tests)
+  TestTools: interface_tests
+  Command: $interface_tests
+  WorkingDirectory: lib/tests

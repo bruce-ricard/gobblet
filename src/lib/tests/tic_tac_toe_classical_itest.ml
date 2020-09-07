@@ -88,7 +88,7 @@ let board_move_result =
 let check_move_result = Alcotest.check board_move_result
 let check_move_ok = check_move_result "OK"
 
-let test_player_on_can_move () =
+let test_player_on_can_move_1 () =
   let game = new_game () in
   let status = TTT.game_status game in
   let user_action =
@@ -104,18 +104,38 @@ let test_player_on_can_move () =
   in
   let () =
     check_move_ok
+      `Ok
       (TTT.move game (move ~row:0 ~column:0) player_on)
-      `Ok
+  in ()
+
+let test_player_on_can_move_2 () =
+  let game = new_game () in
+  let status = TTT.game_status game in
+  let user_action =
+    match status with
+      | `GameOver _ -> assert false
+      | `PlayOn f -> f
+  in
+  let player_on =
+    match user_action "p1" with
+    | `Watch -> assert false
+    | `Play -> "p1"
+    | `Wait -> "p2"
   in
   let () =
     check_move_ok
+      `Ok
+      (TTT.move game (move ~row:0 ~column:0) player_on)
+  in
+  let () =
+    check_move_ok
+      `Ok
       (TTT.move game (move ~row:0 ~column:1) (next_player player_on))
-      `Ok
   in
   let () =
     check_move_ok
-      (TTT.move game (move ~row:0 ~column:2) player_on)
       `Ok
+      (TTT.move game (move ~row:0 ~column:2) player_on)
   in ()
 
 let test_returns_winner () =
@@ -161,6 +181,7 @@ let test_returns_winner () =
   | _ -> assert false
 
 let suite = [
-    "player on can move", `Quick, test_player_on_can_move;
+    "player on can move 1", `Quick, test_player_on_can_move_1;
+    "player on can move 2", `Quick, test_player_on_can_move_2;
     "returns winner", `Quick, test_returns_winner;
   ]
