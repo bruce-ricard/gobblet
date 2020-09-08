@@ -15,7 +15,7 @@ let test_invalid_move () =
   let board = Boards.XOWinBoard.empty_board () in
   Alcotest.check
     board_move_result
-    "should be a legal move"
+    "should be an illegal move"
     (`Invalid `InvalidMove)
     (Boards.XOWinBoard.place board {row=0;column=3} `X)
 
