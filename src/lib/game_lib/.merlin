@@ -2,3 +2,4 @@ S .
 B ../../_build/lib/game_lib/
 
 PKG logs ttt.lib.common alcotest
+PKG internal_test_utils

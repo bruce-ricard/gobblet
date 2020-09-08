@@ -49,12 +49,18 @@ Executable "create_config"
   BuildDepends: ttt.config-file
   MainIs: create_config.ml
 
+Library "internal_test_utils"
+  Path: lib/test_utils
+  BuildTools: ocamlbuild
+  BuildDepends: ttt.lib.common, ttt.lib.game, alcotest
+  Modules: Checkers
+
 Executable "lib_tests"
   Path: lib/tests/
   MainIs: tests.ml
   CompiledObject: best
   Install: false
-  BuildDepends: ttt.lib.server, ttt.lib.game, alcotest, alcotest-lwt
+  BuildDepends: ttt.lib.server, ttt.lib.game, alcotest, alcotest-lwt, internal_test_utils
 
 Test "lib_tests"
   Run$: flag(tests)

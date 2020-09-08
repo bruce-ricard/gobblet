@@ -1,0 +1,5 @@
+S .
+B ../../_build/lib/test_utils/
+
+PKG ttt.lib.game ttt.lib.common
+PKG alcotest
