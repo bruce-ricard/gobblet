@@ -1,5 +1,7 @@
 S .
 B ../../_build/lib/tests
+B ../../_build/lib/game_lib
 
 PKG alcotest alcotest-lwt
 PKG ttt.lib.common ttt.lib.game ttt.lib.user
+PKG internal_test_utils
