@@ -40,13 +40,13 @@ let test_win () =
   let place = Boards.XOWinBoard.place board in
   Alcotest.check
     board_move_result
-    "should be a legal move"
+    "should be a legal move 1"
     (`Ok `KeepPlaying)
     (place {row=0;column=0} `X);
 
     Alcotest.check
     board_move_result
-    "should be a legal move"
+    "should be a legal move 2"
     (`Ok `KeepPlaying)
     (place {row=0;column=1} `X);
 
