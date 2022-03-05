@@ -1,9 +1,10 @@
 #!/bin/bash
 
-set -o xtrace
 set -o errexit
 set -o nounset
 set -o pipefail
+
+set -o xtrace
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
