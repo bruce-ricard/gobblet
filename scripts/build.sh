@@ -2,16 +2,6 @@
 
 set -ex
 
-if [ "${INSERTED_GIT_REPO}" = 'true' ]; then
-    echo 'Using inserted git repo'
-else
-    echo 'Pulling latest master...'
-    cd ~/gobblet && git pull
-fi
-
-HASH=$(cd ~/gobblet && git show | head -1)
-echo "Running tests on $HASH"
-
 cd ~/gobblet/src
 eval `opam env`
 rm -f setup.data
@@ -32,6 +22,4 @@ make install
 (
     cd server
     make all
-    make distclean
 )
-make test
