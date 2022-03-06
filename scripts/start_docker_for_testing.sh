@@ -13,4 +13,4 @@ docker run \
        -v ~/bruce/gobblet:/root/gobblet \
        --publish 8080:8080 \
        ttt \
-       /root/gobblet/scripts/start_server_from_docker.sh
+       bash
