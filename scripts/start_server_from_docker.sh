@@ -8,9 +8,11 @@ set -o xtrace
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+cd /root/gobblet
+git pull
+
 ${SCRIPT_DIR}/full_build_from_clean_state.sh
 
-cd /root/gobblet
 cd src/server
 
 (
