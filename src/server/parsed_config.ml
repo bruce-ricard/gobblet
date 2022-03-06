@@ -1,6 +1,14 @@
 let config_file_name = "config/config"
 
-let () = Config_reader.group#read config_file_name
+let () =
+  if Sys.file_exists config_file_name then
+    Config_reader.group#read config_file_name
+  else
+    begin
+      print_endline
+        "[CRITICAL] Config file \"config/config\" couldn't be found. Aborting";
+      exit 1
+    end
 
 module ServerConfig =
   struct
