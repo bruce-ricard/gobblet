@@ -8,9 +8,9 @@ postgres = {
   (* Postgres port *)
   port = ""
   (* Postgres database *)
-  database = ""
+  database = "gobblet"
   (* Postgres user *)
-  user = ""
+  user = "gobblet_server_user"
   (* Postgres password *)
   password = ""
 }
