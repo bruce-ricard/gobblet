@@ -1,4 +1,6 @@
-let () = Config_reader.group#read "config/config"
+let config_file_name = "config/config"
+
+let () = Config_reader.group#read config_file_name
 
 module ServerConfig =
   struct
