@@ -7,7 +7,6 @@ RUN ln -snf "/usr/share/zoneinfo/$(curl https://ipapi.co/timezone)" /etc/localti
 
 RUN apt-get install sudo -y
 RUN apt-get install git -y
-RUN git clone https://github.com/bruce-ricard/gobblet.git ~/gobblet
 RUN chmod -R 777 /usr/local/bin
 
 RUN apt-get install emacs --yes
@@ -42,6 +41,7 @@ RUN eval `opam env` && opam install	 sha
 RUN eval `opam env` && opam install	 eliom.6.12.1
 RUN eval `opam env` && opam install	 oasis
 
+RUN git clone https://github.com/bruce-ricard/gobblet.git ~/gobblet
 
 RUN cd ~/gobblet/src && eval `opam env` && ./configure --enable-tests
 
