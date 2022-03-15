@@ -29,4 +29,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: brucericard/ttt:$(date -Idate)
+          tags: brucericard/ttt:latest
